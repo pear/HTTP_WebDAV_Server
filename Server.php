@@ -39,6 +39,22 @@ class HTTP_WebDAV_Server
     // {{{ Member Variables 
     
     /**
+     * complete URI for this request
+     *
+     * @var string 
+     */
+    var $uri;
+
+
+    /**
+     * base URI for this request
+     *
+     * @var string 
+     */
+    var $base_uri;
+
+
+    /**
      * URI path for this request
      *
      * @var string 
@@ -108,6 +124,13 @@ class HTTP_WebDAV_Server
      */
     function ServeRequest() 
     {
+        // default uri is the complete request uri
+        $uri = (@$_SERVER["HTTPS"] === "on" ? "https:" : "http:");
+        $uri.= "//$_SERVER[HTTP_HOST]$_SERVER[SCRIPT_NAME]";
+        
+        $this->base_uri = $uri;
+        $this->uri      = $uri . $_SERVER[PATH_INFO]";
+
         // identify ourselves
         if (empty($this->dav_powered_by)) {
             header("X-Dav-Powered-By: PHP class: ".get_class($this));
@@ -137,7 +160,11 @@ class HTTP_WebDAV_Server
         }
         
         // set path
-        $this->path = $this->_urldecode(!empty($_SERVER["PATH_INFO"]) ? $_SERVER["PATH_INFO"] : "/");
+        $this->path = $this->_urldecode($_SERVER["PATH_INFO"]);
+        if (!strlen($this->path)) {
+            header("Location: ".$this->base_uri."/");
+            exit;
+        }
         if(ini_get("magic_quotes_gpc")) {
             $this->path = stripslashes($this->path);
         }
@@ -605,8 +632,7 @@ class HTTP_WebDAV_Server
 
             echo " <D:response $ns_defs>\n";
         
-            $href = $_SERVER['SCRIPT_NAME'] . $path;
-            //TODO make sure collection resource pathes end in a trailing slash
+            $href = $this->_slashify($_SERVER['SCRIPT_NAME'] . $path);
         
             echo "  <D:href>$href</D:href>\n";
         
@@ -1685,9 +1711,7 @@ class HTTP_WebDAV_Server
 
             foreach($this->_if_header_uris as $uri => $conditions) {
                 if ($uri == "") {
-                    // default uri is the complete request uri
-                    $uri = (@$_SERVER["HTTPS"] === "on" ? "https:" : "http:");
-                    $uri.= "//$_SERVER[HTTP_HOST]$_SERVER[SCRIPT_NAME]$_SERVER[PATH_INFO]";
+                    $uri = $this->uri;
                 }
                 // all must match
                 $state = true;
@@ -1879,6 +1903,19 @@ class HTTP_WebDAV_Server
         default:
             return utf8_encode($text);
         }
+    }
+
+    /**
+     * Slashify - make sure path ends in a slash
+     *
+     * @param   string directory path
+     * @returns string directory path wiht trailing slash
+     */
+    function _slashify($path) {
+        if ($path[strlen($path)-1] != '/') {
+            $path = $path."/";
+        }
+        return $path;
     }
 } 
 
