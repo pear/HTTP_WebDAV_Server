@@ -902,7 +902,10 @@ class HTTP_WebDAV_Server
             $this->http_status("404 not found");
         }
 
-        $this->http_status("$status");
+		if (!headers_sent()) {
+			// TODO: check setting of headers in various code pathes above
+			$this->http_status("$status");
+		}
     }
 
 
