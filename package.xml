@@ -24,11 +24,46 @@
   </maintainers>
     
   <release>
-   <version>0.99</version>
-   <date>2003-11-18</date>
+   <version>0.99.1</version>
+   <date>2004-04-22</date>
    <state>beta</state>
    <license>PHP</license>
    <notes>
+Some serious stuff showed up that needs to be added/fixed before 
+we go for 1.0. This release doesn't really address any of these,
+it only 
+   </notes>
+   <deps>
+    <dep type="php" rel="ge" version="4.3"/>
+    <dep type="pkg" rel="ge" version="1.0">HTTP</dep>
+   </deps>
+   <filelist>
+    <dir name="/" baseinstalldir="HTTP/WebDAV">
+     <file role="doc">README</file>
+     <file role="doc">dav.txt</file>
+     <file role="php">Server.php</file>
+     <dir name="Server">
+      <file role="php">Filesystem.php</file>
+     </dir>
+     <dir name="Tools">
+      <file role="php">_parse_propfind.php</file>
+      <file role="php">_parse_proppatch.php</file>
+      <file role="php">_parse_lockinfo.php</file>
+     </dir>
+     <dir name="db">
+      <file role="doc">Fileserver.sql</file>
+     </dir>
+    </dir>
+   </filelist>
+  </release>
+    
+  <changelog>
+   <release>
+    <version>0.99</version>
+    <date>2003-11-18</date>
+    <state>beta</state>
+    <license>PHP</license>
+    <notes>
 almost all TODO features and issues for 1.0 are now implemented,
 there might be some additional API cleanups in PROPFIND and PROPPATCH
 and some small issues in the Fileserver example still exist
@@ -48,27 +83,9 @@ appropriate open stream are the current size of the
 resource in $options['size'] for both GET and PUT 
 and the mimetype in $options['mimetype'] and modification 
 date in $options['mtime'] for GET.
-   </notes>
-   <deps>
-    <dep type="php" rel="ge" version="4.3"/>
-    <dep type="pkg" rel="ge" version="1.0">HTTP</dep>
-   </deps>
-   <filelist>
-    <dir name="/" baseinstalldir="HTTP/WebDAV">
-     <file role="php">Server.php</file>
-     <dir name="Server">
-      <file role="php">Filesystem.php</file>
-     </dir>
-     <dir name="Tools">
-      <file role="php">_parse_propfind.php</file>
-      <file role="php">_parse_proppatch.php</file>
-      <file role="php">_parse_lockinfo.php</file>
-     </dir>
-    </dir>
-   </filelist>
-  </release>
-    
-  <changelog>
+    </notes>
+   </release>
+
    <release>
     <version>0.9.1</version>
     <date>2003-05-28</date>
