@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE package SYSTEM "../package.dtd">
+
+<package version="1.0">
+	<name>HTTP_WebDAV_Server</name>
+  <summary>WebDAV Server Baseclass.</summary>
+  <description>
+   Mostly RFC2518 compliant helper class for WebDAV server implementation. 
+  </description>
+	
+  <maintainers>
+		<maintainer>
+			<user>hholzgra</user>
+			<name>Hartmut Holzgraefe</name>
+			<email>hholzgra@php.net</email>
+			<role>lead</role>
+		</maintainer>
+		
+		<maintainer>
+			<user>chregu</user>
+			<name>Christian Stocker</name>
+			<email>chregu@bitflux.ch</email>
+			<role>lead</role>
+		</maintainer>
+  </maintainers>
+	
+  <release>
+    <version>0.2</version>
+    <date>2002-07-27</date>
+    <state>stable</state>
+    <license>alpha</license>
+    <notes>
+o still work in progress
+    </notes>
+    <deps>
+			<dep type="php" rel="ge" version="4.3"/>
+      <dep type="pkg" rel="ge" version="1.0">HTTP</dep>
+    </deps>
+    <filelist>
+			<dir name="/" baseinstalldir="HTTP/WebDAV">
+        <file role="php">Server.php</file>
+        <file role="php">FileServer.php</file>
+				<dir name="Server">
+					<file role="php">_parse_propfind.php</file>
+					<file role="php">_parse_proppatch.php</file>
+					<file role="php">_parse_lockinfo.php</file>
+				</dir>
+			</dir>
+		</filelist>
+  </release>
+	
+  <changelog>
+  </changelog>
+	
+</package>
