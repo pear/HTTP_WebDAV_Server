@@ -92,7 +92,7 @@ class HTTP_WebDAV_Server {
          */
     function ServeRequest() {
             // identify ourselves
-            header("X-Dav-Powered-By: PHP class: ".get_class($this));
+            header("X-Dav-Powered-By: PHP class ".get_class($this));
 
             if (!$this->_check_auth()) {
                 // RFC2518 says we must use Digest instead of Basic
