@@ -21,9 +21,7 @@
 //
 // WebDAV server base class, needs to be extended to do useful work
 //
-
 // require_once "HTTP/HTTP.php";
-
 require_once "HTTP/WebDAV/Server/_parse_propfind.php";
 require_once "HTTP/WebDAV/Server/_parse_proppatch.php";
 require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
@@ -40,54 +38,50 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
    * @author Hartmut Holzgraefe <hholzgra@php.net>
    * @version 0.7
    */
-  class HTTP_WebDAV_Server 
-{
-
-		// {{{ Member Variables 
-
-		/**
+class HTTP_WebDAV_Server {
+    // {{{ Member Variables 
+	
+                /**
 		 * URI path for this request
 		 *
 		 * @var string 
 		 */
-		var $path;
+    var $path;
 
-		/**
+                /**
 		 * Realm string to be used in authentification popups
 		 *
 		 * @var string 
 		 */
-		var $http_auth_realm = "PHP WebDAV";
+    var $http_auth_realm = "PHP WebDAV";
 
-		/**
+                /**
 		 * Remember parsed If: (RFC2518/9.4) header conditions  
 		 *
 		 * @var array
 		 */
-		var $_if_header_uris = array();
+    var $_if_header_uris = array();
 
 
-		var $_http_status = "200 OK";
+    var $_http_status = "200 OK";
 
-		// }}}
-		
-		// {{{ Constructor 
+    // }}}
 
-		/** 
+    // {{{ Constructor 
+
+                /** 
 		 * Constructor
 		 *
 		 * @param void
 		 */
-		function HTTP_WebDAV_Server() {
-			// PHP messages destroy XML output -> switch them off
-			ini_set("display_errors", 0);
-		}
+    function HTTP_WebDAV_Server() {
+        // PHP messages destroy XML output -> switch them off
+        ini_set("display_errors", 0);
+    }
 
-		// }}}
-
-		// {{{ ServeRequest() 
-
-   	/** 
+	// }}}
+	// {{{ ServeRequest() 
+/** 
 		 * Serve WebDAV HTTP request
 		 *
 		 * dispatch WebDAV HTTP request to the apropriate method handler
@@ -146,12 +140,12 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 
     }
 
-		// }}}
-		
-  	// {{{ abstract WebDAV methods 
+    // }}}
 
- 		// {{{ GET() 
-		 /**
+    // {{{ abstract WebDAV methods 
+
+    // {{{ GET() 
+                 /**
 		 * GET implementation
 		 *
 		 * overload this method to retrieve resources from your server
@@ -169,16 +163,16 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 * @returns int HTTP-Statuscode
 		 */
 
-	/* abstract
-		function GET(&$params) {
-			// dummy entry for PHPDoc
-		} 
-	*/
+    /* abstract
+       function GET(&$params) {
+       // dummy entry for PHPDoc
+       } 
+     */
 
     // }}}
-		
-		// {{{ PUT() 
-		/**
+
+    // {{{ PUT() 
+                /**
 		 * PUT implementation
 		 *
 		 * PUT implementation
@@ -188,17 +182,17 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 * @returns int HTTP-Statuscode
 		 */
 
-	/* abstract
-		function PUT() {
-			// dummy entry for PHPDoc
-		} 
-	*/
+    /* abstract
+       function PUT() {
+       // dummy entry for PHPDoc
+       } 
+     */
 
-		// }}}
-		
-		// {{{ COPY() 
+    // }}}
 
-		/**
+    // {{{ COPY() 
+
+                /**
 		 * COPY implementation
 		 *
 		 * COPY implementation
@@ -208,17 +202,17 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 * @returns int HTTP-Statuscode
 		 */
 
-	/* abstract
-		function COPY() {
-			// dummy entry for PHPDoc
-		} 
-	*/
+    /* abstract
+       function COPY() {
+       // dummy entry for PHPDoc
+       } 
+     */
 
-		// }}}
+    // }}}
 
-		// {{{ MOVE() 
+    // {{{ MOVE() 
 
-		/**
+                /**
 		 * MOVE implementation
 		 *
 		 * MOVE implementation
@@ -228,17 +222,17 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 * @returns int HTTP-Statuscode
 		 */
 
-	/* abstract
-		function MOVE() {
-			// dummy entry for PHPDoc
-		} 
-	*/
+    /* abstract
+       function MOVE() {
+       // dummy entry for PHPDoc
+       } 
+     */
 
-		// }}}
+    // }}}
 
-	  // {{{ DELETE() 
+    // {{{ DELETE() 
 
-		/**
+                /**
 		 * DELETE implementation
 		 *
 		 * DELETE implementation
@@ -248,16 +242,16 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 * @returns int HTTP-Statuscode
 		 */
 
-	/* abstract
-		function DELETE() {
-			// dummy entry for PHPDoc
-		} 
-	*/
-		// }}}
+    /* abstract
+       function DELETE() {
+       // dummy entry for PHPDoc
+       } 
+     */
+    // }}}
 
-  	// {{{ PROPFIND() 
+    // {{{ PROPFIND() 
 
-		/**
+                /**
 		 * PROPFIND implementation
 		 *
 		 * PROPFIND implementation
@@ -267,17 +261,17 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 * @returns int HTTP-Statuscode
 		 */
 
-	/* abstract
-		function PROPFIND() {
-			// dummy entry for PHPDoc
-		} 
-	*/
+    /* abstract
+       function PROPFIND() {
+       // dummy entry for PHPDoc
+       } 
+     */
 
-	// }}}
+    // }}}
 
-	  // {{{ PROPPATCH() 
+    // {{{ PROPPATCH() 
 
-		/**
+                /**
 		 * PROPPATCH implementation
 		 *
 		 * PROPPATCH implementation
@@ -287,16 +281,16 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 * @returns int HTTP-Statuscode
 		 */
 
-	/* abstract
-		function PROPPATCH() {
-			// dummy entry for PHPDoc
-		} 
-	*/
-		// }}}
+    /* abstract
+       function PROPPATCH() {
+       // dummy entry for PHPDoc
+       } 
+     */
+    // }}}
 
-	  // {{{ LOCK() 
+    // {{{ LOCK() 
 
-		/**
+                /**
 		 * LOCK implementation
 		 *
 		 * LOCK implementation
@@ -306,16 +300,16 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 * @returns int HTTP-Statuscode
 		 */
 
-	/* abstract
-		function LOCK() {
-			// dummy entry for PHPDoc
-		} 
-	*/
-		// }}}
+    /* abstract
+       function LOCK() {
+       // dummy entry for PHPDoc
+       } 
+     */
+    // }}}
 
-  	// {{{ UNLOCK() 
+    // {{{ UNLOCK() 
 
-		/**
+                /**
 		 * UNLOCK implementation
 		 *
 		 * UNLOCK implementation
@@ -325,20 +319,20 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 * @returns int HTTP-Statuscode
 		 */
 
-	/* abstract
-		function UNLOCK() {
-			// dummy entry for PHPDoc
-		} 
-	*/
-		// }}}
+    /* abstract
+       function UNLOCK() {
+       // dummy entry for PHPDoc
+       } 
+     */
+    // }}}
 
-	// }}}
+    // }}}
 
-		// {{{ other abstract methods 
+    // {{{ other abstract methods 
 
- 		// {{{ check_auth() 
+    // {{{ check_auth() 
 
-		 /**
+                 /**
 		 * check authentication
 		 *
 		 * overload this method to retrieve and confirm authentication information
@@ -350,17 +344,17 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 * @returns bool Authentication status
 		 */
 
-	/* abstract
-		function check_auth($type, $username, $password) {
-			// dummy entry for PHPDoc
-		} 
-	*/
+    /* abstract
+       function check_auth($type, $username, $password) {
+       // dummy entry for PHPDoc
+       } 
+     */
 
     // }}}
 
- 		// {{{ checklock() 
+    // {{{ checklock() 
 
-		 /**
+                 /**
 		 * check lock status for a resource
 		 *
 		 * overload this method to return shared and exclusive locks 
@@ -372,21 +366,21 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 *                of 'type' ('shared'/'exclusive'), 'token' and 'timeout'
 		 */
 
-	/* abstract
-		function checklock($resource) {
-			// dummy entry for PHPDoc
-		} 
-	*/
+    /* abstract
+       function checklock($resource) {
+       // dummy entry for PHPDoc
+       } 
+     */
 
     // }}}
 
-		// }}}
+    // }}}
 
-	// {{{ WebDAV HTTP method wrappers 
+    // {{{ WebDAV HTTP method wrappers 
 
-	// {{{ http_OPTIONS() 
+    // {{{ http_OPTIONS() 
 
-		/**
+                /**
 		 * OPTIONS method handler
 		 *
 		 * The OPTIONS method handler creates a valid OPTIONS reply
@@ -398,31 +392,31 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 */
 
     function http_OPTIONS() {
-			$this->http_status("200 OK");
+        $this->http_status("200 OK");
 
-			// be nice to M$ clients
-			header("MS-Author-Via: DAV");
+        // be nice to M$ clients
+        header("MS-Author-Via: DAV");
 
-			// get allowed methods
-			$allow = $this->_allow();
+        // get allowed methods
+        $allow = $this->_allow();
 
-			// dav header
-			$dav = array(1);        // assume we are always dav class 1 compliant
-			if (isset($allow['lock']))
-				$dav[] = 2;         // dav class 2 requires locking 
+        // dav header
+        $dav = array(1);        // assume we are always dav class 1 compliant
+        if (isset($allow['lock']))
+            $dav[] = 2;         // dav class 2 requires locking 
 
-			header("DAV: ".join(",", $dav));
-			header("Allow: ".join(", ", $allow));
+        header("DAV: ".join(",", $dav));
+        header("Allow: ".join(", ", $allow));
     }
 
-		// }}}
+    // }}}
 
 
-	// {{{ http_PROPFIND() 
+    // {{{ http_PROPFIND() 
 
     function http_PROPFIND() {
-			$options = Array();
-			$options["path"] = $this->path;
+        $options = Array();
+        $options["path"] = $this->path;
 
 			if (isset($_SERVER['HTTP_DEPTH'])) {
 				$options["depth"] = $_SERVER["HTTP_DEPTH"];
@@ -627,9 +621,9 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 			}
     }
 
-		// }}}
+    // }}}
 
-	// {{{ http_PROPPATCH() 
+    // {{{ http_PROPPATCH() 
 
     function http_PROPPATCH() {
 		if($this->_check_lock_status($this->path)) {
@@ -676,26 +670,26 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		}
     }
 
-		// }}}
+    // }}}
 
 
-	// {{{ http_MKCOL() 
+    // {{{ http_MKCOL() 
 
     function http_MKCOL() {
-			$options = Array();
-			$options["path"] = $this->path;
+        $options = Array();
+        $options["path"] = $this->path;
 
-			$stat = $this->mkcol($options);
+        $stat = $this->mkcol($options);
 
-			$this->http_status($stat);
+        $this->http_status($stat);
     }
 
-		// }}}
-		
+    // }}}
 
-	// {{{ http_GET() 
 
-		/**
+    // {{{ http_GET() 
+
+                /**
 		 * GET wrapper
 		 *
 		 * GET wrapper
@@ -705,22 +699,136 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 */
 
     function http_GET() {
-			$options = Array();
-			$options["path"] = $this->path;
+        $options = Array();
+        $options["path"] = $this->path;
 
-			if ($status = $this->get($options)) {
-				if(!headers_sent()) {
-					if($status === true) $status = "200 OK";
-					$this->http_status("$status");
+		if (isset($_SERVER['HTTP_RANGE'])) {
+			if (ereg("bytes[[:space:]]*=[[:space:]]*(.*)", $_SERVER['HTTP_RANGE'], $matches)) {
+				$options["ranges"] = array();
+				foreach (explode(",", $matches[1]) as $range) {
+					list($start, $end) = explode("-", $range);
+					$options["ranges"][] = ($start==="") ? array("last"=>$end) : array("start"=>$start, "end"=>$end);
 				}
-			} else {
-				$this->http_status("404 not found");
 			}
+		}
+
+        if (true == ($status = $this->get($options))) {
+			if (!headers_sent()) {
+				$status = "200 OK";
+
+				if (!isset($options['mimetype'])) {
+					$options['mimetype'] = "application/octet-stream";
+				}
+				header("Content-type: $options[mimetype]");
+					
+				if (isset($options['mtime'])) {
+					header("Last-modified:".date("D, j M Y H:m:s ", $options['mtime'])."GMT");
+				}
+				
+				if (isset($options['stream'])) {
+					// GET handler returned a stream
+					if (!empty($options['ranges']) && (0===fseek($options['stream'], 0, SEEK_SET))) {
+						// partial request and stream is seekable 
+						$status = "206 partial";
+						
+						if (count($options['ranges']) === 1) {
+							$range = $option['ranges'][0];
+							if (isset($range['start'])) {
+								fseek($options['stream'], $range['start'], SEEK_SET);
+								if (isset($range['end'])) {
+									$size = $range['end']-$range['start']+1;
+									header("Content-length: $size");
+									header("Content-range: $start-$end/". (isset($options['size']) ? $options['size'] : "*"));
+									while ($size && !feof($options['stream'])) {
+										$buffer = fread($options['stream'], 4096);
+										$size -= strlen($buffer);
+										echo $buffer;
+									}
+								} else {
+									if (isset($options['size'])) {
+										header("Content-length: ".($options['size'] - $range['start']));
+										header("Content-range: $start-$end/". (isset($options['size']) ? $options['size'] : "*"));
+									}
+									fpassthru($options['stream']);
+								}
+							} else {
+								header("Content-length: ".$range['last']);
+								fseek($options['stream'], -$range['last'], SEEK_END);
+								fpassthru($options['stream']);
+							}
+						} else {
+							$this->_multipart_byterange_header(); // init multipart
+							foreach ($options['ranges'] as $range) {
+								// TODO what if size unknown? 500?
+								if (isset($range['start'])) {
+									$from  = $range['start'];
+									$to    = !empty($range['end']) ? $range['end'] : $options['size']-1; 
+								} else {
+									$from = $options['size'] - $range['last']-1;
+									$to = $options['size'] -1;
+								}
+								$total = isset($options['size']) ? $options['size'] : "*"; 
+								$size = $to - $from + 1;
+								$this->_multipart_byterange_header($options['mimetype'], $from, $to, $total);
+
+
+								fseek($options['stream'], $start, SEEK_SET);
+								while ($size && !feof($options['stream'])) {
+									$buffer = fread($options['stream'], 4096);
+									$size -= strlen($buffer);
+									echo $buffer;
+								}
+							}
+							$this->_multipart_byterange_header(); // end multipart
+						}
+					} else {
+						// normal request or stream isn't seekable, return full content
+						if (isset($options['size'])) {
+							header("Content-length: ".$options['size']);
+						}
+						fpassthru($options['stream']);
+					}
+				} elseif (isset($options['data']))  {
+					if (is_array($options['data'])) {
+						// reply to partial request
+					} else {
+						header("Content-length: ".strlen($options['data']));
+						echo $data;
+					}
+				}
+			} 
+        } 
+
+		if (false === $status) {
+			$this->http_status("404 not found");
+        }
+
+		$this->http_status("$status");
     }
 
-		// }}}
+	function _multipart_byterange_header($mimetype = false, $from = false, $to=false, $total=false) {
+		if ($mimetype == false) {
+			if (!isset($this->multipart_separator)) {
+				// initial
+				$this->multipart_separator = "SEPPARATOR_".md5(microtime());
+				header("Content-type: multipart/byteranges; boundary=".$this->multipart_separator);
+			} else {
+				// final
+				echo "\n--{$this->multipart_separator}--";
+			}
+		} else {
+			echo "\n--{$this->multipart_separator}\n";
+			echo "Content-type: $mimetype\n";
+			echo "Content-range: $from-$to/". ($total === false ? "*" : $total);
+			echo "\n\n";
+		}
+	}
 
-	// {{{ http_HEAD() 
+			
+
+    // }}}
+
+    // {{{ http_HEAD() 
 
     function http_HEAD() {
 		$status = false;
@@ -741,65 +849,65 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		$this->http_status($status);
     }
 
-		// }}}
+    // }}}
 
-	// {{{ http_PUT() 
+    // {{{ http_PUT() 
 
     function http_PUT() {
-		if($this->_check_lock_status($this->path)) {
-			$options = Array();
-			$options["path"] = $this->path;
-			$options["content_length"] = $_SERVER["CONTENT_LENGTH"];
-			$options["stream"] = fopen("php://input", "r");
-			$stat = $this->put($options);
-			$this->http_status($stat);
-		} else {
-			$this->http_status("423 Locked");
-		}
+        if ($this->_check_lock_status($this->path)) {
+            $options = Array();
+            $options["path"] = $this->path;
+            $options["content_length"] = $_SERVER["CONTENT_LENGTH"];
+            $options["stream"] = fopen("php://input", "r");
+            $stat = $this->put($options);
+            $this->http_status($stat);
+        } else {
+            $this->http_status("423 Locked");
+        }
     }
 
-		// }}}
+    // }}}
 
 
-	// {{{ http_DELETE() 
+    // {{{ http_DELETE() 
 
-	function http_DELETE() {
-		if($this->_check_lock_status($this->path)) {
-			$options = Array();
-			$options["path"] = $this->path;
-			
-			$stat = $this->delete($options);
-			
-			$this->http_status($stat);
-		} else {
-			$this->http_status("423 Locked");
-		}
-	}
+    function http_DELETE() {
+        if ($this->_check_lock_status($this->path)) {
+            $options = Array();
+            $options["path"] = $this->path;
 
-	// }}}
+            $stat = $this->delete($options);
 
-	// {{{ http_COPY() 
+            $this->http_status($stat);
+        } else {
+            $this->http_status("423 Locked");
+        }
+    }
+
+    // }}}
+
+    // {{{ http_COPY() 
 
     function http_COPY() {
-		$this->_copymove("copy");
+        $this->_copymove("copy");
     }
 
-		// }}}
+    // }}}
 
-	// {{{ http_MOVE() 
+    // {{{ http_MOVE() 
 
     function http_MOVE() {
-		if($this->_check_lock_status($this->path)) {
-			$this->_copymove("move");
-		} else {
-			$this->http_status("423 Locked");
-		}
+        if ($this->_check_lock_status($this->path)) {
+            $this->_copymove("move");
+        } else {
+            $this->http_status("423 Locked");
+        }
     }
 
-		// }}}
+    // }}}
 
 
-	// {{{ http_LOCK() 
+    // {{{ http_LOCK() 
 
     function http_LOCK() {
 		if($this->_check_lock_status($this->path)) {
@@ -879,70 +987,70 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		}
     }
 
-		// }}}
+    // }}}
 
-	// {{{ http_UNLOCK() 
+    // {{{ http_UNLOCK() 
 
     function http_UNLOCK() {
-			$options = Array();
-			$options["path"] = $this->path;
+        $options = Array();
+        $options["path"] = $this->path;
 
-			if (isset($_SERVER['HTTP_DEPTH'])) {
-				$options["depth"] = $_SERVER["HTTP_DEPTH"];
-			} else {
-				$options["depth"] = "infinity";
-			}
+        if (isset($_SERVER['HTTP_DEPTH'])) {
+            $options["depth"] = $_SERVER["HTTP_DEPTH"];
+        } else {
+            $options["depth"] = "infinity";
+        }
 
-			$options["token"] = substr($_SERVER["HTTP_LOCK_TOKEN"],1,-1); // strip <> 
+        $options["token"] = substr($_SERVER["HTTP_LOCK_TOKEN"], 1, -1); // strip <> 
 
-			$stat = $this->unlock($options);
+        $stat = $this->unlock($options);
 
-			$this->http_status($stat);
+        $this->http_status($stat);
     }
 
-		// }}}
+    // }}}
 
-		// }}}
+    // }}}
 
-	// {{{ _copymove() 
+    // {{{ _copymove() 
 
     function _copymove($what) {
-			$options = Array();
-			$options["path"] = $this->path;
+        $options = Array();
+        $options["path"] = $this->path;
 
-			if (isset($_SERVER['HTTP_DEPTH'])) {
-				$options["depth"] = $_SERVER["HTTP_DEPTH"];
-			} else {
-				$options["depth"] = "infinity";
-			}
+        if (isset($_SERVER['HTTP_DEPTH'])) {
+            $options["depth"] = $_SERVER["HTTP_DEPTH"];
+        } else {
+            $options["depth"] = "infinity";
+        }
 
-			extract(parse_url($_SERVER["HTTP_DESTINATION"]));
-			$http_host = $host;
-			if (isset($port))
-				$http_host .= ":$port";
+        extract(parse_url($_SERVER["HTTP_DESTINATION"]));
+        $http_host = $host;
+        if (isset($port))
+            $http_host.= ":$port";
 
-			if ($http_host == $_SERVER["HTTP_HOST"] &&
-					!strncmp($_SERVER["SCRIPT_NAME"], $path,
-									 strlen($_SERVER["SCRIPT_NAME"]))) {
-				$options["dest"] = substr($path, strlen($_SERVER["SCRIPT_NAME"]));
-				if(!$this->_check_lock_status($options["dest"])) {
-					$this->http_status("423 Locked");
-					return;
-				}
+        if ($http_host == $_SERVER["HTTP_HOST"] &&
+            !strncmp($_SERVER["SCRIPT_NAME"], $path,
+                     strlen($_SERVER["SCRIPT_NAME"]))) {
+            $options["dest"] = substr($path, strlen($_SERVER["SCRIPT_NAME"]));
+            if (!$this->_check_lock_status($options["dest"])) {
+                $this->http_status("423 Locked");
+                return;
+            }
 
-			} else {
-				$options["dest_url"] = $_SERVER["HTTP_DESTINATION"];
-			}
+        } else {
+            $options["dest_url"] = $_SERVER["HTTP_DESTINATION"];
+        }
 
-			$options["overwrite"] = @$_SERVER["HTTP_OVERWRITE"] == "T";
+        $options["overwrite"] = @$_SERVER["HTTP_OVERWRITE"] == "T";
 
-			$stat = $this->$what($options);
-			$this->http_status($stat);
+        $stat = $this->$what($options);
+        $this->http_status($stat);
     }
 
-		// }}}
+    // }}}
 
-	// {{{ _allow() 
+    // {{{ _allow() 
 
     /**
 		 * check for implemented HTTP methods
@@ -952,127 +1060,144 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 * @param void
 		 * @returns array something
 		 */
-		function _allow() {
-			// OPTIONS is always there
-			$allow = array("options" => "OPTIONS");
+    function _allow() {
+        // OPTIONS is always there
+        $allow = array("options" =>"OPTIONS");
 
-			// all other METHODS need both a http_method() wrapper
-			// and a method() implementation
-			// the base class supplies wrappers only
-			foreach(get_class_methods($this) as $method) {
-				if (!strncmp("http_", $method, 5)) {
-					$method = substr($method, 5);
-					if (method_exists($this, $method)) {
-						$allow[$method] = strtoupper($method);
-					}
-				}
-			}
+        // all other METHODS need both a http_method() wrapper
+        // and a method() implementation
+        // the base class supplies wrappers only
+        foreach(get_class_methods($this) as $method) {
+            if (!strncmp("http_", $method, 5)) {
+                $method = substr($method, 5);
+                if (method_exists($this, $method)) {
+                    $allow[$method] = strtoupper($method);
+                }
+            }
+        }
 
-			// we can emulate a missing HEAD implemetation using GET
-			if (isset($allow["get"]))
-				$allow["head"] = "HEAD";
+        // we can emulate a missing HEAD implemetation using GET
+        if (isset($allow["get"]))
+            $allow["head"] = "HEAD";
 
-			// no LOCK without checklok()
-			if (!method_exists($this, "checklock")) {
-				unset($allow["lock"]);
-				unset($allow["unlock"]);
-			}
+        // no LOCK without checklok()
+        if (!method_exists($this, "checklock")) {
+            unset($allow["lock"]);
+            unset($allow["unlock"]);
+        }
 
-			return $allow;
+        return $allow;
     }
 
-		// }}}
+    // }}}
 
 
     function mkprop() {
-			$args = func_get_args();
-			if (count($args) == 3) {
-				return array("name" => $args[1],
-										 "ns" => $args[0], "val" => $args[2]);
-			} else {
-				return array("name" => $args[0],
-										 "ns" => "DAV:", "val" => $args[1]);
-			}
+        $args = func_get_args();
+        if (count($args) == 3) {
+            return array("name" =>$args[1],
+                         "ns" =>$args[0], "val" =>$args[2]);
+        } else {
+            return array("name" =>$args[0],
+                         "ns" =>"DAV:", "val" =>$args[1]);
+        }
     }
 
-	// {{{ _check_auth 
+    // {{{ _check_auth 
 
     function _check_auth() {
-			if (method_exists($this, "check_auth")) {
-				return $this->check_auth(@$_SERVER["AUTH_TYPE"],
-																 @$_SERVER["PHP_AUTH_USER"],
-																 @$_SERVER["PHP_AUTH_PW"]);
-			} else {
-				return true;
-			}
+        if (method_exists($this, "check_auth")) {
+            return $this->check_auth(@$_SERVER["AUTH_TYPE"],
+                                     @$_SERVER["PHP_AUTH_USER"],
+                                     @$_SERVER["PHP_AUTH_PW"]);
+        } else {
+            return true;
+        }
     }
 
-		// }}}
+    // }}}
 
-		// {{{ UUID stuff 
+    // {{{ UUID stuff 
 
-		function _new_uuid() {
-			if (function_exists("uuid_create")) {
-				return uuid_create();
-			}
-			
-			// fallback
-			$uuid = md5(microtime().getmypid()); // this should be random enough for now
+    function _new_uuid() {
+        if (function_exists("uuid_create")) {
+            return uuid_create();
+        }
+        // fallback
+        $uuid = md5(microtime().getmypid());    // this should be random enough for now
 
-			// set variant and version fields for 'true' random uuid
-			$uuid{12} = "4";
-			$n = 8 + (ord($uuid{16}) & 3);
-			$hex = "0123456789abcdef";
-			$uuid{16} = $hex{$n};
+        // set variant and version fields for 'true' random uuid
+        $uuid {
+        12}
+        = "4";
+        $n = 8 + (ord($uuid {
+                      16}
+                  ) & 3);
+        $hex = "0123456789abcdef";
+        $uuid {
+        16}
+        = $hex {
+        $n};
 
-			// return formated uuid
-			return substr($uuid,0,8)."-".substr($uuid,8,4)."-".substr($uuid,12,4)."-".substr($uuid,16,4)."-".substr($uuid,20);
-		}
+        // return formated uuid
+        return substr($uuid, 0, 8)."-".substr($uuid, 8, 4)."-".substr($uuid,
+                                                                      12,
+                                                                      4)."-".
+            substr($uuid, 16, 4)."-".substr($uuid, 20);
+    }
 
     function _new_locktoken() {
-			return "opaquelocktoken:" . $this->_new_uuid();
+        return "opaquelocktoken:".$this->_new_uuid();
     }
 
-		// }}}
+    // }}}
 
-		// {{{ WebDAV If: header parsing 
+    // {{{ WebDAV If: header parsing 
 
-	function _if_header_lexer($string , &$pos) {
+    function _if_header_lexer($string,
+                              &$pos) {
 
-		while(ctype_space($string{$pos})) ++$pos; // skip whitespace
+        while (ctype_space($string {
+                           $pos}
+               ))
+            ++$pos;             // skip whitespace
 
-		if(strlen($string) <= $pos) return false;
+        if (strlen($string) <= $pos)
+            return false;
 
-		$c = $string{$pos++};
-		switch($c) {
-		case "<":
-			$pos2 = strpos($string, ">", $pos);
-			$uri = substr($string, $pos, $pos2 - $pos);
-			$pos = $pos2 + 1;
-			return array("URI", $uri); 
+        $c = $string {
+        $pos++};
+        switch ($c) {
+            case "<":
+                $pos2 = strpos($string, ">", $pos);
+                $uri = substr($string, $pos, $pos2 - $pos);
+                $pos = $pos2 + 1;
+                return array("URI", $uri);
 
-		case "[":
-			if($string{$pos}=="W") {
-				$type = "ETAG_WEAK";
-				$pos += 2;
-			} else {
-				$type = "ETAG_STRONG";
-			}
-			$pos2 = strpos($string, "]", $pos);
-			$etag= substr($string, $pos+1, $pos2 - $pos -2);
-			$pos = $pos2 + 1;
-			return array($type, $etag);
-			
-		case "N":
-			$pos += 2;
-			return array("NOT", "Not");
+            case "[":
+                if ($string {
+                    $pos}
+                    == "W") {
+                    $type = "ETAG_WEAK";
+                    $pos += 2;
+                } else {
+                    $type = "ETAG_STRONG";
+                }
+                $pos2 = strpos($string, "]", $pos);
+                $etag = substr($string, $pos + 1, $pos2 - $pos - 2);
+                $pos = $pos2 + 1;
+                return array($type, $etag);
 
-		default:
-			return array("CHAR", $c);
-		}
-	}
+            case "N":
+                $pos += 2;
+                return array("NOT", "Not");
 
-   	/** 
+            default:
+                return array("CHAR", $c);
+        }
+    }
+
+        /** 
 		 * parse If: header
 		 *
 		 * dispatch WebDAV HTTP request to the apropriate method handler
@@ -1080,101 +1205,105 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		 * @param $str
 		 * @return void
 		 */
-	function _if_header_parser($str) {
-		$pos = 0;
-		$len = strlen($str);
+    function _if_header_parser($str) {
+        $pos = 0;
+        $len = strlen($str);
 
-		$uris = array();
-		
-		while($pos < $len) {
-			$token = $this->_if_header_lexer($str, $pos);
+        $uris = array();
 
-			if($token[0] == "URI") {
-				$uri = $token[1];
-				$token = $this->_if_header_lexer($str, $pos);
-			} else {
-				$uri = "";
-			}
+        while ($pos < $len) {
+            $token = $this->_if_header_lexer($str, $pos);
 
-			if($token[0] != "CHAR" || $token[1] != "(") return false;
+            if ($token[0] == "URI") {
+                $uri = $token[1];
+                $token = $this->_if_header_lexer($str, $pos);
+            } else {
+                $uri = "";
+            }
 
-			$list = array();
-			$level = 1;
-			$not = "";
-			while($level) {
-				$token = $this->_if_header_lexer($str, $pos);
-				
-				if($token[0] == "NOT") {
-					$not = "!";
-					continue;
-				} 
-				switch($token[0]) {
-				case "CHAR":
-					switch($token[1]) {
-					case "(":
-						$level++;
-						break;
-					case ")":
-						$level--;
-						break;
-					default: 
-						return false;
-					}
-					break;
+            if ($token[0] != "CHAR" || $token[1] != "(")
+                return false;
 
-				case "URI":
-					$list[] = $not."<$token[1]>";
-					break;
+            $list = array();
+            $level = 1;
+            $not = "";
+            while ($level) {
+                $token = $this->_if_header_lexer($str, $pos);
 
-				case "ETAG_WEAK":
-					$list[] = $not."[W/'$token[1]']>";
-					break;
+                if ($token[0] == "NOT") {
+                    $not = "!";
+                    continue;
+                }
+                switch ($token[0]) {
+                    case "CHAR":
+                        switch ($token[1]) {
+                            case "(":
+                                $level++;
+                                break;
+                            case ")":
+                                $level--;
+                                break;
+                            default:
+                                return false;
+                        }
+                        break;
 
-				case "ETAG_STRONG":
-					$list[] = $not."['$token[1]']>";
-					break;
+                    case "URI":
+                        $list[] = $not."<$token[1]>";
+                        break;
 
-				default: 
-					return false;
-				}
-				$not = "";
-			}
+                    case "ETAG_WEAK":
+                        $list[] = $not."[W/'$token[1]']>";
+                        break;
 
-			$uris[$uri] = $list;
-		}
+                    case "ETAG_STRONG":
+                        $list[] = $not."['$token[1]']>";
+                        break;
 
-		return $uris;
-	}
+                    default:
+                        return false;
+                }
+                $not = "";
+            }
 
-	function _check_if_header_conditions() {
-		// see rfc 2518 sec. 9.4
-		if(isset($_SERVER["HTTP_IF"])) {
-			$this->_if_header_uris = $this->_if_header_parser($_SERVER["HTTP_IF"]);
+            $uris[$uri] = $list;
+        }
 
-			foreach($this->_if_header_uris as $uri => $conditions) {
-				if($uri == "") {
-					// default uri is the complete request uri
-					$uri = (@$_SERVER["HTTPS"] === "on" ? "https:" : "http:");
-					$uri.= "//$_SERVER[HTTP_HOST]$_SERVER[SCRIPT_NAME]$_SERVER[PATH_INFO]";
-				}
-				// all must match
-				$state = true;
-				foreach($conditions as $condition) {
-					if(! $this->_check_uri_condition($uri, $condition)) {
-						$state = false; 
-						break;
-					}
-				}
+        return $uris;
+    }
 
-				// any match is ok
-				if($state == true) return true;
-			}
-			return false;
-		}
-		return true;
-	}
+    function _check_if_header_conditions() {
+        // see rfc 2518 sec. 9.4
+        if (isset($_SERVER["HTTP_IF"])) {
+            $this->_if_header_uris =
+                $this->_if_header_parser($_SERVER["HTTP_IF"]);
 
-	/**
+            foreach($this->_if_header_uris as $uri => $conditions) {
+                if ($uri == "") {
+                    // default uri is the complete request uri
+                    $uri = (@$_SERVER["HTTPS"] === "on" ? "https:" : "http:");
+                    $uri.=
+                        "//$_SERVER[HTTP_HOST]$_SERVER[SCRIPT_NAME]$_SERVER[PATH_INFO]";
+                }
+                // all must match
+                $state = true;
+                foreach($conditions as $condition) {
+                    if (!$this->_check_uri_condition($uri, $condition)) {
+                        $state = false;
+                        break;
+                    }
+                }
+
+                // any match is ok
+                if ($state == true)
+                    return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+        /**
 	 * Check a single URI condition parsed from an if-header
 	 *
 	 * Check a single URI condition parsed from an if-header
@@ -1184,54 +1313,56 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 	 * @param string $condition Condition to check for this URI
 	 * @returns bool Condition check result
 	 */
-	function _check_uri_condition($uri, $condition) {
-		// not really implemented here, 
-		// implementations must override
-		return true;
-	}
+    function _check_uri_condition($uri,
+                                  $condition) {
+        // not really implemented here, 
+        // implementations must override
+        return true;
+    }
 
 
-	function _check_lock_status($path, $depth=0) {
-		if(method_exists($this, "checklock")) {
-			// FIXME depth -> ignored for now
+    function _check_lock_status($path,
+                                $depth = 0) {
+        if (method_exists($this, "checklock")) {
+            // FIXME depth -> ignored for now
 
-			// is locked?
-			$lock = $this->checklock($path);
+            // is locked?
+            $lock = $this->checklock($path);
 
-			// ... and lock is not owned?
-			if(is_array($lock) && count($lock)) {					
-				// FIXME doesn't check uri restrictions yet
-				if(!strstr($_SERVER["HTTP_IF"], $lock["token"])) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-
-	// }}}
-	
+            // ... and lock is not owned?
+            if (is_array($lock) && count($lock)) {
+                // FIXME doesn't check uri restrictions yet
+                if (!strstr($_SERVER["HTTP_IF"], $lock["token"])) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
 
-	function lockdiscovery($path) {
-		if(!method_exists($this, "checklock")) {
-			return "";
-		}
+    // }}}
 
-		$lock = $this->checklock($path);
 
-		$activelocks = "";
 
-		if(is_array($lock) && count($lock)) {
-			if(!empty($lock["expires"])) {
-				$timeout = "Second-".($lock["expires"]-time());
-			} else if(!empty($lock["timeout"])) {
-				$timeout = "Second-$lock[timeout]";
-			} else {
-				$timeout = "Infinite";
-			}
-			$activelocks .= "
+    function lockdiscovery($path) {
+        if (!method_exists($this, "checklock")) {
+            return "";
+        }
+
+        $lock = $this->checklock($path);
+
+        $activelocks = "";
+
+        if (is_array($lock) && count($lock)) {
+            if (!empty($lock["expires"])) {
+                $timeout = "Second-".($lock["expires"] - time());
+            } else if (!empty($lock["timeout"])) {
+                $timeout = "Second-$lock[timeout]";
+            } else {
+                $timeout = "Infinite";
+            }
+            $activelocks.= "
 			  <D:activelock>
 			   <D:lockscope><D:$lock[scope]/></D:lockscope>
 			   <D:locktype><D:$lock[type]/></D:locktype>
@@ -1240,11 +1371,11 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 			   <D:timeout>$timeout</D:timeout>
 			   <D:locktoken><D:href>$lock[token]</D:href></D:locktoken>
 			  </D:activelock>
-      ";       
-		} 
+      ";
+        }
 
-		return $activelocks;
-	}
+        return $activelocks;
+    }
 
 	function http_status($status) {
 		if($status === true) $status = "200 OK";
@@ -1278,4 +1409,4 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
    * c-basic-offset: 4
    * End:
    */
-  ?>
+?>

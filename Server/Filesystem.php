@@ -4,23 +4,34 @@
 
 	class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server {
 
-		var $base;
+		var $base = false;
 
-		function ServeRequest($base) {
-			
+		var $db_host = "localhost";
+
+		var $db_user = "root";
+
+		var $db_passwd = "";
+
+		var $db_name = "webdav";
+
+		function ServeRequest($base = false) {
 			// special treatment for litmus compliance test
 			// reply on its identifier header
 			// not needed for the test itself but eases debugging
 			foreach(apache_request_headers() as $key => $value) {
 				if(stristr($key,"litmus")) {
-#					error_log("--- $value");
 					header("X-Litmus-reply: ".$value);
 				}
 			}
 
-			$this->base = $base;
-			mysql_connect("localhost","root","") or die(mysql_error());
-			mysql_select_db("webdav") or die(mysql_error());
+			if ($base) { 
+				$this->base = $base;
+			} else if(!$this->base) {
+				$this->base = $_SERVER['DOCUMENT_ROOT'];
+			}
+				
+			mysql_connect($this->db_host, $this->db_user, $this->db_passwd) or die(mysql_error());
+			mysql_select_db($this->db_name) or die(mysql_error());
 			parent::ServeRequest();
 		}
 
@@ -28,7 +39,7 @@
 			return true;
 		}
 
-		function propfind ($options,&$files) {				
+		function PROPFIND($options, &$files) {				
 			$fspath = realpath($this->base . $options["path"]);
 			
 			if (!file_exists($fspath)) {
@@ -73,7 +84,7 @@
 				$file["props"][] = $this->mkprop("resourcetype", "");
 				$file["props"][] = $this->mkprop("getcontentlength", filesize($fspath));
 				if (is_readable($fspath)) {
-					$file["props"][] = $this->mkprop("getcontenttype", rtrim(preg_replace("/^([^;]*);.*/","$1",`file -izb '$fspath' 2> /dev/null`)));
+					$file["props"][] = $this->mkprop("getcontenttype", $this->_mimetype($fspath));
 				} else {
 					$file["props"][] = $this->mkprop("getcontenttype", "application/x-non-readable");
 				}				
@@ -88,25 +99,79 @@
 			return $file;
 		}
 
+		function _mimetype($fspath) {
+			if (@is_dir($fspath)) {
+				return "httpd/unix-directory"; // TODO what on Windows? ;>
+			} else if (function_exists("mime_content_type")) {
+				// use mime magic extension if available
+				$mime_type = mime_content_type($fspath);
+			} else if (extension_loaded("posix")) {
+				// it is likely that we are on a unix-like system and have
+				// the 'file' binary installed if we have POSIX support
+				// newer versions of find have MIME support using the '-i' option
+				// TODO: find a better test for this
+				$fp = popen("file -i '$fspath' 2>/dev/null", "r");
+				$reply = fgets($fp);
+				pclose($fp);
+				
+				// popen will not return an error if the binary was not found
+				// and find may not have mime support using "-i"
+				// so we test the format of the returned string 
+				
+				// the reply begins with the requested filename
+				if (!strncmp($reply, "$fspath: ", strlen($fspath)+2)) {						
+					$reply = substr($reply, strlen($fspath)+2);
+					// followed by the mime type (maybe including options)
+					if (ereg("^[[:alnum:]_-]+/[[:alnum:]_-]+;?.*", $reply, $matches)) {
+						$mime_type = $matches[0];
+					}
+				}
+			} 
+			
+			if (empty($mime_type)) {
+				// Fallback solution: try to guess the type by the file extension
+				// TODO: add more ...
+				// TODO: can we use the registry for this on Windows?
+				//       OTOH if the server is Windos the clients are likely to 
+				//       be Windows, too, and tend do ignore the Content-Type
+				//       anyway (overriding it with information taken from
+				//       the registry)
+				// TODO: have a seperate PEAR class for mimetype detection?
+				switch (strtolower(strrchr(basename($fspath), "."))) {
+				case ".html":
+					$mime_type = "text/html";
+					break;
+				case ".gif":
+					$mime_type = "image/gif";
+					break;
+				case ".jpg":
+					$mime_type = "image/jpeg";
+					break;
+				default: 
+					$mime_type = "application/octet-stream";
+					break;
+				}
+			}
+			
+			return $mime_type;
+		}
 
-		function get($options) {
+		function GET(&$options) {
 			$fspath = $this->base . $options["path"];
 
 			if (file_exists($fspath)) {				
-				if (!is_dir($fspath)) {
-					header("Content-Type: " . `file -izb '$fspath' 2> /dev/null`); 
-				} else {
-					header ("Content-Type: httpd/unix-directory");					
-				}
-
+				$options['mimetype'] = $this->_mimetype($fspath); 
+				
 				// see rfc2518, section 13.7
 				// some clients seem to treat this as a reverse rule
 				// requiering a Last-Modified header if the getlastmodified header was set
-				header("Last-Modified: ".date("D, j M Y H:m:s ", file_mtime($fspath))."GMT");
+				$options['mtime'] = filemtime($fspath);
+				
+				$options['size'] = filesize($fspath);
+			
+				// TODO check permissions/result
+				$options['stream'] = fopen($fspath, "r");
 
-				header("Content-Length: ".filesize($fspath));
-
-				readfile($fspath);
 				return true;
 			} else {
 				return false;
@@ -342,6 +407,10 @@
 			return $result;
 		}
 
+
+		function create_database() {
+			// TODO
+		}
 	}
 
 
