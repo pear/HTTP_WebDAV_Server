@@ -1,0 +1,185 @@
+
+
+Die dav_server Klasse bietet ein Framework zur implementation eigener
+WebDAV-Server. Sie kümmert sich um die Parameter-Aufbereitung der 
+verschiedenen DAV-Requests und um die protokoll-gerechte Erstellung 
+der Replies. Die eigentliche Abbildung der Zugriffe auf Collections,
+Resources und Properties sind dagen Aufgabe der von dav_server abstammenden
+tatsächlichen Implementationen. Die beiliegende dav_fileserver Klasse
+enthält beispielhaft die Umsetzung eines einfachen DAV-Fileservers.
+
+Die Klasse erkennt selbstständig, welche DAV_Request Methoden impelemtiert
+sind und beantwortet OPTIONS-Requests dementsprechend. Minimalvoraussetzung
+ist die Implementation der propfind() Methode. Folgende Methoden können 
+implementiert werden:
+
+* propfind()   PROPFIND Request Handler
+* get()        GET Request Handler
+* put()        PUT Request Handler
+* mkcol()      MKCOL Request Handler
+* delete()     DELETE Request Handler
+* copy()       COPY Request Handler
+* move()       MOVE Request Handler
+
+Für einen Server mit Locking-Unterstützung sind zusätzlich folgende Methoden
+erforderlich (ACHTUNG: noch nicht vollständig umgesetzt!):
+
+* lock()       LOCK Request Handler
+* unlock()     UNLOCK Request Handler
+* checklock()  Helper-Funktion zur Lock-Prüfung in Request-Handlern
+
+Nur wenn alle drei Methoden implementiert sind meldet der OPTIONS-Handler
+das der Server WebDAV Class 2 konform ist und LOCK und UNLOCK unterstützt.
+
+
+Authentifikation ist nicht Teil des WebDAV Protokolls sondern wird normal
+über HTTP-Authentifikationsmechanismen abgewickelt. Dies kann sowohl über
+die Webserver-Konfiguration (.htaccess) oder auch über PHP abgewickelt 
+werden. Soll die Server-Klasse sich darum kümmern, so muß die Methode
+check_auth($type, $user, $passwd) implementiert werden.
+
+
+
+
+Die beiliegende Datei dav_fileserver.php zeigt als Beispiel-Implementation
+die Umsetzung eines einfachen DAV-Fileservers (ohne Locking und User-Properties)
+auf Basis der dav_server Klasse.
+
+
+
+
+
+
+bool propinfo($options, &$files)
+
+  options[path]  - Resource-Pfad
+  options[depth] - Angeforderte Suchtiefe: "0", "1", oder "infinity"
+  options[props] - "all", "names" oder Array der angeforderten Properties:
+                     Jeder Property-Eintrag enthält den Namen direkt als String
+										 (impliziert Namespace = "DAV:") oder ein Array mit den
+                     Elementen "name" (immer) und "xmlns" (Namespace URL)
+
+									  
+                      
+  &$files - Ablage-Array für Ergebnisse mit folgenden Elementen:
+
+            "files" -> Array der gefundenen Resourcen mit folgenden Elementen:
+
+               "path" -> Pfad zur Resource 
+               "props" -> properties Array
+                          Jeder Property-Eintrag enthält den Namen direkt als String
+    			  						  (impliziert Namespace = "DAV:") oder ein Array mit den
+                          Elementen "name" (immer) und "xmlns" (Namespace URL)
+            
+                          es sollten mindestens folgende DAV-Properties versorgt werden:
+
+                          - resourcetype:     "collection" oder ""
+                          - displayname:      string
+                          - creationdate:     unix-timestamp
+                          - getcontenttype:   mime-type
+                          - getcontentlength: integer                
+                          - getlastmodified:  unix-timestamp
+
+  return-value: true / false
+  
+
+
+
+string mkcol($option)
+
+  options[path] - Pfad der anzulegenden collection
+
+  return-value: string 
+                HTTP-Status und Status-Message, mögliche Stati sind
+                * 201 Success
+                * 403 Forbidden
+                * 405 Method not allowed
+                * 409 Conflict
+                * 415 Unsupported media type
+                * 507 Insufficient Storage
+                (siehe RFC2518 8.3.2)
+
+
+
+
+string get($options)
+
+  options[path] - Pfad zur gewünschten Resource
+
+  return-value: true bei Erfolg, false wenn not found
+
+  (TODO: andere stati berücksichtigen)
+
+  Content-Type, Content-Length header müssen von der Methode selbst
+  erzeugt werden                
+
+
+
+
+string post($options)
+
+  options[path] - Pfad zur gewünschten Resource
+  options[content_length] - Datenmenge in Bytes
+  options[data] - Zu schreibende Daten
+
+  return-value: string 
+                HTTP-Status und Status-Message, mögliche Stati sind
+								* 201 Created -> Resource neu angelegt 
+                * 204 No Content -> Resource überschrieben
+                * 409 Conflict
+                ...
+
+
+
+
+string copy($options)
+
+  options[path]      - Pfad der Quellresource
+  options[depth]     - "0" oder "infinity"
+  options[overwrite] - true / false
+  options[dest]      - Pfad wenn Zielresource lokal
+  options[dest_url]  - komplette URL wenn Zielresource extern
+
+  return-value: string 
+                HTTP-Status und Status-Message, mögliche Stati sind
+								siehe RFC2518 8.8.5
+
+
+
+
+
+string move($options)
+
+  options[path]      - Pfad der Quellresource
+  options[depth]     - "0" oder "infinity"
+  options[overwrite] - true / false
+  options[dest]      - Pfad wenn Zielresource lokal
+  options[dest_url]  - komplette URL wenn Zielresource extern
+
+  return-value: string 
+                HTTP-Status und Status-Message, mögliche Stati sind
+								siehe RFC2518 8.8.5
+
+
+
+
+string delete($options)
+
+  options[path] - Pfad der zu löschenden Resource
+
+  return-value: string 
+                HTTP-Status und Status-Message, mögliche Stati sind
+								siehe RFC2518 8.6.2
+  
+
+
+
+
+bool check_auth($type, $user, $passwd)
+
+  $type: HTTP-Auth type, i.A. "Basic"
+  $user: HTTP Username
+  $passwd: HTTP Passwort
+
+  return-value: true bei success, sonst false
+  (ToDo: array mit Auth-Type und Realm String zulassen bei fehler)
