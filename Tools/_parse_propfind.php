@@ -12,8 +12,8 @@
 			$had_input = false;
 			$xml_parser = xml_parser_create_ns("UTF-8", " ");
 			xml_set_element_handler($xml_parser,
-															array(&$this, "_startElement"),
-															array(&$this, "_endElement"));
+									array(&$this, "_startElement"),
+									array(&$this, "_endElement"));
 			xml_parser_set_option($xml_parser, XML_OPTION_CASE_FOLDING,
 														false);
 			$f_in = fopen($path, "r");
