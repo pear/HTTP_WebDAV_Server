@@ -1343,10 +1343,15 @@ class HTTP_WebDAV_Server
 
         extract(parse_url($_SERVER["HTTP_DESTINATION"]));
         $http_host = $host;
-        if (isset($port))
+        if (isset($port) && $port != 80)
             $http_host.= ":$port";
 
-        if ($http_host == $_SERVER["HTTP_HOST"] &&
+        list($http_header_host,$http_header_port)  = explode(":",$_SERVER["HTTP_HOST"]);
+        if (isset($http_header_port) && $http_header_port != 80) { 
+            $http_header_host .= ":".$http_header_port;
+        }
+
+        if ($http_host == $http_header_host &&
             !strncmp($_SERVER["SCRIPT_NAME"], $path,
                      strlen($_SERVER["SCRIPT_NAME"]))) {
             $options["dest"] = substr($path, strlen($_SERVER["SCRIPT_NAME"]));
