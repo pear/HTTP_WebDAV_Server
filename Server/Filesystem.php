@@ -451,6 +451,7 @@
         {
             // TODO Property updates still broken (Litmus should detect this?)
 
+            
             if(!empty($_SERVER["CONTENT_LENGTH"])) { // no body parsing yet
                 return "415 Unsupported media type";
             }
@@ -498,11 +499,10 @@
                     error_log("---- ".$options["depth"]);
                     return "400 Bad request";
                 }
-
-                system("cp -R $source $dest");
+                system(escapeshellcmd("cp -R ".escapeshellarg($source) ." " .  escapeshellarg($dest)));
 
                 if($del) {
-                    system("rm -rf $source");
+                    system(escapeshellcmd("rm -rf ".escapeshellarg($source)) );
                 }
             } else {                
                 if($del) {
