@@ -1,22 +1,23 @@
-Short term:
-- streams support for GET and PUT
-  - no need to create headers for GET yourself
-	- PUT may just return a stream to write to
-	- partial GET/PUT support, see below
-	- automatic mime type guessing when 
-	  ext/mime_magic is available and supporting
-		streams ...
-  (work already in progress)
-- GET and PUT should allow Range: requests
-  for partial reads, writes and updates
-  (work already in progress)
-- the XML parsing parts are *very* Q&D
-  should maybe use XML_Parser and XML_Tree 
-  (as soon as these support namespaces)
-- "Depth: Infinite" not supported yet (in fileserver)
-- Overwrite header not parsed (litmus doesn't test this?)
+Short term (1.0 show stoppers):
+
+- API cleanups
+
+- documentation
+
+- "Depth: Infinite" not supported yet (in fileserver PROPFIND)
+
+- properties not copied/moved (in fileserver COPY/MOVE)
+
+Medium term (nice to have in 1.0):
+
+- ETags support ...
+
 - MIME-type detection should become a
   package of its own?
+
+- mimetype may be guessed for stream
+  (mime_magic extension now supports this in HEAD)
+
 - provide helper classes that extend the
   Server class by adding prepared LOCKing 
   functionality, eg.:
@@ -25,11 +26,16 @@ Short term:
 	- HTTP_WebDAV_Server_Lock_PearDB
   - ...
   (have to dig out my design pattern book ...?)
-- mimetype may be guessed for stream
-  (mime_magic extension now supports this in HEAD)
-- maybe: ETags support ...
 
-Long term:
+
+
+Long term (definetly not in 1.0 or even 1.x):
+
+- the XML parsing parts are *very* Q&D
+  change to simpleXML and DOM (requires PHP5)
+
 - Versioning 
+
 - DASL
+
 - ...
