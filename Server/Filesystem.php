@@ -20,6 +20,7 @@
 			// not needed for the test itself but eases debugging
 			foreach(apache_request_headers() as $key => $value) {
 				if(stristr($key,"litmus")) {
+					error_log("Litmus test $value");
 					header("X-Litmus-reply: ".$value);
 				}
 			}
@@ -52,11 +53,13 @@
 				if (substr($options["path"],-1) != "/") {
 					$options["path"] .= "/";
 				}
-				$handle = opendir($fspath);
+				$handle = @opendir($fspath);
 				
-				while ($filename = readdir($handle)) {
-					if ($filename != "." && $filename != "..") {
-						$files["files"][] = $this->fileinfo ($options["path"].$filename, $options);
+				if ($handle) {
+					while ($filename = readdir($handle)) {
+						if ($filename != "." && $filename != "..") {
+							$files["files"][] = $this->fileinfo ($options["path"].$filename, $options);
+						}
 					}
 				}
 			}
@@ -99,17 +102,36 @@
 			return $file;
 		}
 
+		/* @@@ */
+		function _can_execute($name, $path=false) {
+			if (!strncmp(PHP_OS, "WIN", 3)) {
+				$exts = array(".exe", ".com");
+			} else {
+				$exts = array("");
+			}
+
+			if ($path===false) {
+				$path = getenv("PATH");
+			}
+
+			foreach (explode(PATH_SEPARATOR, $path) as $dir) {
+				if (!@is_dir($dir)) continue;
+				foreach ($exts as $ext) {
+					if (@is_executable("$dir/$name".$ext)) return true;
+				}
+			}
+		}
+
+
 		function _mimetype($fspath) {
 			if (@is_dir($fspath)) {
 				return "httpd/unix-directory"; // TODO what on Windows? ;>
 			} else if (function_exists("mime_content_type")) {
 				// use mime magic extension if available
 				$mime_type = mime_content_type($fspath);
-			} else if (extension_loaded("posix")) {
-				// it is likely that we are on a unix-like system and have
-				// the 'file' binary installed if we have POSIX support
-				// newer versions of find have MIME support using the '-i' option
-				// TODO: find a better test for this
+			} else if ($this->_can_execute("file")) {
+				// it looks like we have a 'file' command, 
+				// lets see it it does have mime support
 				$fp = popen("file -i '$fspath' 2>/dev/null", "r");
 				$reply = fgets($fp);
 				pclose($fp);
@@ -364,7 +386,8 @@
                           , path    = '$options[path]'
                           , owner   = '$options[owner]'
                           , expires = '$options[timeout]'
-                ";
+                          , exclusivelock  = " .($options['scope'] === "exclusive" ? "1" : "0")
+				;
  			mysql_query($query);
 			return mysql_affected_rows() > 0;
 
@@ -383,7 +406,7 @@
 		function checklock($path) {
 			$result = false;
 			
-			$query = "SELECT owner, token, expires
+			$query = "SELECT owner, token, expires, exclusivelock
                   FROM locks
                  WHERE path = '$path'
                ";
@@ -395,7 +418,7 @@
 
 				if($row) {
 					$result = array( "type"    => "write",
-													 "scope"   => "exclusive",
+													 "scope"   => $row["exclusivelock"] ? "exclusive" : "shared",
 													 "depth"   => 0,
 													 "owner"   => $row['owner'],
 													 "token"   => $row['token'],
