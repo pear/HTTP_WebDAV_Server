@@ -117,14 +117,16 @@ class HTTP_WebDAV_Server
 
         // check authentication
         if (!$this->_check_auth()) {
-            $this->http_status('401 Unauthorized');
-
             // RFC2518 says we must use Digest instead of Basic
             // but Microsoft Clients do not support Digest
             // and we don't support NTLM and Kerberos
             // so we are stuck with Basic here
             header('WWW-Authenticate: Basic realm="'.($this->http_auth_realm).'"');
-            
+
+            // Windows seems to require this being the last header sent
+			// (changed according to PECL bug #3138)
+            $this->http_status('401 Unauthorized');
+
             return;
         }
         
