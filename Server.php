@@ -114,6 +114,10 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 			// set path
 			$this->path =
 				!empty($_SERVER["PATH_INFO"]) ? $_SERVER["PATH_INFO"] : "/";
+			if(ini_get("magic_quotes_gpc")) {
+				$this->path = stripslashes($this->path);
+			}
+
 
 			// detect requested method names
 			$method = strtolower($_SERVER["REQUEST_METHOD"]);
