@@ -794,7 +794,7 @@ class HTTP_WebDAV_Server {
                         // reply to partial request
                     } else {
                         header("Content-length: ".strlen($options['data']));
-                        echo $data;
+                        echo $options['data'];
                     }
                 }
             } 
