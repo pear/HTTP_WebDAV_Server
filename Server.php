@@ -717,20 +717,22 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 	// {{{ http_HEAD() 
 
     function http_HEAD() {
-			$options = Array();
-			$options["path"] = $this->path;
-
-			if (method_exists($this, "head")) {
-				if (!$this->head($options)) {
-					$this->http_status("404 Not Found");
-				}
-			} else {
-				ob_start();
-				if (!$this->get($options)) {
-					$this->http_status("404 Not Found");
-				}
-				ob_end_clean();
-			}
+		$status = false;
+		$options = Array();
+		$options["path"] = $this->path;
+		
+		if (method_exists($this, "HEAD")) {
+			$status = $this->head($options);
+		} else if (method_exists($this, "GET")) {
+			ob_start();
+			$status = $this->get($options);
+			ob_end_clean();
+		}
+		
+		if($status===true)  $status = "200 OK";
+		if($status===false) $status = "404 Not found";
+		
+		$this->http_status($status);
     }
 
 		// }}}
