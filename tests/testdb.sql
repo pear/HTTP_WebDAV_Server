@@ -15,10 +15,10 @@ CREATE TABLE locks (
   owner varchar(200) default NULL,
   recursive int(11) default '0',
   writelock int(11) default '0',
-  exclusivelock int(11) default '0',
+  exclusivelock int(11) NOT NULL default 0,
   PRIMARY KEY  (token),
   UNIQUE KEY token (token),
-  UNIQUE KEY path (path),
+  KEY path (path),
   KEY path_2 (path),
   KEY path_3 (path,token),
   KEY expires (expires)
