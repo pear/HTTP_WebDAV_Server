@@ -794,6 +794,7 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 	// {{{ http_LOCK() 
 
     function http_LOCK() {
+		if($this->_check_lock_status($this->path)) {
 			$options = Array();
 			$options["path"] = $this->path;
 
@@ -835,7 +836,13 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 			$this->http_status($http_stat);
 
 			if($options["timeout"]) {
-				$timeout = "Second-$options[timeout]";
+				// more than a million is considered an absolute timestamp
+				// less is more likely a relative value
+				if($options["timeout"]>1000000) {
+					$timeout = "Second-".($options['timeout']-time());
+				} else {
+					$timeout = "Second-$options[timeout]";
+				}
 			} else {
 				$timeout = "Infinite";
 			}
@@ -843,7 +850,7 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 			if ($stat == true) {        // ok 
 				header("Lock-Token: <$options[locktoken]>");
 				echo "<?xml version='1.0' encoding='utf8'?>\n";
-				echo "<D:prop  xmlns:D='DAV:'>\n";
+				echo "<D:prop xmlns:D='DAV:'>\n";
 				echo " <D:lockdiscovery>\n";
 				echo "  <D:activelock>\n";
 				echo "   <D:lockscope><D:$options[scope]/></D:lockscope>\n";
@@ -854,10 +861,13 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 				echo "   <D:locktoken><D:href>$options[locktoken]</D:href></D:locktoken>\n";
 				echo "  </D:activelock>\n";
 				echo " </D:lockdiscovery>\n";
-				echo "</D:prop>\n";
+				echo "</D:prop>\n\n";
 			} else {                // fail 
 				// TODO!!!
 			}
+		} else {
+			$this->http_status("423 Locked");
+		}
     }
 
 		// }}}
