@@ -637,7 +637,7 @@ class HTTP_WebDAV_Server
                             break;
                         case "getlastmodified":
                             echo "     <D:getlastmodified ns0:dt=\"dateTime.rfc1123\">"
-                                . gmdate("D, d M Y H:m:s ", $prop['val'])
+                                . gmdate("D, d M Y H:i:s ", $prop['val'])
                                 . "GMT</D:getlastmodified>\n";
                             break;
                         case "resourcetype":
@@ -809,7 +809,7 @@ class HTTP_WebDAV_Server
                 header("Content-type: $options[mimetype]");
                 
                 if (isset($options['mtime'])) {
-                    header("Last-modified:".gmdate("D, j M Y H:m:s ", $options['mtime'])."GMT");
+                    header("Last-modified:".gmdate("D, d M Y H:i:s ", $options['mtime'])."GMT");
                 }
                 
                 if (isset($options['stream'])) {
