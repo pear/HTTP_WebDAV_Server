@@ -520,8 +520,10 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 				echo "<D:multistatus xmlns:D=\"DAV:\">\n";
 
 				foreach($files["files"] as $file) {
+					if(!is_array($file) || empty($file) || !isset($file["path"])) continue;
 					echo " <D:response $ns_defs>\n";
-					$path = $file['path'];
+					$path = $file['path'];					
+					if(!is_string($path) || $path==="") continue;
 					// todo: make sure collection hrefs end in '/'
 					// http://$_SERVER[HTTP_HOST]
 					echo "  <D:href>".$this->_urlencode($_SERVER["SCRIPT_NAME"].$path)."</D:href>\n";
