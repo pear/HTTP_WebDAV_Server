@@ -1,0 +1,16 @@
+This code depends on code introduced into the developement branch for
+PHP 4.3, so for now it will only work with CVS builds. 
+
+The code requires the PHP ini values 'always_populate_raw_post_data' 
+and 'allow_webdav_methods' to be set. You can do that globaly in your
+php.ini file, but if possible you should restrict these options to
+directories where they are really needed.
+
+With Apache you can do this  by setting them in a <directory> 
+environment in your httpd.conf file or in a local .htaccess file
+by using
+
+  php_value always_populate_raw_post_data 1
+  php_value allow_webdav_methods 1
+ 
+

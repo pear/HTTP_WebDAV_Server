@@ -1,19 +1,29 @@
 <?php
-/**
- * php_value always_populate_raw_post_data 1
- * php_value allow_webdav_methods 1
- */
+//
+// +----------------------------------------------------------------------+
+// | PHP Version 4                                                        |
+// +----------------------------------------------------------------------+
+// | Copyright (c) 1997-2002 The PHP Group                                |
+// +----------------------------------------------------------------------+
+// | This source file is subject to version 2.02 of the PHP license,      |
+// | that is bundled with this package in the file LICENSE, and is        |
+// | available at through the world-wide-web at                           |
+// | http://www.php.net/license/2_02.txt.                                 |
+// | If you did not receive a copy of the PHP license and are unable to   |
+// | obtain it through the world-wide-web, please send a note to          |
+// | license@php.net so we can mail you a copy immediately.               |
+// +----------------------------------------------------------------------+
+// | Authors: Hartmut Holzgraefe <hartmut@six.de>                         |
+// |          Author: Christian Stocker <chregu@bitflux.ch>               |
+// +----------------------------------------------------------------------+
+//
+// $Id$
+//
+// WebDAV server base class, needs to be extended to do useful work
+//
 
-if (!function_exists("errlog_r")) {
-    function errlog_r(&$var, $title = "errlog_r")
-    {
-        ob_start();
-        echo "$title\n";
-        print_r($var);
-        error_log(ob_get_contents());
-        ob_end_clean();
-    } 
-} 
+
+
 // helper class for parsing PROPFIND request bodies
 class _parse_propinfo {
     // get requested properties as array containing name/namespace pairs
