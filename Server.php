@@ -438,7 +438,7 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 			if ($this->propfind($options, $files)) {
 				// collect namespaces
 				$ns_hash = array();
-				$ns_defs = "xmlns:ns0='urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/'";    // M$ needs this for time values
+				$ns_defs = "xmlns:ns0=\"urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/\"";    // M$ needs this for time values
 				foreach($files["files"] as $filekey => $file) {
 					if (@is_array($file["props"])) {
 						foreach($file["props"] as $key => $prop) {
@@ -479,7 +479,7 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 								continue;
 							$ns_name = "ns".(count($ns_hash) + 1);
 							$ns_hash[$ns] = $ns_name;
-							$ns_defs .= " xmlns:$ns_name='$ns'";
+							$ns_defs .= " xmlns:$ns_name=\"$ns\"";
 						}
 					}
 					// add entries requested but not found
@@ -505,7 +505,7 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 										!isset($ns_hash[$reqprop["xmlns"]])) {
 										$ns_name = "ns".(count($ns_hash) + 1);
 										$ns_hash[$reqprop["xmlns"]] = $ns_name;
-										$ns_defs .= " xmlns:$ns_name='$reqprop[xmlns]'";
+										$ns_defs .= " xmlns:$ns_name=\"$reqprop[xmlns]\"";
 									}
 								}
 							}
@@ -516,8 +516,8 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 				$this->http_status("207 Multi-Status");
 				header('Content-Type: text/xml; charset="utf-8"');
 
-				echo "<?xml version='1.0' encoding='utf-8'?>\n";
-				echo "<D:multistatus xmlns:D='DAV:'>\n";
+				echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+				echo "<D:multistatus xmlns:D=\"DAV:\">\n";
 
 				foreach($files["files"] as $file) {
 					echo " <D:response $ns_defs>\n";
@@ -538,17 +538,17 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 								} else if($prop["ns"]) {
 									echo "     <".$ns_hash[$prop["ns"]].":$prop[name]/>\n";
 								} else {
-									echo "     <$prop[name] xmlns=''/>";
+									echo "     <$prop[name] xmlns=\"\"/>";
 								}
 							} else if ($prop["ns"] == "DAV:") {
 								switch ($prop["name"]) {
 								case "creationdate":
-									echo "     <D:creationdate ns0:dt='dateTime.tz'>".
+									echo "     <D:creationdate ns0:dt=\"dateTime.tz\">".
 										date("Y-m-d\\TH:i:s\\Z",$prop['val']).
 										"</D:creationdate>\n";
 									break;
 								case "getlastmodified":
-									echo "     <D:getlastmodified ns0:dt='dateTime.rfc1123'>".
+									echo "     <D:getlastmodified ns0:dt=\"dateTime.rfc1123\">".
 										date("D, j M Y H:m:s ",
 												 $prop['val']).
 										"GMT</D:getlastmodified>\n";
@@ -580,7 +580,7 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 										$ns_hash[$prop["ns"]].
 										":$prop[name]>\n";
 								} else {
-									echo "     <$prop[name] xmlns=''>".
+									echo "     <$prop[name] xmlns=\"\">".
 										utf8_encode(htmlspecialchars
 																($prop['val'])).
 										"</$prop[name]>\n";
@@ -601,7 +601,7 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 							if ($prop["ns"] == "DAV:") {
 								echo "     <D:$prop[name]/>\n";
 							} else if ($prop["ns"] == "") {
-								echo "     <$prop[name] xmlns=''/>\n";
+								echo "     <$prop[name] xmlns=\"\"/>\n";
 							} else {
 								echo "     <".$ns_hash[$prop["ns"]].
 									":$prop[name]/>\n";
@@ -642,17 +642,17 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 			$responsedescr = $this->proppatch($options);
 
 			$this->http_status("207 Multi-Status");
-			header('Content-Type: text/xml');
+			header('Content-Type: text/xml; charset="utf-8"');
 
-			echo "<?xml version='1.0' encoding='utf-8'?>\n";
+			echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 
-			echo "<D:multistatus xmlns:D='DAV:'>\n";
+			echo "<D:multistatus xmlns:D=\"DAV:\">\n";
 			echo " <D:response>\n";
 			echo "  <D:href>".$this->_urlencode($_SERVER["SCRIPT_NAME"].$this->path)."</D:href>\n";
 
 			foreach($options["props"] as $prop) {
 				echo "   <D:propstat>\n";
-				echo "    <D:prop><$prop[name] xmlns='$prop[ns]'/></D:prop>\n";
+				echo "    <D:prop><$prop[name] xmlns=\"$prop[ns]\"/></D:prop>\n";
 				echo "    <D:status>HTTP/1.1 $prop[status]</D:status>\n";
 				echo "   </D:propstat>\n";
 			}
@@ -848,9 +848,10 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 			}
 			
 			if ($stat == true) {        // ok 
+				header('Content-Type: text/xml; charset="utf-8"');
 				header("Lock-Token: <$options[locktoken]>");
-				echo "<?xml version='1.0' encoding='utf-8'?>\n";
-				echo "<D:prop xmlns:D='DAV:'>\n";
+				echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+				echo "<D:prop xmlns:D=\"DAV:\">\n";
 				echo " <D:lockdiscovery>\n";
 				echo "  <D:activelock>\n";
 				echo "   <D:lockscope><D:$options[scope]/></D:lockscope>\n";
