@@ -325,6 +325,11 @@
             // sanity check
             if (!file_exists($fspath)) return false;
             
+			// is this a collection?
+			if (is_dir($fspath)) {
+				return $this->GetDir($fspath, $options);
+			}
+			
             // detect resource type
             $options['mimetype'] = $this->_mimetype($fspath); 
                 
@@ -343,7 +348,49 @@
             return true;
         }
 
-        
+		/**
+		 * GET method handler for directories
+		 *
+		 * This is a very simple mod_index lookalike.
+		 * See RFC 2518, Section 8.4 on GET/HEAD for collections
+		 *
+		 * @param  string  directory path
+		 * @return void    function has to handle HTTP response itself
+		 */
+		function GetDir($fspath, &$options) 
+		{
+			// fixed width directory column format
+			$format = "%15s  %-19s  %-s\n";
+
+			$handle = @opendir($fspath) or return false;
+
+			echo "<html><head><title>Index of ".$options['path']."</title></head>\n";
+			
+			echo "<h1>Index of ".$options['path']."</h1>\n";
+			
+			echo "<pre>";
+			printf($format, "Size", "Last modified", "Filename");
+			echo "<hr>";
+
+			while ($filename = readdir($handle)) {
+				if ($filename != "." && $filename != "..") {
+					$fullpath = $fspath."/".$filename;
+					printf($format, 
+						   number_format(filesize($fullpath)),
+						   strftime("%Y-%m-%d %H:%M:%S", filemtime($fullpath)), 
+						   htmlspecialchars($filename));
+				}
+			}
+
+			echo "</pre>";
+
+			closedir($handle);
+
+			echo "</html>\n";
+
+			exit;
+		}
+
         /**
          * PUT method handler
          * 
