@@ -100,6 +100,10 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 			header("X-Dav-Powered-By: PHP class: ".get_class($this));
 
 			if (!$this->_check_auth()) {
+				// RFC2518 says we must use Digest instead of Basic
+				// but Microsoft Clients do not support Digest
+				// and we don't support NTLM and M$-Kerberos
+				// so we are stuck with Basic here
 				header('WWW-Authenticate: Basic realm="'.($this->http_auth_realm).'"');
 				header('HTTP/1.0 401 Unauthorized');
 
