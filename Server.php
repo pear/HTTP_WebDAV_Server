@@ -434,7 +434,7 @@ class HTTP_WebDAV_Server
 
         // dav header
         $dav = array(1);        // assume we are always dav class 1 compliant
-        if (isset($allow['lock'])) {
+        if (isset($allow['LOCK'])) {
             $dav[] = 2;         // dav class 2 requires that locking is supported 
         }
 
@@ -637,7 +637,7 @@ class HTTP_WebDAV_Server
                             break;
                         case "getlastmodified":
                             echo "     <D:getlastmodified ns0:dt=\"dateTime.rfc1123\">"
-                                . gmdate("D, j M Y H:m:s ", $prop['val'])
+                                . gmdate("D, d M Y H:m:s ", $prop['val'])
                                 . "GMT</D:getlastmodified>\n";
                             break;
                         case "resourcetype":
@@ -1388,28 +1388,28 @@ class HTTP_WebDAV_Server
     function _allow() 
     {
         // OPTIONS is always there
-        $allow = array("options" =>"OPTIONS");
+        $allow = array("OPTIONS" =>"OPTIONS");
 
         // all other METHODS need both a http_method() wrapper
         // and a method() implementation
         // the base class supplies wrappers only
         foreach(get_class_methods($this) as $method) {
             if (!strncmp("http_", $method, 5)) {
-                $method = substr($method, 5);
+                $method = strtoupper(substr($method, 5));
                 if (method_exists($this, $method)) {
-                    $allow[$method] = strtoupper($method);
+                    $allow[$method] = $method;
                 }
             }
         }
 
         // we can emulate a missing HEAD implemetation using GET
-        if (isset($allow["get"]))
-            $allow["head"] = "HEAD";
+        if (isset($allow["GET"]))
+            $allow["HEAD"] = "HEAD";
 
         // no LOCK without checklok()
         if (!method_exists($this, "checklock")) {
-            unset($allow["lock"]);
-            unset($allow["unlock"]);
+            unset($allow["LOCK"]);
+            unset($allow["UNLOCK"]);
         }
 
         return $allow;
