@@ -27,6 +27,7 @@ Short term:
   (have to dig out my design pattern book ...?)
 - mimetype may be guessed for stream
   (mime_magic extension now supports this in HEAD)
+- maybe: ETags support ...
 
 Long term:
 - Versioning 
