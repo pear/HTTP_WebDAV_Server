@@ -177,7 +177,6 @@
                 // directory (WebDAV collection)
                 $info["props"][] = $this->mkprop("resourcetype", "collection");
                 $info["props"][] = $this->mkprop("getcontenttype", "httpd/unix-directory");             
-                $info["props"][] = $this->mkprop("getcontentlength", 0);
             } else {
                 // plain file (WebDAV resource)
                 $info["props"][] = $this->mkprop("resourcetype", "");
