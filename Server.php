@@ -825,13 +825,13 @@ class HTTP_WebDAV_Server
                             if (isset($range['start'])) {
                                 fseek($options['stream'], $range['start'], SEEK_SET);
                                 if (feof($options['stream'])) {
-                                    http_status("416 Requested range not satisfiable");
+                                    $this->http_status("416 Requested range not satisfiable");
                                     exit;
                                 }
 
                                 if (isset($range['end'])) {
                                     $size = $range['end']-$range['start']+1;
-                                    http_status("206 partial");
+                                    $this->http_status("206 partial");
                                     header("Content-length: $size");
                                     header("Content-range: $range[start]-$range[end]/"
                                            . (isset($options['size']) ? $options['size'] : "*"));
@@ -841,7 +841,7 @@ class HTTP_WebDAV_Server
                                         echo $buffer;
                                     }
                                 } else {
-                                    http_status("206 partial");
+                                    $this->http_status("206 partial");
                                     if (isset($options['size'])) {
                                         header("Content-length: ".($options['size'] - $range['start']));
                                         header("Content-range: $start-$end/"
