@@ -1,30 +1,86 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE package SYSTEM "http://pear.php.net/dtd/package-1.0">
 
-<package version="1.0">
-	<name>HTTP_WebDAV_Server</name>
+ <package>
+  <name>HTTP_WebDAV_Server</name>
   <summary>WebDAV Server Baseclass.</summary>
   <description>
-   Mostly RFC2518 compliant helper class for WebDAV server implementation. 
+   RFC2518 compliant helper class for WebDAV server implementation. 
   </description>
-	
+    
   <maintainers>
-		<maintainer>
-			<user>hholzgra</user>
-			<name>Hartmut Holzgraefe</name>
-			<email>hholzgra@php.net</email>
-			<role>lead</role>
-		</maintainer>
-		
-		<maintainer>
-			<user>chregu</user>
-			<name>Christian Stocker</name>
-			<email>chregu@bitflux.ch</email>
-			<role>lead</role>
-		</maintainer>
+   <maintainer>
+    <user>hholzgra</user>
+    <name>Hartmut Holzgraefe</name>
+    <email>hholzgra@php.net</email>
+    <role>lead</role>
+   </maintainer>     
+   <maintainer>
+    <user>chregu</user>
+    <name>Christian Stocker</name>
+    <email>chregu@bitflux.ch</email>
+    <role>lead</role>
+   </maintainer>
   </maintainers>
-	
+    
   <release>
+   <version>0.99</version>
+   <date>2003-11-18</date>
+   <state>beta</state>
+   <license>PHP</license>
+   <notes>
+almost all TODO features and issues for 1.0 are now implemented,
+there might be some additional API cleanups in PROPFIND and PROPPATCH
+and some small issues in the Fileserver example still exist
+
+as soon as this is done i think the packe is ready for
+a 1.0RC1 release
+
+Starting with this release it is now possible to return 
+streams from GET and PUT. IF you return a readable stream 
+from GET or a writable stream from PUT the base class will
+take care of any further action including HTTP header 
+generation and handling of partial GETs and PUTs (if the
+returned streams are seekable). 
+
+The only things you should return in addition to an
+appropriate open stream are the current size of the
+resource in $options['size'] for both GET and PUT 
+and the mimetype in $options['mimetype'] and modification 
+date in $options['mtime'] for GET.
+   </notes>
+   <deps>
+    <dep type="php" rel="ge" version="4.3"/>
+    <dep type="pkg" rel="ge" version="1.0">HTTP</dep>
+   </deps>
+   <filelist>
+    <dir name="/" baseinstalldir="HTTP/WebDAV">
+     <file role="php">Server.php</file>
+     <dir name="Server">
+      <file role="php">Filesystem.php</file>
+     </dir>
+     <dir name="Tools">
+      <file role="php">_parse_propfind.php</file>
+      <file role="php">_parse_proppatch.php</file>
+      <file role="php">_parse_lockinfo.php</file>
+     </dir>
+    </dir>
+   </filelist>
+  </release>
+    
+  <changelog>
+   <release>
+    <version>0.9.1</version>
+    <date>2003-05-28</date>
+    <state>alpha</state>
+    <license>PHP</license>
+    <notes>
+usable (complies to RFC 2518 in all but shared locks afaik)
+but still in developement
+    </notes>
+   </release>
+  
+   <release>
     <version>0.9</version>
     <date>2003-02-18</date>
     <state>alpha</state>
@@ -33,24 +89,7 @@
 usable (complies to RFC 2518 in all but shared locks afaik)
 but still in developement
     </notes>
-    <deps>
-			<dep type="php" rel="ge" version="4.3"/>
-      <dep type="pkg" rel="ge" version="1.0">HTTP</dep>
-    </deps>
-    <filelist>
-			<dir name="/" baseinstalldir="HTTP/WebDAV">
-        <file role="php">Server.php</file>
-				<dir name="Server">
-          <file role="php">Filesystem.php</file>
-					<file role="php">_parse_propfind.php</file>
-					<file role="php">_parse_proppatch.php</file>
-					<file role="php">_parse_lockinfo.php</file>
-				</dir>
-			</dir>
-		</filelist>
-  </release>
-	
-  <changelog>
+   </release>
   </changelog>
-	
-</package>
+    
+ </package>
