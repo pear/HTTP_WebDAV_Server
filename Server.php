@@ -22,9 +22,9 @@
 // WebDAV server base class, needs to be extended to do useful work
 //
 // require_once "HTTP/HTTP.php";
-require_once "HTTP/WebDAV/Server/_parse_propfind.php";
-require_once "HTTP/WebDAV/Server/_parse_proppatch.php";
-require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
+require_once "HTTP/WebDAV/Tools/_parse_propfind.php";
+require_once "HTTP/WebDAV/Tools/_parse_proppatch.php";
+require_once "HTTP/WebDAV/Tools/_parse_lockinfo.php";
 
 
 
@@ -40,104 +40,104 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
    */
 class HTTP_WebDAV_Server {
     // {{{ Member Variables 
-	
+    
                 /**
-		 * URI path for this request
-		 *
-		 * @var string 
-		 */
+         * URI path for this request
+         *
+         * @var string 
+         */
     var $path;
 
                 /**
-		 * Realm string to be used in authentification popups
-		 *
-		 * @var string 
-		 */
+         * Realm string to be used in authentification popups
+         *
+         * @var string 
+         */
     var $http_auth_realm = "PHP WebDAV";
 
                 /**
-		 * Remember parsed If: (RFC2518/9.4) header conditions  
-		 *
-		 * @var array
-		 */
+         * Remember parsed If: (RFC2518/9.4) header conditions  
+         *
+         * @var array
+         */
     var $_if_header_uris = array();
 
 
     var $_http_status = "200 OK";
 
-	var $_prop_encoding = "utf-8";
+    var $_prop_encoding = "utf-8";
     // }}}
 
     // {{{ Constructor 
 
                 /** 
-		 * Constructor
-		 *
-		 * @param void
-		 */
+         * Constructor
+         *
+         * @param void
+         */
     function HTTP_WebDAV_Server() {
         // PHP messages destroy XML output -> switch them off
         ini_set("display_errors", 0);
     }
 
-	// }}}
-	// {{{ ServeRequest() 
+    // }}}
+    // {{{ ServeRequest() 
 /** 
-		 * Serve WebDAV HTTP request
-		 *
-		 * dispatch WebDAV HTTP request to the apropriate method handler
-		 * 
-		 * @param void
-		 * @return void
-		 */
+         * Serve WebDAV HTTP request
+         *
+         * dispatch WebDAV HTTP request to the apropriate method handler
+         * 
+         * @param void
+         * @return void
+         */
     function ServeRequest() {
-			// identify ourselves
-			header("X-Dav-Powered-By: PHP class: ".get_class($this));
+            // identify ourselves
+            header("X-Dav-Powered-By: PHP class: ".get_class($this));
 
-			if (!$this->_check_auth()) {
-				// RFC2518 says we must use Digest instead of Basic
-				// but Microsoft Clients do not support Digest
-				// and we don't support NTLM and M$-Kerberos
-				// so we are stuck with Basic here
-				header('WWW-Authenticate: Basic realm="'.($this->http_auth_realm).'"');
-				header('HTTP/1.0 401 Unauthorized');
+            if (!$this->_check_auth()) {
+                // RFC2518 says we must use Digest instead of Basic
+                // but Microsoft Clients do not support Digest
+                // and we don't support NTLM and M$-Kerberos
+                // so we are stuck with Basic here
+                header('WWW-Authenticate: Basic realm="'.($this->http_auth_realm).'"');
+                header('HTTP/1.0 401 Unauthorized');
 
-				exit;
-			}
+                exit;
+            }
 
-			if(! $this->_check_if_header_conditions()) {
-				header("HTTP/1.0 412 Precondition failed");
-				exit;
-			}
+            if(! $this->_check_if_header_conditions()) {
+                header("HTTP/1.0 412 Precondition failed");
+                exit;
+            }
 
-			// set path
-			$this->path =
-				$this->_urldecode(!empty($_SERVER["PATH_INFO"]) ? $_SERVER["PATH_INFO"] : "/");
-			if(ini_get("magic_quotes_gpc")) {
-				$this->path = stripslashes($this->path);
-			}
+            // set path
+            $this->path =
+                $this->_urldecode(!empty($_SERVER["PATH_INFO"]) ? $_SERVER["PATH_INFO"] : "/");
+            if(ini_get("magic_quotes_gpc")) {
+                $this->path = stripslashes($this->path);
+            }
 
 
-			// detect requested method names
-			$method = strtolower($_SERVER["REQUEST_METHOD"]);
-			$wrapper = "http_".$method;
+            // detect requested method names
+            $method = strtolower($_SERVER["REQUEST_METHOD"]);
+            $wrapper = "http_".$method;
 
-			// activate HEAD emulation by GET if no HEAD method found
-			if ($method == "head" && !method_exists($this, "head")) {
-				$method = "get";
-			}
+            // activate HEAD emulation by GET if no HEAD method found
+            if ($method == "head" && !method_exists($this, "head")) {
+                $method = "get";
+            }
 
-			if (method_exists($this, $wrapper) &&
-					($method == "options" || method_exists($this, $method))) {
-				$this->$wrapper();  // call method by name
-			} else {
-				if ($_SERVER["REQUEST_METHOD"] == "LOCK") {
-					$this->http_status("412 Precondition failed");
-				} else {
-					$this->http_status("405 Method not allowed");
-					header("Allow: ".join(", ", $this->_allow()));  // tell client what's allowed
-				}
-			}
+            if (method_exists($this, $wrapper) &&
+                    ($method == "options" || method_exists($this, $method))) {
+                $this->$wrapper();  // call method by name
+            } else {
+                if ($_SERVER["REQUEST_METHOD"] == "LOCK") {
+                    $this->http_status("412 Precondition failed");
+                } else {
+                    $this->http_status("405 Method not allowed");
+                    header("Allow: ".join(", ", $this->_allow()));  // tell client what's allowed
+                }
+            }
 
     }
 
@@ -147,22 +147,22 @@ class HTTP_WebDAV_Server {
 
     // {{{ GET() 
                  /**
-		 * GET implementation
-		 *
-		 * overload this method to retrieve resources from your server
-		 * <br>
-		 * 
-		 *
-		 * @abstract 
-		 * @param array &$params Array of input and output parameters
-		 * <br><b>input</b><ul>
-		 * <li> path - 
-		 * </ul>
-		 * <br><b>output</b><ul>
-		 * <li> size - 
-		 * </ul>
-		 * @returns int HTTP-Statuscode
-		 */
+         * GET implementation
+         *
+         * overload this method to retrieve resources from your server
+         * <br>
+         * 
+         *
+         * @abstract 
+         * @param array &$params Array of input and output parameters
+         * <br><b>input</b><ul>
+         * <li> path - 
+         * </ul>
+         * <br><b>output</b><ul>
+         * <li> size - 
+         * </ul>
+         * @returns int HTTP-Statuscode
+         */
 
     /* abstract
        function GET(&$params) {
@@ -174,14 +174,14 @@ class HTTP_WebDAV_Server {
 
     // {{{ PUT() 
                 /**
-		 * PUT implementation
-		 *
-		 * PUT implementation
-		 *
-		 * @abstract 
-		 * @param array &$params
-		 * @returns int HTTP-Statuscode
-		 */
+         * PUT implementation
+         *
+         * PUT implementation
+         *
+         * @abstract 
+         * @param array &$params
+         * @returns int HTTP-Statuscode
+         */
 
     /* abstract
        function PUT() {
@@ -194,14 +194,14 @@ class HTTP_WebDAV_Server {
     // {{{ COPY() 
 
                 /**
-		 * COPY implementation
-		 *
-		 * COPY implementation
-		 *
-		 * @abstract 
-		 * @param array &$params
-		 * @returns int HTTP-Statuscode
-		 */
+         * COPY implementation
+         *
+         * COPY implementation
+         *
+         * @abstract 
+         * @param array &$params
+         * @returns int HTTP-Statuscode
+         */
 
     /* abstract
        function COPY() {
@@ -214,14 +214,14 @@ class HTTP_WebDAV_Server {
     // {{{ MOVE() 
 
                 /**
-		 * MOVE implementation
-		 *
-		 * MOVE implementation
-		 *
-		 * @abstract 
-		 * @param array &$params
-		 * @returns int HTTP-Statuscode
-		 */
+         * MOVE implementation
+         *
+         * MOVE implementation
+         *
+         * @abstract 
+         * @param array &$params
+         * @returns int HTTP-Statuscode
+         */
 
     /* abstract
        function MOVE() {
@@ -234,14 +234,14 @@ class HTTP_WebDAV_Server {
     // {{{ DELETE() 
 
                 /**
-		 * DELETE implementation
-		 *
-		 * DELETE implementation
-		 *
-		 * @abstract 
-		 * @param array &$params
-		 * @returns int HTTP-Statuscode
-		 */
+         * DELETE implementation
+         *
+         * DELETE implementation
+         *
+         * @abstract 
+         * @param array &$params
+         * @returns int HTTP-Statuscode
+         */
 
     /* abstract
        function DELETE() {
@@ -253,14 +253,14 @@ class HTTP_WebDAV_Server {
     // {{{ PROPFIND() 
 
                 /**
-		 * PROPFIND implementation
-		 *
-		 * PROPFIND implementation
-		 *
-		 * @abstract 
-		 * @param array &$params
-		 * @returns int HTTP-Statuscode
-		 */
+         * PROPFIND implementation
+         *
+         * PROPFIND implementation
+         *
+         * @abstract 
+         * @param array &$params
+         * @returns int HTTP-Statuscode
+         */
 
     /* abstract
        function PROPFIND() {
@@ -273,14 +273,14 @@ class HTTP_WebDAV_Server {
     // {{{ PROPPATCH() 
 
                 /**
-		 * PROPPATCH implementation
-		 *
-		 * PROPPATCH implementation
-		 *
-		 * @abstract 
-		 * @param array &$params
-		 * @returns int HTTP-Statuscode
-		 */
+         * PROPPATCH implementation
+         *
+         * PROPPATCH implementation
+         *
+         * @abstract 
+         * @param array &$params
+         * @returns int HTTP-Statuscode
+         */
 
     /* abstract
        function PROPPATCH() {
@@ -292,14 +292,14 @@ class HTTP_WebDAV_Server {
     // {{{ LOCK() 
 
                 /**
-		 * LOCK implementation
-		 *
-		 * LOCK implementation
-		 *
-		 * @abstract 
-		 * @param array &$params
-		 * @returns int HTTP-Statuscode
-		 */
+         * LOCK implementation
+         *
+         * LOCK implementation
+         *
+         * @abstract 
+         * @param array &$params
+         * @returns int HTTP-Statuscode
+         */
 
     /* abstract
        function LOCK() {
@@ -311,14 +311,14 @@ class HTTP_WebDAV_Server {
     // {{{ UNLOCK() 
 
                 /**
-		 * UNLOCK implementation
-		 *
-		 * UNLOCK implementation
-		 *
-		 * @abstract 
-		 * @param array &$params
-		 * @returns int HTTP-Statuscode
-		 */
+         * UNLOCK implementation
+         *
+         * UNLOCK implementation
+         *
+         * @abstract 
+         * @param array &$params
+         * @returns int HTTP-Statuscode
+         */
 
     /* abstract
        function UNLOCK() {
@@ -334,16 +334,16 @@ class HTTP_WebDAV_Server {
     // {{{ check_auth() 
 
                  /**
-		 * check authentication
-		 *
-		 * overload this method to retrieve and confirm authentication information
-		 *
-		 * @abstract 
-		 * @param string type Authentication type, e.g. "basic" or "digest"
-		 * @param string username Transmitted username
-		 * @param string passwort Transmitted password
-		 * @returns bool Authentication status
-		 */
+         * check authentication
+         *
+         * overload this method to retrieve and confirm authentication information
+         *
+         * @abstract 
+         * @param string type Authentication type, e.g. "basic" or "digest"
+         * @param string username Transmitted username
+         * @param string passwort Transmitted password
+         * @returns bool Authentication status
+         */
 
     /* abstract
        function check_auth($type, $username, $password) {
@@ -356,16 +356,16 @@ class HTTP_WebDAV_Server {
     // {{{ checklock() 
 
                  /**
-		 * check lock status for a resource
-		 *
-		 * overload this method to return shared and exclusive locks 
-		 * active for this resource
-		 *
-		 * @abstract 
-		 * @param string resource Resource path to check
-		 * @returns array An array of lock entries each consisting
-		 *                of 'type' ('shared'/'exclusive'), 'token' and 'timeout'
-		 */
+         * check lock status for a resource
+         *
+         * overload this method to return shared and exclusive locks 
+         * active for this resource
+         *
+         * @abstract 
+         * @param string resource Resource path to check
+         * @returns array An array of lock entries each consisting
+         *                of 'type' ('shared'/'exclusive'), 'token' and 'timeout'
+         */
 
     /* abstract
        function checklock($resource) {
@@ -382,15 +382,15 @@ class HTTP_WebDAV_Server {
     // {{{ http_OPTIONS() 
 
                 /**
-		 * OPTIONS method handler
-		 *
-		 * The OPTIONS method handler creates a valid OPTIONS reply
-		 * including Dav: and Allowed: heaers
-		 * based on the implemented methods found in the actual instance
-		 *
-		 * @param void
-		 * @returns void
-		 */
+         * OPTIONS method handler
+         *
+         * The OPTIONS method handler creates a valid OPTIONS reply
+         * including Dav: and Allowed: heaers
+         * based on the implemented methods found in the actual instance
+         *
+         * @param void
+         * @returns void
+         */
 
     function http_OPTIONS() {
         $this->http_status("200 OK");
@@ -419,207 +419,207 @@ class HTTP_WebDAV_Server {
         $options = Array();
         $options["path"] = $this->path;
 
-			if (isset($_SERVER['HTTP_DEPTH'])) {
-				$options["depth"] = $_SERVER["HTTP_DEPTH"];
-			} else {
-				$options["depth"] = "infinity";
-			}
-			
-			$propinfo = new _parse_propfind("php://input");
+            if (isset($_SERVER['HTTP_DEPTH'])) {
+                $options["depth"] = $_SERVER["HTTP_DEPTH"];
+            } else {
+                $options["depth"] = "infinity";
+            }
+            
+            $propinfo = new _parse_propfind("php://input");
 
-			if (!$propinfo->success) {
-				$this->http_status("400 Error");
-				return;
-			}
-			
-			$options['props'] = $propinfo->props;
-			
-			if ($this->propfind($options, $files)) {
-				// collect namespaces
-				$ns_hash = array();
-				$ns_defs = "xmlns:ns0=\"urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/\"";    // M$ needs this for time values
-				foreach($files["files"] as $filekey => $file) {
-					if (@is_array($file["props"])) {
-						foreach($file["props"] as $key => $prop) {
-							// clean up returned properties, leave only requested entries
+            if (!$propinfo->success) {
+                $this->http_status("400 Error");
+                return;
+            }
+            
+            $options['props'] = $propinfo->props;
+            
+            if ($this->propfind($options, $files)) {
+                // collect namespaces
+                $ns_hash = array();
+                $ns_defs = "xmlns:ns0=\"urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/\"";    // M$ needs this for time values
+                foreach($files["files"] as $filekey => $file) {
+                    if (@is_array($file["props"])) {
+                        foreach($file["props"] as $key => $prop) {
+                            // clean up returned properties, leave only requested entries
 
-							switch($options['props']) {
-							case "all":   
-								break;
-							case "names":
-								unset($files["files"][$filekey]["props"][$key]["val"]);
-								break;
-							default:
-								$found = false;
-								
-								if (is_array($options["props"])) {
-									foreach($options["props"] as $reqprop) {
-										if ($reqprop["name"] == $prop["name"]) {
-											// todo NameSpaces
-											$found = true;
-											break;
-										}
-									}
-								}
-								
-								if (!$found) {
-									$files["files"][$filekey]["props"][$key]="";
-									continue(2);
-								}
-								break;
-							}
+                            switch($options['props']) {
+                            case "all":   
+                                break;
+                            case "names":
+                                unset($files["files"][$filekey]["props"][$key]["val"]);
+                                break;
+                            default:
+                                $found = false;
+                                
+                                if (is_array($options["props"])) {
+                                    foreach($options["props"] as $reqprop) {
+                                        if ($reqprop["name"] == $prop["name"]) {
+                                            // todo NameSpaces
+                                            $found = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                if (!$found) {
+                                    $files["files"][$filekey]["props"][$key]="";
+                                    continue(2);
+                                }
+                                break;
+                            }
 
-							if (empty($prop["ns"]))
-								continue;
-							$ns = $prop["ns"];
-							if ($ns == "DAV:")
-								continue;
-							if (isset($ns_hash[$ns]))
-								continue;
-							$ns_name = "ns".(count($ns_hash) + 1);
-							$ns_hash[$ns] = $ns_name;
-							$ns_defs .= " xmlns:$ns_name=\"$ns\"";
-						}
-					}
-					// add entries requested but not found
-					if (is_array($options['props'])) {
-						foreach($options["props"] as $reqprop) {
-							if($reqprop['name']=="") continue;
-							$found = false;
-							foreach($file["props"] as $prop) {
-								if ($reqprop["name"] == $prop["name"]) {
-									// todo NameSpaces
-									$found = true;
-									break;
-								}
-							}
-							if (!$found) {
-								if($reqprop["xmlns"]==="DAV:" && $reqprop["name"]==="lockdiscovery") {
-									$files["files"][$filekey]["props"][] 
-										= $this->mkprop("DAV:", "lockdiscovery" , $this->lockdiscovery($files["files"][$filekey]['path']));
-								} else {
-									$files["files"][$filekey]["noprops"][] =
-										$this->mkprop($reqprop["xmlns"], $reqprop["name"], "");
-									if ($reqprop["xmlns"] != "DAV:" &&
-										!isset($ns_hash[$reqprop["xmlns"]])) {
-										$ns_name = "ns".(count($ns_hash) + 1);
-										$ns_hash[$reqprop["xmlns"]] = $ns_name;
-										$ns_defs .= " xmlns:$ns_name=\"$reqprop[xmlns]\"";
-									}
-								}
-							}
-						}
-					}
-				}
-				
-				$this->http_status("207 Multi-Status");
-				header('Content-Type: text/xml; charset="utf-8"');
+                            if (empty($prop["ns"]))
+                                continue;
+                            $ns = $prop["ns"];
+                            if ($ns == "DAV:")
+                                continue;
+                            if (isset($ns_hash[$ns]))
+                                continue;
+                            $ns_name = "ns".(count($ns_hash) + 1);
+                            $ns_hash[$ns] = $ns_name;
+                            $ns_defs .= " xmlns:$ns_name=\"$ns\"";
+                        }
+                    }
+                    // add entries requested but not found
+                    if (is_array($options['props'])) {
+                        foreach($options["props"] as $reqprop) {
+                            if($reqprop['name']=="") continue;
+                            $found = false;
+                            foreach($file["props"] as $prop) {
+                                if ($reqprop["name"] == $prop["name"]) {
+                                    // todo NameSpaces
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                            if (!$found) {
+                                if($reqprop["xmlns"]==="DAV:" && $reqprop["name"]==="lockdiscovery") {
+                                    $files["files"][$filekey]["props"][] 
+                                        = $this->mkprop("DAV:", "lockdiscovery" , $this->lockdiscovery($files["files"][$filekey]['path']));
+                                } else {
+                                    $files["files"][$filekey]["noprops"][] =
+                                        $this->mkprop($reqprop["xmlns"], $reqprop["name"], "");
+                                    if ($reqprop["xmlns"] != "DAV:" &&
+                                        !isset($ns_hash[$reqprop["xmlns"]])) {
+                                        $ns_name = "ns".(count($ns_hash) + 1);
+                                        $ns_hash[$reqprop["xmlns"]] = $ns_name;
+                                        $ns_defs .= " xmlns:$ns_name=\"$reqprop[xmlns]\"";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                $this->http_status("207 Multi-Status");
+                header('Content-Type: text/xml; charset="utf-8"');
 
-				echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-				echo "<D:multistatus xmlns:D=\"DAV:\">\n";
+                echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+                echo "<D:multistatus xmlns:D=\"DAV:\">\n";
 
-				foreach($files["files"] as $file) {
-					if(!is_array($file) || empty($file) || !isset($file["path"])) continue;
-					echo " <D:response $ns_defs>\n";
-					$path = $file['path'];					
-					if(!is_string($path) || $path==="") continue;
-					// todo: make sure collection hrefs end in '/'
-					// http://$_SERVER[HTTP_HOST]
-					echo "  <D:href>".$this->_urlencode($_SERVER["SCRIPT_NAME"].$path)."</D:href>\n";
-					echo "   <D:propstat>\n";
-					echo "    <D:prop>\n";
-					if (@is_array($file["props"])) {
-						foreach($file["props"] as $key => $prop) {
-							if (!is_array($prop)) continue;
-							if (!isset($prop["name"])) continue;
+                foreach($files["files"] as $file) {
+                    if(!is_array($file) || empty($file) || !isset($file["path"])) continue;
+                    echo " <D:response $ns_defs>\n";
+                    $path = $file['path'];                  
+                    if(!is_string($path) || $path==="") continue;
+                    // todo: make sure collection hrefs end in '/'
+                    // http://$_SERVER[HTTP_HOST]
+                    echo "  <D:href>".$this->_urlencode($_SERVER["SCRIPT_NAME"].$path)."</D:href>\n";
+                    echo "   <D:propstat>\n";
+                    echo "    <D:prop>\n";
+                    if (@is_array($file["props"])) {
+                        foreach($file["props"] as $key => $prop) {
+                            if (!is_array($prop)) continue;
+                            if (!isset($prop["name"])) continue;
 
-							if (!isset($prop["val"]) || $prop["val"] === "" || $prop["val"] === false) {
-								if($prop["ns"]=="DAV:") {
-									echo "     <D:$prop[name]/>\n";
-								} else if($prop["ns"]) {
-									echo "     <".$ns_hash[$prop["ns"]].":$prop[name]/>\n";
-								} else {
-									echo "     <$prop[name] xmlns=\"\"/>";
-								}
-							} else if ($prop["ns"] == "DAV:") {
-								switch ($prop["name"]) {
-								case "creationdate":
-									echo "     <D:creationdate ns0:dt=\"dateTime.tz\">".
-										date("Y-m-d\\TH:i:s\\Z",$prop['val']).
-										"</D:creationdate>\n";
-									break;
-								case "getlastmodified":
-									echo "     <D:getlastmodified ns0:dt=\"dateTime.rfc1123\">".
-										date("D, j M Y H:m:s ",
-												 $prop['val']).
-										"GMT</D:getlastmodified>\n";
-									break;
-								case "resourcetype":
-									echo "     <D:resourcetype><D:$prop[val]/></D:resourcetype>\n";
-									break;
-								case "supportedlock":
-									echo "     <D:supportedlock>$prop[val]</D:supportedlock>\n";
-									break;
-								case "lockdiscovery":  
-									echo "     <D:lockdiscovery>\n";
-									echo $prop["val"];
-									echo "     </D:lockdiscovery>\n";
-									break;
-								default:									
-									echo "     <D:$prop[name]>".
-										$this->prop_encode(htmlspecialchars
-																($prop['val'])).
-										"</D:$prop[name]>\n";								
-									break;
-								}
-							} else {
-								if ($prop["ns"]) {
-									echo "     <".$ns_hash[$prop["ns"]].
-										":$prop[name]>".
-										$this->prop_encode(htmlspecialchars
-																($prop['val']))."</".
-										$ns_hash[$prop["ns"]].
-										":$prop[name]>\n";
-								} else {
-									echo "     <$prop[name] xmlns=\"\">".
-										$this->prop_encode(htmlspecialchars
-																($prop['val'])).
-										"</$prop[name]>\n";
-								}								
-							}
-						}
-					}
-					echo "   </D:prop>\n";
-					echo "   <D:status>HTTP/1.1 200 OK</D:status>\n";
-					echo "  </D:propstat>\n";
+                            if (!isset($prop["val"]) || $prop["val"] === "" || $prop["val"] === false) {
+                                if($prop["ns"]=="DAV:") {
+                                    echo "     <D:$prop[name]/>\n";
+                                } else if($prop["ns"]) {
+                                    echo "     <".$ns_hash[$prop["ns"]].":$prop[name]/>\n";
+                                } else {
+                                    echo "     <$prop[name] xmlns=\"\"/>";
+                                }
+                            } else if ($prop["ns"] == "DAV:") {
+                                switch ($prop["name"]) {
+                                case "creationdate":
+                                    echo "     <D:creationdate ns0:dt=\"dateTime.tz\">".
+                                        date("Y-m-d\\TH:i:s\\Z",$prop['val']).
+                                        "</D:creationdate>\n";
+                                    break;
+                                case "getlastmodified":
+                                    echo "     <D:getlastmodified ns0:dt=\"dateTime.rfc1123\">".
+                                        date("D, j M Y H:m:s ",
+                                                 $prop['val']).
+                                        "GMT</D:getlastmodified>\n";
+                                    break;
+                                case "resourcetype":
+                                    echo "     <D:resourcetype><D:$prop[val]/></D:resourcetype>\n";
+                                    break;
+                                case "supportedlock":
+                                    echo "     <D:supportedlock>$prop[val]</D:supportedlock>\n";
+                                    break;
+                                case "lockdiscovery":  
+                                    echo "     <D:lockdiscovery>\n";
+                                    echo $prop["val"];
+                                    echo "     </D:lockdiscovery>\n";
+                                    break;
+                                default:                                    
+                                    echo "     <D:$prop[name]>".
+                                        $this->prop_encode(htmlspecialchars
+                                                                ($prop['val'])).
+                                        "</D:$prop[name]>\n";                               
+                                    break;
+                                }
+                            } else {
+                                if ($prop["ns"]) {
+                                    echo "     <".$ns_hash[$prop["ns"]].
+                                        ":$prop[name]>".
+                                        $this->prop_encode(htmlspecialchars
+                                                                ($prop['val']))."</".
+                                        $ns_hash[$prop["ns"]].
+                                        ":$prop[name]>\n";
+                                } else {
+                                    echo "     <$prop[name] xmlns=\"\">".
+                                        $this->prop_encode(htmlspecialchars
+                                                                ($prop['val'])).
+                                        "</$prop[name]>\n";
+                                }                               
+                            }
+                        }
+                    }
+                    echo "   </D:prop>\n";
+                    echo "   <D:status>HTTP/1.1 200 OK</D:status>\n";
+                    echo "  </D:propstat>\n";
 
-					if (@is_array($file["noprops"])) {
-						echo "   <D:propstat>\n";
-						echo "    <D:prop>\n";
-						foreach($file["noprops"] as $key => $prop) {
-							if (!is_array($prop))
-								$prop = array("val" => $prop);
-							if ($prop["ns"] == "DAV:") {
-								echo "     <D:$prop[name]/>\n";
-							} else if ($prop["ns"] == "") {
-								echo "     <$prop[name] xmlns=\"\"/>\n";
-							} else {
-								echo "     <".$ns_hash[$prop["ns"]].
-									":$prop[name]/>\n";
-							}
-						}
-						echo "   </D:prop>\n";
-						echo "   <D:status>HTTP/1.1 404 Not Found</D:status>\n";
-						echo "  </D:propstat>\n";
-					}
+                    if (@is_array($file["noprops"])) {
+                        echo "   <D:propstat>\n";
+                        echo "    <D:prop>\n";
+                        foreach($file["noprops"] as $key => $prop) {
+                            if (!is_array($prop))
+                                $prop = array("val" => $prop);
+                            if ($prop["ns"] == "DAV:") {
+                                echo "     <D:$prop[name]/>\n";
+                            } else if ($prop["ns"] == "") {
+                                echo "     <$prop[name] xmlns=\"\"/>\n";
+                            } else {
+                                echo "     <".$ns_hash[$prop["ns"]].
+                                    ":$prop[name]/>\n";
+                            }
+                        }
+                        echo "   </D:prop>\n";
+                        echo "   <D:status>HTTP/1.1 404 Not Found</D:status>\n";
+                        echo "  </D:propstat>\n";
+                    }
 
-					echo " </D:response>\n";
-				}
+                    echo " </D:response>\n";
+                }
 
-				echo "</D:multistatus>\n";
-			} else {
-				$this->http_status("404 Not Found");
-			}
+                echo "</D:multistatus>\n";
+            } else {
+                $this->http_status("404 Not Found");
+            }
     }
 
     // }}}
@@ -627,48 +627,48 @@ class HTTP_WebDAV_Server {
     // {{{ http_PROPPATCH() 
 
     function http_PROPPATCH() {
-		if($this->_check_lock_status($this->path)) {
-			$options = Array();
-			$options["path"] = $this->path;
+        if($this->_check_lock_status($this->path)) {
+            $options = Array();
+            $options["path"] = $this->path;
 
-			$propinfo = new _parse_proppatch("php://input");
+            $propinfo = new _parse_proppatch("php://input");
 
-			if (!$propinfo->success) {
-				$this->http_status("400 Error");
-				return;
-			}
+            if (!$propinfo->success) {
+                $this->http_status("400 Error");
+                return;
+            }
 
-			$options['props'] = $propinfo->props;
+            $options['props'] = $propinfo->props;
 
-			$responsedescr = $this->proppatch($options);
+            $responsedescr = $this->proppatch($options);
 
-			$this->http_status("207 Multi-Status");
-			header('Content-Type: text/xml; charset="utf-8"');
+            $this->http_status("207 Multi-Status");
+            header('Content-Type: text/xml; charset="utf-8"');
 
-			echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+            echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 
-			echo "<D:multistatus xmlns:D=\"DAV:\">\n";
-			echo " <D:response>\n";
-			echo "  <D:href>".$this->_urlencode($_SERVER["SCRIPT_NAME"].$this->path)."</D:href>\n";
+            echo "<D:multistatus xmlns:D=\"DAV:\">\n";
+            echo " <D:response>\n";
+            echo "  <D:href>".$this->_urlencode($_SERVER["SCRIPT_NAME"].$this->path)."</D:href>\n";
 
-			foreach($options["props"] as $prop) {
-				echo "   <D:propstat>\n";
-				echo "    <D:prop><$prop[name] xmlns=\"$prop[ns]\"/></D:prop>\n";
-				echo "    <D:status>HTTP/1.1 $prop[status]</D:status>\n";
-				echo "   </D:propstat>\n";
-			}
+            foreach($options["props"] as $prop) {
+                echo "   <D:propstat>\n";
+                echo "    <D:prop><$prop[name] xmlns=\"$prop[ns]\"/></D:prop>\n";
+                echo "    <D:status>HTTP/1.1 $prop[status]</D:status>\n";
+                echo "   </D:propstat>\n";
+            }
 
-			if ($responsedescr) {
-				echo "  <D:responsedescription>".
-					$this->prop_encode(htmlspecialchars($responsedescr)).
-					"</D:responsedescription>\n";
-			}
+            if ($responsedescr) {
+                echo "  <D:responsedescription>".
+                    $this->prop_encode(htmlspecialchars($responsedescr)).
+                    "</D:responsedescription>\n";
+            }
 
-			echo " </D:response>\n";
-			echo "</D:multistatus>\n";
-		} else {
-			$this->http_status("423 Locked");
-		}
+            echo " </D:response>\n";
+            echo "</D:multistatus>\n";
+        } else {
+            $this->http_status("423 Locked");
+        }
     }
 
     // }}}
@@ -691,164 +691,176 @@ class HTTP_WebDAV_Server {
     // {{{ http_GET() 
 
                 /**
-		 * GET wrapper
-		 *
-		 * GET wrapper
-		 *
-		 * @param void
-		 * @returns void
-		 */
+         * GET wrapper
+         *
+         * GET wrapper
+         *
+         * @param void
+         * @returns void
+         */
 
     function http_GET() {
         $options = Array();
         $options["path"] = $this->path;
 
-		if (isset($_SERVER['HTTP_RANGE'])) {
-			if (ereg("bytes[[:space:]]*=[[:space:]]*(.*)", $_SERVER['HTTP_RANGE'], $matches)) {
-				$options["ranges"] = array();
-				foreach (explode(",", $matches[1]) as $range) {
-					list($start, $end) = explode("-", $range);
-					$options["ranges"][] = ($start==="") ? array("last"=>$end) : array("start"=>$start, "end"=>$end);
-				}
-			}
-		}
+        $this->_get_ranges($options);
 
         if (true == ($status = $this->get($options))) {
-			if (!headers_sent()) {
-				$status = "200 OK";
+            if (!headers_sent()) {
+                $status = "200 OK";
 
-				if (!isset($options['mimetype'])) {
-					$options['mimetype'] = "application/octet-stream";
-				}
-				header("Content-type: $options[mimetype]");
-					
-				if (isset($options['mtime'])) {
-					header("Last-modified:".date("D, j M Y H:m:s ", $options['mtime'])."GMT");
-				}
-				
-				if (isset($options['stream'])) {
-					// GET handler returned a stream
-					if (!empty($options['ranges']) && (0===fseek($options['stream'], 0, SEEK_SET))) {
-						// partial request and stream is seekable 
-						$status = "206 partial";
-						
-						if (count($options['ranges']) === 1) {
-							$range = $option['ranges'][0];
-							if (isset($range['start'])) {
-								fseek($options['stream'], $range['start'], SEEK_SET);
-								if (isset($range['end'])) {
-									$size = $range['end']-$range['start']+1;
-									header("Content-length: $size");
-									header("Content-range: $start-$end/". (isset($options['size']) ? $options['size'] : "*"));
-									while ($size && !feof($options['stream'])) {
-										$buffer = fread($options['stream'], 4096);
-										$size -= strlen($buffer);
-										echo $buffer;
-									}
-								} else {
-									if (isset($options['size'])) {
-										header("Content-length: ".($options['size'] - $range['start']));
-										header("Content-range: $start-$end/". (isset($options['size']) ? $options['size'] : "*"));
-									}
-									fpassthru($options['stream']);
-								}
-							} else {
-								header("Content-length: ".$range['last']);
-								fseek($options['stream'], -$range['last'], SEEK_END);
-								fpassthru($options['stream']);
-							}
-						} else {
-							$this->_multipart_byterange_header(); // init multipart
-							foreach ($options['ranges'] as $range) {
-								// TODO what if size unknown? 500?
-								if (isset($range['start'])) {
-									$from  = $range['start'];
-									$to    = !empty($range['end']) ? $range['end'] : $options['size']-1; 
-								} else {
-									$from = $options['size'] - $range['last']-1;
-									$to = $options['size'] -1;
-								}
-								$total = isset($options['size']) ? $options['size'] : "*"; 
-								$size = $to - $from + 1;
-								$this->_multipart_byterange_header($options['mimetype'], $from, $to, $total);
+                if (!isset($options['mimetype'])) {
+                    $options['mimetype'] = "application/octet-stream";
+                }
+                header("Content-type: $options[mimetype]");
+                    
+                if (isset($options['mtime'])) {
+                    header("Last-modified:".date("D, j M Y H:m:s ", $options['mtime'])."GMT");
+                }
+                
+                if (isset($options['stream'])) {
+                    // GET handler returned a stream
+                    if (!empty($options['ranges']) && (0===fseek($options['stream'], 0, SEEK_SET))) {
+                        // partial request and stream is seekable 
+                    
+                        if (count($options['ranges']) === 1) {
+                            $range = $options['ranges'][0];
+
+                            if (isset($range['start'])) {
+                                fseek($options['stream'], $range['start'], SEEK_SET);
+                                if (feof($options['stream'])) {
+                                    http_status("416 Requested range not satisfiable");
+                                    exit;
+                                }
+
+                                if (isset($range['end'])) {
+                                    $size = $range['end']-$range['start']+1;
+                                    http_status("206 partial");
+                                    header("Content-length: $size");
+                                    header("Content-range: $range[start]-$range[end]/". (isset($options['size']) ? $options['size'] : "*"));
+                                    while ($size && !feof($options['stream'])) {
+                                        $buffer = fread($options['stream'], 4096);
+                                        $size -= strlen($buffer);
+                                        echo $buffer;
+                                    }
+                                } else {
+                                    http_status("206 partial");
+                                    if (isset($options['size'])) {
+                                        header("Content-length: ".($options['size'] - $range['start']));
+                                        header("Content-range: $start-$end/". (isset($options['size']) ? $options['size'] : "*"));
+                                    }
+                                    fpassthru($options['stream']);
+                                }
+                            } else {
+                                header("Content-length: ".$range['last']);
+                                fseek($options['stream'], -$range['last'], SEEK_END);
+                                fpassthru($options['stream']);
+                            }
+                        } else {
+                            $this->_multipart_byterange_header(); // init multipart
+                            foreach ($options['ranges'] as $range) {
+                                // TODO what if size unknown? 500?
+                                if (isset($range['start'])) {
+                                    $from  = $range['start'];
+                                    $to    = !empty($range['end']) ? $range['end'] : $options['size']-1; 
+                                } else {
+                                    $from = $options['size'] - $range['last']-1;
+                                    $to = $options['size'] -1;
+                                }
+                                $total = isset($options['size']) ? $options['size'] : "*"; 
+                                $size = $to - $from + 1;
+                                $this->_multipart_byterange_header($options['mimetype'], $from, $to, $total);
 
 
-								fseek($options['stream'], $start, SEEK_SET);
-								while ($size && !feof($options['stream'])) {
-									$buffer = fread($options['stream'], 4096);
-									$size -= strlen($buffer);
-									echo $buffer;
-								}
-							}
-							$this->_multipart_byterange_header(); // end multipart
-						}
-					} else {
-						// normal request or stream isn't seekable, return full content
-						if (isset($options['size'])) {
-							header("Content-length: ".$options['size']);
-						}
-						fpassthru($options['stream']);
-						return; // no more headers
-					}
-				} elseif (isset($options['data']))  {
-					if (is_array($options['data'])) {
-						// reply to partial request
-					} else {
-						header("Content-length: ".strlen($options['data']));
-						echo $data;
-					}
-				}
-			} 
+                                fseek($options['stream'], $start, SEEK_SET);
+                                while ($size && !feof($options['stream'])) {
+                                    $buffer = fread($options['stream'], 4096);
+                                    $size -= strlen($buffer);
+                                    echo $buffer;
+                                }
+                            }
+                            $this->_multipart_byterange_header(); // end multipart
+                        }
+                    } else {
+                        // normal request or stream isn't seekable, return full content
+                        if (isset($options['size'])) {
+                            header("Content-length: ".$options['size']);
+                        }
+                        fpassthru($options['stream']);
+                        return; // no more headers
+                    }
+                } elseif (isset($options['data']))  {
+                    if (is_array($options['data'])) {
+                        // reply to partial request
+                    } else {
+                        header("Content-length: ".strlen($options['data']));
+                        echo $data;
+                    }
+                }
+            } 
         } 
 
-		if (false === $status) {
-			$this->http_status("404 not found");
+        if (false === $status) {
+            $this->http_status("404 not found");
         }
 
-		$this->http_status("$status");
+        $this->http_status("$status");
     }
 
-	function _multipart_byterange_header($mimetype = false, $from = false, $to=false, $total=false) {
-		if ($mimetype == false) {
-			if (!isset($this->multipart_separator)) {
-				// initial
-				$this->multipart_separator = "SEPPARATOR_".md5(microtime());
-				header("Content-type: multipart/byteranges; boundary=".$this->multipart_separator);
-			} else {
-				// final
-				echo "\n--{$this->multipart_separator}--";
-			}
-		} else {
-			echo "\n--{$this->multipart_separator}\n";
-			echo "Content-type: $mimetype\n";
-			echo "Content-range: $from-$to/". ($total === false ? "*" : $total);
-			echo "\n\n";
-		}
-	}
 
-			
+    function _get_ranges(&$options) {
+        if (isset($_SERVER['HTTP_RANGE'])) {
+            if (ereg("bytes[[:space:]]*=[[:space:]]*(.*)", $_SERVER['HTTP_RANGE'], $matches)) {
+                $options["ranges"] = array();
+                foreach (explode(",", $matches[1]) as $range) {
+                    list($start, $end) = explode("-", $range);
+                    $options["ranges"][] = ($start==="") ? array("last"=>$end) : array("start"=>$start, "end"=>$end);
+                }
+            }
+        }
+    }
+
+    function _multipart_byterange_header($mimetype = false, $from = false, $to=false, $total=false) {
+        if ($mimetype == false) {
+            if (!isset($this->multipart_separator)) {
+                // initial
+                $this->multipart_separator = "SEPPARATOR_".md5(microtime());
+                header("Content-type: multipart/byteranges; boundary=".$this->multipart_separator);
+            } else {
+                // final
+                echo "\n--{$this->multipart_separator}--";
+            }
+        } else {
+            echo "\n--{$this->multipart_separator}\n";
+            echo "Content-type: $mimetype\n";
+            echo "Content-range: $from-$to/". ($total === false ? "*" : $total);
+            echo "\n\n";
+        }
+    }
+
+            
 
     // }}}
 
     // {{{ http_HEAD() 
 
     function http_HEAD() {
-		$status = false;
-		$options = Array();
-		$options["path"] = $this->path;
-		
-		if (method_exists($this, "HEAD")) {
-			$status = $this->head($options);
-		} else if (method_exists($this, "GET")) {
-			ob_start();
-			$status = $this->get($options);
-			ob_end_clean();
-		}
-		
-		if($status===true)  $status = "200 OK";
-		if($status===false) $status = "404 Not found";
-		
-		$this->http_status($status);
+        $status = false;
+        $options = Array();
+        $options["path"] = $this->path;
+        
+        if (method_exists($this, "HEAD")) {
+            $status = $this->head($options);
+        } else if (method_exists($this, "GET")) {
+            ob_start();
+            $status = $this->GET($options);
+            ob_end_clean();
+        }
+        
+        if($status===true)  $status = "200 OK";
+        if($status===false) $status = "404 Not found";
+        
+        $this->http_status($status);
     }
 
     // }}}
@@ -860,8 +872,98 @@ class HTTP_WebDAV_Server {
             $options = Array();
             $options["path"] = $this->path;
             $options["content_length"] = $_SERVER["CONTENT_LENGTH"];
+
+            // get the Content-type 
+            if (isset($_SERVER["CONTENT_TYPE"])) {
+                // for now we do not support any sort of multipart requests
+                if (!strncmp($_SERVER["CONTENT_TYPE"], "multipart/", 10)) {
+                    $this->http_status(501); 
+                    return;
+                }
+                $options["content_type"] = $_SERVER["CONTENT_TYPE"];
+            } else {
+                // default content type if none given
+                $options["content_type"] = "application/octet-stream";
+            }
+
+            /* RFC 2616 2.6 says "The recipient of the entity MUST NOT 
+               ignore any Content-* (e.g. Content-Range) headers that it 
+               does not understand or implement and MUST return a 501 
+               (Not Implemented) response in such cases.
+            */
+            foreach ($_SERVER as $key => $val) {
+                if (strncmp($key, "HTTP_CONTENT", 11)) continue;
+                switch ($key) {
+                case 'HTTP_CONTENT_ENCODING': // RFC 2616 14.11
+                    // TODO support this if ext/zlib filters are available
+                    $this->http_status(501); 
+                    return;
+
+                case 'HTTP_CONTENT_LANGUAGE': // RFC 2616 14.12
+                    // we assume it is not critical if this one is ignored
+                    // in the actual PUT implementation ...
+                    $options["content_language"] = $value;
+                    break;
+
+                case 'HTTP_CONTENT_LOCATION': // RFC 2616 14.14
+                    /* The meaning of the Content-Location header in PUT 
+                       or POST requests is undefined; servers are free 
+                       to ignore it in those cases. */
+                    break;
+
+                case 'HTTP_CONTENT_RANGE':    // RFC 2616 14.16
+                    // single byte range requests are supported
+                    // the header format is also specified in RFC 2616 14.16
+                    // TODO we have to ensure that implementations support this or send 501 instead
+                    if (!preg_match('@bytes\s+(\d+)-(\d+)/((\d+)|\*)@', $value, $matches)) {
+                        $this->http_status(400); 
+                        return;
+                    }
+                    
+                    $range = array("start"=>$matches[1], "end"=>$matches[2]);
+                    if (is_numeric($matches[3])) {
+                        $range["total_length"] = $matches[3];
+                    }
+                    $option["ranges"][] = $range;
+
+                    // TODO make sure the implementation supports partial PUT
+                    // this has to be done in advance to avoid data being overwritten
+                    // on implementations that do not support this ...
+                    break;
+
+                case 'HTTP_CONTENT_MD5':      // RFC 2616 14.15
+                    // TODO: maybe we can just pretend here?
+                    $this->http_status(501); 
+                    return;
+
+                default: 
+                    // any other unknown Content-* headers
+                    $this->http_status(501); 
+                    return;
+                }
+            }
+
             $options["stream"] = fopen("php://input", "r");
-            $stat = $this->put($options);
+
+            $stat = $this->PUT($options);
+
+            if (is_resource($stat) && get_resource_type($stat) == "stream") {
+                $stream = $stat;
+                if (!empty($options["ranges"])) {
+                    // TODO multipart support is missing (see also above)
+                    // TODO error checking
+                    $stat = fseek($stream, $range[0]["start"], SEEK_SET);
+                    fwrite($stream, fread($options["stream"], $range[0]["end"]-$range[0]["start"]+1));
+                } else {
+                    while (!feof($options["stream"])) {
+                        fwrite($stream, fread($options["stream"], 4096));
+                    }
+                }
+                fclose($stream);
+            
+                $stat = $options["new"] ? "201 Created" : "204 No Content";
+            } 
+
             $this->http_status($stat);
         } else {
             $this->http_status("423 Locked");
@@ -874,6 +976,14 @@ class HTTP_WebDAV_Server {
     // {{{ http_DELETE() 
 
     function http_DELETE() {
+        // RFC 2518 Section 9.2, last paragraph
+        if (isset($_SERVER["HTTP_DEPTH"])) {
+            if ($_SERVER["HTTP_DEPTH"] != "infinity") {
+                $this->http_status("400 Bad Request");
+                return;
+            }
+        }
+
         if ($this->_check_lock_status($this->path)) {
             $options = Array();
             $options["path"] = $this->path;
@@ -912,82 +1022,82 @@ class HTTP_WebDAV_Server {
     // {{{ http_LOCK() 
 
     function http_LOCK() {
-		$lockinfo = new _parse_lockinfo("php://input");
+        $lockinfo = new _parse_lockinfo("php://input");
 
-		if($this->_check_lock_status($this->path, $lockinfo->lockscope === "shared")) {
-			$options = Array();
-			$options["path"] = $this->path;
+        if($this->_check_lock_status($this->path, $lockinfo->lockscope === "shared")) {
+            $options = Array();
+            $options["path"] = $this->path;
 
-			if (isset($_SERVER['HTTP_DEPTH'])) {
-				$options["depth"] = $_SERVER["HTTP_DEPTH"];
-			} else {
-				$options["depth"] = "infinity";
-			}
+            if (isset($_SERVER['HTTP_DEPTH'])) {
+                $options["depth"] = $_SERVER["HTTP_DEPTH"];
+            } else {
+                $options["depth"] = "infinity";
+            }
 
-			if (isset($_SERVER["HTTP_TIMEOUT"])) {
-				$options["timeout"] = explode(",", $_SERVER["HTTP_TIMEOUT"]);
-			}
+            if (isset($_SERVER["HTTP_TIMEOUT"])) {
+                $options["timeout"] = explode(",", $_SERVER["HTTP_TIMEOUT"]);
+            }
 
-			if(empty($_SERVER['CONTENT_LENGTH']) && !empty($_SERVER['HTTP_IF'])) {
-				$options["update"] = substr($_SERVER['HTTP_IF'],2,-2);
-				$stat = $this->lock($options);
-			} else { 
-				// new lock 
-				
-				if ($lockinfo->success) {
-					$options["scope"] = $lockinfo->lockscope;
-					$options["type"]  = $lockinfo->locktype;
-					$options["owner"] = $lockinfo->owner;
-				}
-				
+            if(empty($_SERVER['CONTENT_LENGTH']) && !empty($_SERVER['HTTP_IF'])) {
+                $options["update"] = substr($_SERVER['HTTP_IF'],2,-2);
+                $stat = $this->lock($options);
+            } else { 
+                // new lock 
+                
+                if ($lockinfo->success) {
+                    $options["scope"] = $lockinfo->lockscope;
+                    $options["type"]  = $lockinfo->locktype;
+                    $options["owner"] = $lockinfo->owner;
+                }
+                
 
-				$options["locktoken"] = $this->_new_locktoken();
-				
-				$stat = $this->lock($options);				
-			}
-			
-			if(is_bool($stat)) {
-				$http_stat = $stat ? "200 OK" : "423 Locked";
-			} else {
-				$http_stat = $stat;
-			}
+                $options["locktoken"] = $this->_new_locktoken();
+                
+                $stat = $this->lock($options);              
+            }
+            
+            if(is_bool($stat)) {
+                $http_stat = $stat ? "200 OK" : "423 Locked";
+            } else {
+                $http_stat = $stat;
+            }
 
-			$this->http_status($http_stat);
+            $this->http_status($http_stat);
 
-			if($options["timeout"]) {
-				// more than a million is considered an absolute timestamp
-				// less is more likely a relative value
-				if($options["timeout"]>1000000) {
-					$timeout = "Second-".($options['timeout']-time());
-				} else {
-					$timeout = "Second-$options[timeout]";
-				}
-			} else {
-				$timeout = "Infinite";
-			}
-			
-			if ($stat == true) {        // ok 
-				header('Content-Type: text/xml; charset="utf-8"');
-				header("Lock-Token: <$options[locktoken]>");
-				echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-				echo "<D:prop xmlns:D=\"DAV:\">\n";
-				echo " <D:lockdiscovery>\n";
-				echo "  <D:activelock>\n";
-				echo "   <D:lockscope><D:$options[scope]/></D:lockscope>\n";
-				echo "   <D:locktype><D:$options[type]/></D:locktype>\n";
-				echo "   <D:depth>$options[depth]</D:depth>\n";
-				echo "   <D:owner>$options[owner]</D:owner>\n";
-				echo "   <D:timeout>$timeout</D:timeout>\n";
-				echo "   <D:locktoken><D:href>$options[locktoken]</D:href></D:locktoken>\n";
-				echo "  </D:activelock>\n";
-				echo " </D:lockdiscovery>\n";
-				echo "</D:prop>\n\n";
-			} else {                // fail 
-				// TODO!!!
-			}
-		} else {
-			$this->http_status("423 Locked");
-		}
+            if($options["timeout"]) {
+                // more than a million is considered an absolute timestamp
+                // less is more likely a relative value
+                if($options["timeout"]>1000000) {
+                    $timeout = "Second-".($options['timeout']-time());
+                } else {
+                    $timeout = "Second-$options[timeout]";
+                }
+            } else {
+                $timeout = "Infinite";
+            }
+            
+            if ($stat == true) {        // ok 
+                header('Content-Type: text/xml; charset="utf-8"');
+                header("Lock-Token: <$options[locktoken]>");
+                echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+                echo "<D:prop xmlns:D=\"DAV:\">\n";
+                echo " <D:lockdiscovery>\n";
+                echo "  <D:activelock>\n";
+                echo "   <D:lockscope><D:$options[scope]/></D:lockscope>\n";
+                echo "   <D:locktype><D:$options[type]/></D:locktype>\n";
+                echo "   <D:depth>$options[depth]</D:depth>\n";
+                echo "   <D:owner>$options[owner]</D:owner>\n";
+                echo "   <D:timeout>$timeout</D:timeout>\n";
+                echo "   <D:locktoken><D:href>$options[locktoken]</D:href></D:locktoken>\n";
+                echo "  </D:activelock>\n";
+                echo " </D:lockdiscovery>\n";
+                echo "</D:prop>\n\n";
+            } else {                // fail 
+                // TODO!!!
+            }
+        } else {
+            $this->http_status("423 Locked");
+        }
     }
 
     // }}}
@@ -1021,7 +1131,7 @@ class HTTP_WebDAV_Server {
         $options = Array();
         $options["path"] = $this->path;
 
-        if (isset($_SERVER['HTTP_DEPTH'])) {
+        if (isset($_SERVER["HTTP_DEPTH"])) {
             $options["depth"] = $_SERVER["HTTP_DEPTH"];
         } else {
             $options["depth"] = "infinity";
@@ -1045,7 +1155,12 @@ class HTTP_WebDAV_Server {
             $options["dest_url"] = $_SERVER["HTTP_DESTINATION"];
         }
 
-        $options["overwrite"] = @$_SERVER["HTTP_OVERWRITE"] == "T";
+        // see RFC 2518 Sections 9.6, 8.8.4 and 8.9.3
+        if (isset($_SERVER["HTTP_OVERWRITE"])) {
+            $options["overwrite"] = $_SERVER["HTTP_OVERWRITE"] == "T";
+        } else {
+            $options["overwrite"] = true;
+        }
 
         $stat = $this->$what($options);
         $this->http_status($stat);
@@ -1056,13 +1171,13 @@ class HTTP_WebDAV_Server {
     // {{{ _allow() 
 
     /**
-		 * check for implemented HTTP methods
-		 *
-		 * check for implemented HTTP methods
-		 *
-		 * @param void
-		 * @returns array something
-		 */
+         * check for implemented HTTP methods
+         *
+         * check for implemented HTTP methods
+         *
+         * @param void
+         * @returns array something
+         */
     function _allow() {
         // OPTIONS is always there
         $allow = array("options" =>"OPTIONS");
@@ -1198,13 +1313,13 @@ class HTTP_WebDAV_Server {
     }
 
         /** 
-		 * parse If: header
-		 *
-		 * dispatch WebDAV HTTP request to the apropriate method handler
-		 * 
-		 * @param $str
-		 * @return void
-		 */
+         * parse If: header
+         *
+         * dispatch WebDAV HTTP request to the apropriate method handler
+         * 
+         * @param $str
+         * @return void
+         */
     function _if_header_parser($str) {
         $pos = 0;
         $len = strlen($str);
@@ -1265,10 +1380,10 @@ class HTTP_WebDAV_Server {
                 $not = "";
             }
 
-			if (@is_array($uris[$uri]))
-				$uris[$uri] = array_merge($uris[$uri],$list);
-			else
-				$uris[$uri] = $list;
+            if (@is_array($uris[$uri]))
+                $uris[$uri] = array_merge($uris[$uri],$list);
+            else
+                $uris[$uri] = $list;
         }
 
         return $uris;
@@ -1290,14 +1405,14 @@ class HTTP_WebDAV_Server {
                 // all must match
                 $state = true;
                 foreach($conditions as $condition) {
-					// lock tokens may be free form (RFC2518 6.3)
-					// but if opatuelocktokens are used (RFC2518 6.4)
-					// we have to check the format (litmus tests this)
-					if (!strncmp($condition, "<opaquelocktoken:", strlen("<opaquelocktoken"))) {
-						if (!ereg("^<opaquelocktoken:[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}>$", $condition)) {
-							return false;
-						}
-					}
+                    // lock tokens may be free form (RFC2518 6.3)
+                    // but if opatuelocktokens are used (RFC2518 6.4)
+                    // we have to check the format (litmus tests this)
+                    if (!strncmp($condition, "<opaquelocktoken:", strlen("<opaquelocktoken"))) {
+                        if (!ereg("^<opaquelocktoken:[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}>$", $condition)) {
+                            return false;
+                        }
+                    }
                     if (!$this->_check_uri_condition($uri, $condition)) {
                         $state = false;
                         break;
@@ -1314,15 +1429,15 @@ class HTTP_WebDAV_Server {
     }
 
         /**
-	 * Check a single URI condition parsed from an if-header
-	 *
-	 * Check a single URI condition parsed from an if-header
-	 *
-	 * @abstract 
-	 * @param string $uri URI to check
-	 * @param string $condition Condition to check for this URI
-	 * @returns bool Condition check result
-	 */
+     * Check a single URI condition parsed from an if-header
+     *
+     * Check a single URI condition parsed from an if-header
+     *
+     * @abstract 
+     * @param string $uri URI to check
+     * @param string $condition Condition to check for this URI
+     * @returns bool Condition check result
+     */
     function _check_uri_condition($uri, $condition) {
         // not really implemented here, 
         // implementations must override
@@ -1331,7 +1446,7 @@ class HTTP_WebDAV_Server {
 
 
     function _check_lock_status($path, $exclusive_only = false) {
-		// FIXME depth -> ignored for now
+        // FIXME depth -> ignored for now
         if (method_exists($this, "checklock")) {
             // is locked?
             $lock = $this->checklock($path);
@@ -1340,8 +1455,8 @@ class HTTP_WebDAV_Server {
             if (is_array($lock) && count($lock)) {
                 // FIXME doesn't check uri restrictions yet
                 if (!strstr($_SERVER["HTTP_IF"], $lock["token"])) {
-					if (!$exclusive_only || ($lock["scope"] !== "shared"))
-						return false;
+                    if (!$exclusive_only || ($lock["scope"] !== "shared"))
+                        return false;
                 }
             }
         }
@@ -1371,53 +1486,53 @@ class HTTP_WebDAV_Server {
                 $timeout = "Infinite";
             }
             $activelocks.= "
-			  <D:activelock>
-			   <D:lockscope><D:$lock[scope]/></D:lockscope>
-			   <D:locktype><D:$lock[type]/></D:locktype>
-			   <D:depth>$lock[depth]</D:depth>
-			   <D:owner>$lock[owner]</D:owner>
-			   <D:timeout>$timeout</D:timeout>
-			   <D:locktoken><D:href>$lock[token]</D:href></D:locktoken>
-			  </D:activelock>
+              <D:activelock>
+               <D:lockscope><D:$lock[scope]/></D:lockscope>
+               <D:locktype><D:$lock[type]/></D:locktype>
+               <D:depth>$lock[depth]</D:depth>
+               <D:owner>$lock[owner]</D:owner>
+               <D:timeout>$timeout</D:timeout>
+               <D:locktoken><D:href>$lock[token]</D:href></D:locktoken>
+              </D:activelock>
       ";
         }
 
         return $activelocks;
     }
 
-	function http_status($status) {
-		if($status === true) $status = "200 OK";
-		$this->_http_status = $status;
-		header("HTTP/1.1 $status");
-		header("X-WebDAV-Status: $status");
-	}
+    function http_status($status) {
+        if($status === true) $status = "200 OK";
+        $this->_http_status = $status;
+        header("HTTP/1.1 $status");
+        header("X-WebDAV-Status: $status");
+    }
 
-	function _urlencode($path, $for_html=false) {
-		$return = strtr($path,array(" "=>"%20",
-																"&"=>"%26",
-																"<"=>"%3C",
-																">"=>"%3E",
-																));
-		if ($for_html) {
-			$return = str_replace("'", "%27", $return);
-		}
+    function _urlencode($path, $for_html=false) {
+        $return = strtr($path,array(" "=>"%20",
+                                    "&"=>"%26",
+                                    "<"=>"%3C",
+                                    ">"=>"%3E",
+                                    ));
+        if ($for_html) {
+            $return = str_replace("'", "%27", $return);
+        }
 
-		return $return;
-	}
+        return $return;
+    }
 
-	function _urldecode($path) {
-		return urldecode($path);
-	}
+    function _urldecode($path) {
+        return urldecode($path);
+    }
 
 
-	function prop_encode($text) {
-		switch ($this->_prop_encoding) {
-		case "utf-8":
-			return $text;
-		default:
-			return utf8_encode($text);
-		}
-	}
+    function prop_encode($text) {
+        switch ($this->_prop_encoding) {
+        case "utf-8":
+            return $text;
+        default:
+            return utf8_encode($text);
+        }
+    }
 } 
 
   /*
