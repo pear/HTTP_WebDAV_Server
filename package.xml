@@ -25,12 +25,13 @@
   </maintainers>
 	
   <release>
-    <version>0.2</version>
-    <date>2002-07-27</date>
-    <state>stable</state>
-    <license>alpha</license>
+    <version>0.9</version>
+    <date>2003-02-18</date>
+    <state>alpha</state>
+    <license>PHP</license>
     <notes>
-o still work in progress
+usable (complies to RFC 2518 in all but shared locks afaik)
+but still in developement
     </notes>
     <deps>
 			<dep type="php" rel="ge" version="4.3"/>
