@@ -584,9 +584,8 @@
                           , exclusivelock  = " .($options['scope'] === "exclusive" ? "1" : "0")
                 ;
             mysql_query($query);
-            return mysql_affected_rows() > 0;
 
-            return "200 OK";
+            return mysql_affected_rows() ? "200 OK" : "409 Conflict";
         }
 
         /**
