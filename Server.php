@@ -849,7 +849,7 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 			
 			if ($stat == true) {        // ok 
 				header("Lock-Token: <$options[locktoken]>");
-				echo "<?xml version='1.0' encoding='utf8'?>\n";
+				echo "<?xml version='1.0' encoding='utf-8'?>\n";
 				echo "<D:prop xmlns:D='DAV:'>\n";
 				echo " <D:lockdiscovery>\n";
 				echo "  <D:activelock>\n";
