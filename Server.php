@@ -1136,6 +1136,7 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 				if($uri == "") {
 					// default uri is the complete request uri
 					$uri = (@$_SERVER["HTTPS"] === "on" ? "https:" : "http:");
+					$uri.= "//$_SERVER[HTTP_HOST]$_SERVER[SCRIPT_NAME]$_SERVER[PATH_INFO]";
 				}
 				// all must match
 				$state = true;
