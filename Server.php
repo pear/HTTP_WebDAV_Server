@@ -113,7 +113,7 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 
 			// set path
 			$this->path =
-				!empty($_SERVER["PATH_INFO"]) ? $_SERVER["PATH_INFO"] : "/";
+				$this->_urldecode(!empty($_SERVER["PATH_INFO"]) ? $_SERVER["PATH_INFO"] : "/");
 			if(ini_get("magic_quotes_gpc")) {
 				$this->path = stripslashes($this->path);
 			}
@@ -524,9 +524,7 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 					$path = $file['path'];
 					// todo: make sure collection hrefs end in '/'
 					// http://$_SERVER[HTTP_HOST]
-					echo "  <D:href>".str_replace(' ', '%20',
-																				 $_SERVER["SCRIPT_NAME"].$path).
-						"</D:href>\n";
+					echo "  <D:href>".$this->_urlencode($_SERVER["SCRIPT_NAME"].$path)."</D:href>\n";
 					echo "   <D:propstat>\n";
 					echo "    <D:prop>\n";
 					if (@is_array($file["props"])) {
@@ -650,9 +648,7 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 
 			echo "<D:multistatus xmlns:D='DAV:'>\n";
 			echo " <D:response>\n";
-			echo "  <D:href>".str_replace(' ', '%20',
-																		 $_SERVER["SCRIPT_NAME"].$this->path).
-				"</D:href>\n";
+			echo "  <D:href>".$this->_urlencode($_SERVER["SCRIPT_NAME"].$this->path)."</D:href>\n";
 
 			foreach($options["props"] as $prop) {
 				echo "   <D:propstat>\n";
@@ -1247,6 +1243,24 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
 		header("HTTP/1.1 $status");
 		header("X-WebDAV-Status: $status");
 	}
+
+	function _urlencode($path, $for_html=false) {
+		$return = strtr($path,array(" "=>"%20",
+																"&"=>"%26",
+																"<"=>"%3C",
+																">"=>"%3E",
+																));
+		if ($for_html) {
+			$return = str_replace("'", "%27", $return);
+		}
+
+		return $return;
+	}
+
+	function _urldecode($path) {
+		return urldecode($path);
+	}
+
 } 
 
   /*
