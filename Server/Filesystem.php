@@ -177,9 +177,14 @@
             return $file;
         }
 
-        /* @@@ */
         function _can_execute($name, $path=false) 
         {
+            if (function_exists("is_executable")) {
+                $check_fn = "is_executable";
+            } else {
+                $check_fn = "file_exists";
+            }
+
             if (!strncmp(PHP_OS, "WIN", 3)) {
                 $exts = array(".exe", ".com");
             } else {
@@ -191,11 +196,14 @@
             }
 
             foreach (explode(PATH_SEPARATOR, $path) as $dir) {
-                if (!@is_dir($dir)) continue;
+                if (!file_exists($dir)) continue;
+                if (!is_dir($dir)) continue;
                 foreach ($exts as $ext) {
-                    if (@is_executable("$dir/$name".$ext)) return true;
+                    if ($check_fn("$dir/$name".$ext)) return true;
                 }
             }
+
+            return false;
         }
 
 
