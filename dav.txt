@@ -72,16 +72,9 @@ Using the check_auth() method you can create a dynamic interface
 to any authentication system protecting the data you want to serve.
 
 
-Authentifikation ist nicht Teil des WebDAV Protokolls sondern wird normal
-über HTTP-Authentifikationsmechanismen abgewickelt. Dies kann sowohl über
-die Webserver-Konfiguration (.htaccess) oder auch über PHP abgewickelt 
-werden. Soll die Server-Klasse sich darum kümmern, so muß die Methode
-check_auth($type, $user, $passwd) implementiert werden.
-
-
 <WARNING> 
   the following reference information may be outdated and/or
-  incomplete (and part of it even still german ;)
+  incomplete ...
 </WARNING>
 
 bool PROPINFO($options, &$files)
@@ -142,7 +135,7 @@ string MKCOL($option)
                 * 409 Conflict
                 * 415 Unsupported media type
                 * 507 Insufficient Storage
-                (siehe RFC2518 8.3.2)
+                (see also RFC2518 8.3.2)
 
 
 
@@ -164,21 +157,23 @@ string GET(&$options)
   (TODO: andere stati berücksichtigen)
 
   Content-Type, Content-Length header müssen von der Methode selbst
-  erzeugt werden                
+  erzeugt werden  (TODO: outdated) 
 
 
 
 
 string PUT($options)
 
-  options[path] - Pfad zur gewünschten Resource
-  options[content_length] - Datenmenge in Bytes
-  options[data] - Zu schreibende Daten
+  options[path] - path to the requested resource
+  options[content_length] - size of request data in bytes
+  options[stream] - a PHP stream providing the input data
 
   return-value: string 
-                HTTP-Status und Status-Message, mögliche Stati sind
-								* 201 Created -> Resource neu angelegt 
-                * 204 No Content -> Resource überschrieben
+                HTTP status, possible values are:
+								* 201 Created    -> the resource did not exist before
+                                    and has been successfully created  
+                * 204 No Content -> a previously existing resource has 
+                                    successfully been modified
                 * 409 Conflict
                 ...
 
@@ -187,15 +182,14 @@ string PUT($options)
 
 string COPY($options)
 
-  options[path]      - Pfad der Quellresource
-  options[depth]     - "0" oder "infinity"
+  options[path]      - path to the resource to be copied
+  options[depth]     - "0" or "infinity" (applies only to directories)
   options[overwrite] - true / false
-  options[dest]      - Pfad wenn Zielresource lokal
-  options[dest_url]  - komplette URL wenn Zielresource extern
+  options[dest]      - path to the destination resource if local
+  options[dest_url]  - non-local destination path 
 
   return-value: string 
-                HTTP-Status und Status-Message, mögliche Stati sind
-								siehe RFC2518 8.8.5
+                HTTP status, see RFC2518 8.8.5
 
 
 
@@ -203,26 +197,23 @@ string COPY($options)
 
 string MOVE($options)
 
-  options[path]      - Pfad der Quellresource
-  options[depth]     - "0" oder "infinity"
+  options[path]      - path to the resource to be moved
   options[overwrite] - true / false
-  options[dest]      - Pfad wenn Zielresource lokal
-  options[dest_url]  - komplette URL wenn Zielresource extern
+  options[dest]      - path to the destination resource if local
+  options[dest_url]  - non-local destination path 
 
   return-value: string 
-                HTTP-Status und Status-Message, mögliche Stati sind
-								siehe RFC2518 8.8.5
+                HTTP status, see RFC2518 8.9.4
 
 
 
 
 string DELETE($options)
 
-  options[path] - Pfad der zu löschenden Resource
+  options[path] - path to the resource to be removed
 
   return-value: string 
-                HTTP-Status und Status-Message, mögliche Stati sind
-								siehe RFC2518 8.6.2
+                HTTP status, see RFC2518 8.6.2
   
 
 
