@@ -124,7 +124,7 @@ class HTTP_WebDAV_Server
             header('WWW-Authenticate: Basic realm="'.($this->http_auth_realm).'"');
 
             // Windows seems to require this being the last header sent
-			// (changed according to PECL bug #3138)
+            // (changed according to PECL bug #3138)
             $this->http_status('401 Unauthorized');
 
             return;
@@ -902,10 +902,10 @@ class HTTP_WebDAV_Server
             $this->http_status("404 not found");
         }
 
-		if (!headers_sent()) {
-			// TODO: check setting of headers in various code pathes above
-			$this->http_status("$status");
-		}
+        if (!headers_sent()) {
+            // TODO: check setting of headers in various code pathes above
+            $this->http_status("$status");
+        }
     }
 
 
