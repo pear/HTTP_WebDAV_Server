@@ -140,14 +140,25 @@ class _parse_proppatch
 
         if ($this->depth == 1) {
             $this->mode = $tag;
-        }
+        } 
 
         if ($this->depth == 3) {
             $prop = array("name" => $tag);
             $this->current = array("name" => $tag, "ns" => $ns, "status"=> 200);
-            if ($this->mode == "set")
+            if ($this->mode == "set") {
                 $this->current["val"] = "";     // default set val
+            }
         }
+
+        if ($this->depth >= 4) {
+            $this->current["val"] .= "<$tag";
+            foreach ($attr as $key => $val) {
+                $this->current["val"] .= ' '.$key.'="'.str_replace('"','&quot;', $val).'"';
+            }
+            $this->current["val"] .= ">";
+        }
+
+        
 
         $this->depth++;
     }
@@ -162,12 +173,27 @@ class _parse_proppatch
      */
     function _endElement($parser, $name) 
     {
-        if (isset($this->current)) {
-            $this->props[] = $this->current;
-            unset($this->current);
+        if (strstr($name, " ")) {
+            list($ns, $tag) = explode(" ", $name);
+            if ($ns == "")
+                $this->success = false;
+        } else {
+            $ns = "";
+            $tag = $name;
         }
-    
+
         $this->depth--;
+
+        if ($this->depth >= 4) {
+            $this->current["val"] .= "</$tag>";
+        }
+
+        if ($this->depth == 3) {
+            if (isset($this->current)) {
+                $this->props[] = $this->current;
+                unset($this->current);
+            }
+        }
     }
 
     /**
@@ -180,7 +206,7 @@ class _parse_proppatch
      */
     function _data($parser, $data) {
         if (isset($this->current)) {
-            $this->current["val"] = $data;
+            $this->current["val"] .= $data;
         }
     }
 }
