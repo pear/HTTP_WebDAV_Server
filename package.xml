@@ -36,7 +36,6 @@ comments in various places.
    </notes>
    <deps>
     <dep type="php" rel="ge" version="4.3"/>
-    <dep type="pkg" rel="ge" version="1.0">HTTP</dep>
    </deps>
    <filelist>
     <dir name="/" baseinstalldir="HTTP/WebDAV">
