@@ -31,7 +31,8 @@
    <notes>
 Some serious stuff showed up that needs to be added/fixed before 
 we go for 1.0. This release doesn't really address any of these,
-it only 
+it only fixes some small issues with the existing code and adds
+comments in various places.
    </notes>
    <deps>
     <dep type="php" rel="ge" version="4.3"/>
