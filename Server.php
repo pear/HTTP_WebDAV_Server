@@ -1104,21 +1104,33 @@ class HTTP_WebDAV_Server
 
             $stat = $this->PUT($options);
 
-            if (is_resource($stat) && get_resource_type($stat) == "stream") {
+            if ($stat == false) {
+                $stat = "403 Forbidden";
+            } else if (is_resource($stat) && get_resource_type($stat) == "stream") {
                 $stream = $stat;
+
+                $stat = $options["new"] ? "201 Created" : "204 No Content";
+
                 if (!empty($options["ranges"])) {
                     // TODO multipart support is missing (see also above)
-                    // TODO error checking
-                    $stat = fseek($stream, $range[0]["start"], SEEK_SET);
-                    fwrite($stream, fread($options["stream"], $range[0]["end"]-$range[0]["start"]+1));
+                    if (0 == fseek($stream, $range[0]["start"], SEEK_SET)) {
+                        $length = $range[0]["end"]-$range[0]["start"]+1;
+                        if (!fwrite($stream, fread($options["stream"], $length))) {
+                            $stat = "403 Forbidden"; 
+                        }
+                    } else {
+                        $stat = "403 Forbidden"; 
+                    }
                 } else {
                     while (!feof($options["stream"])) {
-                        fwrite($stream, fread($options["stream"], 4096));
+                        if (!fwrite($stream, fread($options["stream"], 4096))) {
+                            $stat = "403 Forbidden"; 
+                            break;
+                        }
                     }
                 }
-                fclose($stream);
-            
-                $stat = $options["new"] ? "201 Created" : "204 No Content";
+
+                fclose($stream);            
             } 
 
             $this->http_status($stat);
