@@ -92,17 +92,25 @@
          * @param  string  HTTP Authentication type (Basic, Digest, ...)
          * @param  string  Username
          * @param  string  Password
+         * @return bool    true on successful authentication
          */
         function check_auth($type, $user, $pass) 
         {
             return true;
         }
 
-        
-        function PROPFIND($options, &$files) 
+
+        /**
+         * PROPFIND method handler
+         *
+         * @param  array  general parameter passing array
+         * @param  array  return array for file properties
+         * @return bool   true on success
+         */
+        function PROPFIND(&$options, &$files) 
         {
             // get absolute fs path to requested resource
-            $fspath = realpath($this->base . $options["path"]);
+            $fspath = $this->base . $options["path"];
             
             // sanity check
             if (!file_exists($fspath)) {
@@ -113,7 +121,7 @@
             $files["files"] = array();
 
             // store information for the requested path itself
-            $files["files"][] = $this->fileinfo($options["path"], $options);
+            $files["files"][] = $this->fileinfo($options["path"]);
 
             // information for contained resources requested?
             if (!empty($options["depth"]))  { // TODO check for is_dir() first?
@@ -130,7 +138,7 @@
                     // ok, now get all its contents
                     while ($filename = readdir($handle)) {
                         if ($filename != "." && $filename != "..") {
-                            $files["files"][] = $this->fileinfo ($options["path"].$filename, $options);
+                            $files["files"][] = $this->fileinfo($options["path"].$filename);
                         }
                     }
                     // TODO recursion needed if "Depth: infinite"
@@ -140,64 +148,93 @@
             // ok, all done
             return true;
         } 
-
-        function fileinfo($uri, $options) 
+        
+        /**
+         * Get properties for a single file/resource
+         *
+         * @param  string  resource path
+         * @return array   resource properties
+         */
+        function fileinfo($path) 
         {
+            // map URI path to filesystem path
+            $fspath = $this->base . $path;
+
+            // create result array
+            $info = array();
+            $info["path"]  = $path;    
+            $info["props"] = array();
             
-            $fspath = $this->base . $uri;
+            // no special beautified displayname here ...
+            $info["props"][] = $this->mkprop("displayname", strtoupper($path));
+            
+            // creation and modification time
+            $info["props"][] = $this->mkprop("creationdate",    filectime($fspath));
+            $info["props"][] = $this->mkprop("getlastmodified", filemtime($fspath));
 
-            $file = array();
-            $file["path"]= $uri;    
-
-            $file["props"][] = $this->mkprop("displayname", strtoupper($uri));
-
-            $file["props"][] = $this->mkprop("creationdate", filectime($fspath));
-            $file["props"][] = $this->mkprop("getlastmodified", filemtime($fspath));
-
+            // type and size (caller already made sure that path exists)
             if (is_dir($fspath)) {
-                $file["props"][] = $this->mkprop("getcontentlength", 0);
-                $file["props"][] = $this->mkprop("resourcetype", "collection");
-                $file["props"][] = $this->mkprop("getcontenttype", "httpd/unix-directory");             
+                // directory (WebDAV collection)
+                $info["props"][] = $this->mkprop("resourcetype", "collection");
+                $info["props"][] = $this->mkprop("getcontenttype", "httpd/unix-directory");             
+                $info["props"][] = $this->mkprop("getcontentlength", 0);
             } else {
-                $file["props"][] = $this->mkprop("resourcetype", "");
-                $file["props"][] = $this->mkprop("getcontentlength", filesize($fspath));
+                // plain file (WebDAV resource)
+                $info["props"][] = $this->mkprop("resourcetype", "");
                 if (is_readable($fspath)) {
-                    $file["props"][] = $this->mkprop("getcontenttype", $this->_mimetype($fspath));
+                    $info["props"][] = $this->mkprop("getcontenttype", $this->_mimetype($fspath));
                 } else {
-                    $file["props"][] = $this->mkprop("getcontenttype", "application/x-non-readable");
+                    $info["props"][] = $this->mkprop("getcontenttype", "application/x-non-readable");
                 }               
+                $info["props"][] = $this->mkprop("getcontentlength", filesize($fspath));
             }
-            
-            $query = "SELECT ns, name, value FROM properties WHERE path = '$uri'";
+
+            // get additional properties from database
+            $query = "SELECT ns, name, value FROM properties WHERE path = '$path'";
             $res = mysql_query($query);
             while($row = mysql_fetch_assoc($res)) {
-                $file["props"][] = $this->mkprop($row["ns"], $row["name"], $row["value"]);
+                $info["props"][] = $this->mkprop($row["ns"], $row["name"], $row["value"]);
             }
             mysql_free_result($res);
-            return $file;
+
+            return $info;
         }
 
-        function _can_execute($name, $path=false) 
+        /**
+         * detect if a given program is found in the search PATH
+         *
+         * helper function used by _mimetype() to detect if the 
+         * external 'file' utility is available
+         *
+         * @param  string  program name
+         * @param  string  optional search path, defaults to $PATH
+         * @return bool    true if executable program found in path
+         */
+        function _can_execute($name, $path = false) 
         {
-            if (function_exists("is_executable")) {
-                $check_fn = "is_executable";
-            } else {
-                $check_fn = "file_exists";
-            }
-
-            if (!strncmp(PHP_OS, "WIN", 3)) {
-                $exts = array(".exe", ".com");
-            } else {
-                $exts = array("");
-            }
-
-            if ($path===false) {
+            // path defaults to PATH from environment if not set
+            if ($path === false) {
                 $path = getenv("PATH");
             }
-
+            
+            // check method depends on operating system
+            if (!strncmp(PHP_OS, "WIN", 3)) {
+                // on Windows an appropriate COM or EXE file needs to exist
+                $exts = array(".exe", ".com");
+                $check_fn = "file_exists";
+            } else { 
+                // anywhere else we look for an executable file of that name
+                $exts = array("");
+                $check_fn = "is_executable";
+            }
+            
+            // now check the directories in the path for the program
             foreach (explode(PATH_SEPARATOR, $path) as $dir) {
+                // skip invalid path entries
                 if (!file_exists($dir)) continue;
                 if (!is_dir($dir)) continue;
+
+                // and now look for the file
                 foreach ($exts as $ext) {
                     if ($check_fn("$dir/$name".$ext)) return true;
                 }
@@ -206,11 +243,18 @@
             return false;
         }
 
-
+        
+        /**
+         * try to detect the mime type of a file
+         *
+         * @param  string  file path
+         * @return string  guessed mime type
+         */
         function _mimetype($fspath) 
         {
             if (@is_dir($fspath)) {
-                return "httpd/unix-directory"; // TODO what on Windows? ;>
+                // directories are easy
+                return "httpd/unix-directory"; 
             } else if (function_exists("mime_content_type")) {
                 // use mime magic extension if available
                 $mime_type = mime_content_type($fspath);
@@ -238,6 +282,11 @@
             if (empty($mime_type)) {
                 // Fallback solution: try to guess the type by the file extension
                 // TODO: add more ...
+                // TODO: it has been suggested to delegate mimetype detection 
+                //       to apache but this has at least three issues:
+                //       - works only with apache
+                //       - needs file to be within the document tree
+                //       - requires apache mod_magic 
                 // TODO: can we use the registry for this on Windows?
                 //       OTOH if the server is Windos the clients are likely to 
                 //       be Windows, too, and tend do ignore the Content-Type
@@ -263,29 +312,45 @@
             return $mime_type;
         }
 
+        /**
+         * GET method handler
+         * 
+         * @param  array  parameter passing array
+         * @return bool   true on success
+         */
         function GET(&$options) 
         {
+            // get absolute fs path to requested resource
             $fspath = $this->base . $options["path"];
 
-            if (file_exists($fspath)) {             
-                $options['mimetype'] = $this->_mimetype($fspath); 
-                
-                // see rfc2518, section 13.7
-                // some clients seem to treat this as a reverse rule
-                // requiering a Last-Modified header if the getlastmodified header was set
-                $options['mtime'] = filemtime($fspath);
-                
-                $options['size'] = filesize($fspath);
+            // sanity check
+            if (!file_exists($fspath)) return false;
             
-                // TODO check permissions/result
-                $options['stream'] = fopen($fspath, "r");
-
-                return true;
-            } else {
-                return false;
-            }               
+            // detect resource type
+            $options['mimetype'] = $this->_mimetype($fspath); 
+                
+            // detect modification time
+            // see rfc2518, section 13.7
+            // some clients seem to treat this as a reverse rule
+            // requiering a Last-Modified header if the getlastmodified header was set
+            $options['mtime'] = filemtime($fspath);
+            
+            // detect resource size
+            $options['size'] = filesize($fspath);
+            
+            // no need to check result here, it is handled by the base class
+            $options['stream'] = fopen($fspath, "r");
+            
+            return true;
         }
 
+        
+        /**
+         * PUT method handler
+         * 
+         * @param  array  parameter passing array
+         * @return bool   true on success
+         */
         function PUT(&$options) 
         {
             $fspath = $this->base . $options["path"];
@@ -302,6 +367,12 @@
         }
 
 
+        /**
+         * MKCOL method handler
+         *
+         * @param  array  general parameter passing array
+         * @return bool   true on success
+         */
         function MKCOL($options) 
         {           
             $path = $this->base .$options["path"];
@@ -333,6 +404,12 @@
         }
         
         
+        /**
+         * DELETE method handler
+         *
+         * @param  array  general parameter passing array
+         * @return bool   true on success
+         */
         function delete($options) 
         {
             $path = $this->base . "/" .$options["path"];
@@ -353,11 +430,23 @@
         }
 
 
+        /**
+         * MOVE method handler
+         *
+         * @param  array  general parameter passing array
+         * @return bool   true on success
+         */
         function move($options) 
         {
             return $this->copy($options, true);
         }
 
+        /**
+         * COPY method handler
+         *
+         * @param  array  general parameter passing array
+         * @return bool   true on success
+         */
         function copy($options, $del=false) 
         {
             // TODO Property updates still broken (Litmus should detect this?)
@@ -432,6 +521,12 @@
             return ($new && !$existing_col) ? "201 Created" : "204 No Content";         
         }
 
+        /**
+         * PROPPATCH method handler
+         *
+         * @param  array  general parameter passing array
+         * @return bool   true on success
+         */
         function proppatch(&$options) 
         {
             global $prefs, $tab;
@@ -460,6 +555,12 @@
         }
 
 
+        /**
+         * LOCK method handler
+         *
+         * @param  array  general parameter passing array
+         * @return bool   true on success
+         */
         function lock(&$options) 
         {
             if(isset($options["update"])) { // Lock Update
@@ -489,6 +590,12 @@
             return "200 OK";
         }
 
+        /**
+         * UNLOCK method handler
+         *
+         * @param  array  general parameter passing array
+         * @return bool   true on success
+         */
         function unlock(&$options) 
         {
             $query = "DELETE FROM locks
@@ -499,7 +606,13 @@
             return mysql_affected_rows() ? "200 OK" : "409 Conflict";
         }
 
-        function checklock($path) 
+        /**
+         * checkLock() helper
+         *
+         * @param  string resource path to check for locks
+         * @return bool   true on success
+         */
+        function checkLock($path) 
         {
             $result = false;
             
@@ -528,9 +641,16 @@
         }
 
 
+        /**
+         * create database tables for property and lock storage
+         *
+         * @param  void
+         * @return bool   true on success
+         */
         function create_database() 
         {
             // TODO
+            return false;
         }
     }
 
