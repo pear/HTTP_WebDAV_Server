@@ -53,6 +53,13 @@ class HTTP_WebDAV_Server
     var $http_auth_realm = "PHP WebDAV";
 
     /**
+     * String to be used in "X-Dav-Powered-By" header
+     *
+     * @var string 
+     */
+    var $dav_powered_by = "";
+
+    /**
      * Remember parsed If: (RFC2518/9.4) header conditions  
      *
      * @var array
@@ -102,7 +109,11 @@ class HTTP_WebDAV_Server
     function ServeRequest() 
     {
         // identify ourselves
-        header("X-Dav-Powered-By: PHP class ".get_class($this));
+        if (empty($this->dav_powered_by)) {
+            header("X-Dav-Powered-By: PHP class: ".get_class($this));
+        } else {
+            header("X-Dav-Powered-By: ".$this->dav_powered_by );
+        }
 
         // check authentication
         if (!$this->_check_auth()) {
@@ -788,7 +799,7 @@ class HTTP_WebDAV_Server
 
         $this->_get_ranges($options);
 
-        if (true == ($status = $this->get($options))) {
+        if (true === ($status = $this->get($options))) {
             if (!headers_sent()) {
                 $status = "200 OK";
 
