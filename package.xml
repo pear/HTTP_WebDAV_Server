@@ -40,8 +40,8 @@ but still in developement
     <filelist>
 			<dir name="/" baseinstalldir="HTTP/WebDAV">
         <file role="php">Server.php</file>
-        <file role="php">FileServer.php</file>
 				<dir name="Server">
+          <file role="php">Filesystem.php</file>
 					<file role="php">_parse_propfind.php</file>
 					<file role="php">_parse_proppatch.php</file>
 					<file role="php">_parse_lockinfo.php</file>
