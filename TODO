@@ -13,7 +13,8 @@ Short term:
 - the XML parsing parts are *very* Q&D
   should maybe use XML_Parser and XML_Tree 
   (as soon as these support namespaces)
-- "Depth: Infinite" not supported yet
+- "Depth: Infinite" not supported yet (in fileserver)
+- Overwrite header not parsed (litmus doesn't test this?)
 - MIME-type detection should become a
   package of its own?
 - provide helper classes that extend the
@@ -23,7 +24,9 @@ Short term:
 	- HTTP_WebDAV_Server_Lock_dbm
 	- HTTP_WebDAV_Server_Lock_PearDB
   - ...
-- mimetype may be guessed for strem
+  (have to dig out my design pattern book ...?)
+- mimetype may be guessed for stream
+  (mime_magic extension now supports this in HEAD)
 
 Long term:
 - Versioning 
