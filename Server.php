@@ -442,6 +442,8 @@ class HTTP_WebDAV_Server
         $this->http_status("200 OK");
         header("DAV: "  .join("," , $dav));
         header("Allow: ".join(", ", $allow));
+
+        header("Content-length: 0");
     }
 
     // }}}
@@ -601,9 +603,7 @@ class HTTP_WebDAV_Server
 
             echo " <D:response $ns_defs>\n";
         
-            $href = (@$_SERVER["HTTPS"] === "on" ? "https:" : "http:");
-            $href.= "//".$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'];
-            $href.= $path;
+            $href = $_SERVER['SCRIPT_NAME'] . $path;
             //TODO make sure collection resource pathes end in a trailing slash
         
             echo "  <D:href>$href</D:href>\n";
@@ -676,7 +676,7 @@ class HTTP_WebDAV_Server
                 echo "  </D:propstat>\n";
             }
        
-            // now report all properties requested bot not found
+            // now report all properties requested but not found
             if (isset($file["noprops"])) {
                 echo "   <D:propstat>\n";
                 echo "    <D:prop>\n";
