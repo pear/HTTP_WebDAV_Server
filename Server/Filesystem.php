@@ -98,6 +98,14 @@
 				} else {
 					header ("Content-Type: httpd/unix-directory");					
 				}
+
+				// see rfc2518, section 13.7
+				// some clients seem to treat this as a reverse rule
+				// requiering a Last-Modified header if the getlastmodified header was set
+				header("Last-Modified: ".date("D, j M Y H:m:s ", file_mtime($fspath))."GMT");
+
+				header("Content-Length: ".filesize($fspath));
+
 				readfile($fspath);
 				return true;
 			} else {
