@@ -36,7 +36,7 @@ require_once "HTTP/WebDAV/Server/_parse_lockinfo.php";
    * 
    * @package HTTP_WebDAV_Server
    * @author Hartmut Holzgraefe <hholzgra@php.net>
-   * @version 0.7
+   * @version 0.95dev
    */
 class HTTP_WebDAV_Server {
     // {{{ Member Variables 
@@ -65,6 +65,7 @@ class HTTP_WebDAV_Server {
 
     var $_http_status = "200 OK";
 
+	var $_prop_encoding = "utf-8";
     // }}}
 
     // {{{ Constructor 
@@ -566,7 +567,7 @@ class HTTP_WebDAV_Server {
 									break;
 								default:									
 									echo "     <D:$prop[name]>".
-										utf8_encode(htmlspecialchars
+										$this->prop_encode(htmlspecialchars
 																($prop['val'])).
 										"</D:$prop[name]>\n";								
 									break;
@@ -575,13 +576,13 @@ class HTTP_WebDAV_Server {
 								if ($prop["ns"]) {
 									echo "     <".$ns_hash[$prop["ns"]].
 										":$prop[name]>".
-										utf8_encode(htmlspecialchars
+										$this->prop_encode(htmlspecialchars
 																($prop['val']))."</".
 										$ns_hash[$prop["ns"]].
 										":$prop[name]>\n";
 								} else {
 									echo "     <$prop[name] xmlns=\"\">".
-										utf8_encode(htmlspecialchars
+										$this->prop_encode(htmlspecialchars
 																($prop['val'])).
 										"</$prop[name]>\n";
 								}								
@@ -659,7 +660,7 @@ class HTTP_WebDAV_Server {
 
 			if ($responsedescr) {
 				echo "  <D:responsedescription>".
-					utf8_encode(htmlspecialchars($responsedescr)).
+					$this->prop_encode(htmlspecialchars($responsedescr)).
 					"</D:responsedescription>\n";
 			}
 
@@ -787,6 +788,7 @@ class HTTP_WebDAV_Server {
 							header("Content-length: ".$options['size']);
 						}
 						fpassthru($options['stream']);
+						return; // no more headers
 					}
 				} elseif (isset($options['data']))  {
 					if (is_array($options['data'])) {
@@ -910,7 +912,9 @@ class HTTP_WebDAV_Server {
     // {{{ http_LOCK() 
 
     function http_LOCK() {
-		if($this->_check_lock_status($this->path)) {
+		$lockinfo = new _parse_lockinfo("php://input");
+
+		if($this->_check_lock_status($this->path, $lockinfo->lockscope === "shared")) {
 			$options = Array();
 			$options["path"] = $this->path;
 
@@ -929,7 +933,6 @@ class HTTP_WebDAV_Server {
 				$stat = $this->lock($options);
 			} else { 
 				// new lock 
-				$lockinfo = new _parse_lockinfo("php://input");
 				
 				if ($lockinfo->success) {
 					$options["scope"] = $lockinfo->lockscope;
@@ -1157,16 +1160,13 @@ class HTTP_WebDAV_Server {
     function _if_header_lexer($string,
                               &$pos) {
 
-        while (ctype_space($string {
-                           $pos}
-               ))
+        while (ctype_space($string{$pos}))
             ++$pos;             // skip whitespace
 
         if (strlen($string) <= $pos)
             return false;
 
-        $c = $string {
-        $pos++};
+        $c = $string{$pos++};
         switch ($c) {
             case "<":
                 $pos2 = strpos($string, ">", $pos);
@@ -1229,7 +1229,6 @@ class HTTP_WebDAV_Server {
             $not = "";
             while ($level) {
                 $token = $this->_if_header_lexer($str, $pos);
-
                 if ($token[0] == "NOT") {
                     $not = "!";
                     continue;
@@ -1266,7 +1265,10 @@ class HTTP_WebDAV_Server {
                 $not = "";
             }
 
-            $uris[$uri] = $list;
+			if (@is_array($uris[$uri]))
+				$uris[$uri] = array_merge($uris[$uri],$list);
+			else
+				$uris[$uri] = $list;
         }
 
         return $uris;
@@ -1288,6 +1290,14 @@ class HTTP_WebDAV_Server {
                 // all must match
                 $state = true;
                 foreach($conditions as $condition) {
+					// lock tokens may be free form (RFC2518 6.3)
+					// but if opatuelocktokens are used (RFC2518 6.4)
+					// we have to check the format (litmus tests this)
+					if (!strncmp($condition, "<opaquelocktoken:", strlen("<opaquelocktoken"))) {
+						if (!ereg("^<opaquelocktoken:[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}>$", $condition)) {
+							return false;
+						}
+					}
                     if (!$this->_check_uri_condition($uri, $condition)) {
                         $state = false;
                         break;
@@ -1313,19 +1323,16 @@ class HTTP_WebDAV_Server {
 	 * @param string $condition Condition to check for this URI
 	 * @returns bool Condition check result
 	 */
-    function _check_uri_condition($uri,
-                                  $condition) {
+    function _check_uri_condition($uri, $condition) {
         // not really implemented here, 
         // implementations must override
         return true;
     }
 
 
-    function _check_lock_status($path,
-                                $depth = 0) {
+    function _check_lock_status($path, $exclusive_only = false) {
+		// FIXME depth -> ignored for now
         if (method_exists($this, "checklock")) {
-            // FIXME depth -> ignored for now
-
             // is locked?
             $lock = $this->checklock($path);
 
@@ -1333,7 +1340,8 @@ class HTTP_WebDAV_Server {
             if (is_array($lock) && count($lock)) {
                 // FIXME doesn't check uri restrictions yet
                 if (!strstr($_SERVER["HTTP_IF"], $lock["token"])) {
-                    return false;
+					if (!$exclusive_only || ($lock["scope"] !== "shared"))
+						return false;
                 }
             }
         }
@@ -1401,6 +1409,15 @@ class HTTP_WebDAV_Server {
 		return urldecode($path);
 	}
 
+
+	function prop_encode($text) {
+		switch ($this->_prop_encoding) {
+		case "utf-8":
+			return $text;
+		default:
+			return utf8_encode($text);
+		}
+	}
 } 
 
   /*
