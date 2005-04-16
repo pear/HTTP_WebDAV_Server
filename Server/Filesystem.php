@@ -359,10 +359,19 @@
          */
         function GetDir($fspath, &$options) 
         {
+            $path = $this->_slashify($options["path"]);
+            if ($path != $options["path"]) {
+                header("Location: ".$this->base_uri.$path);
+                exit;
+            }
+
             // fixed width directory column format
             $format = "%15s  %-19s  %-s\n";
 
-            $handle = @opendir($fspath) or return false;
+            $handle = @opendir($fspath);
+            if (!$handle) {
+                return false;
+            }
 
             echo "<html><head><title>Index of ".$options['path']."</title></head>\n";
             
@@ -375,10 +384,11 @@
             while ($filename = readdir($handle)) {
                 if ($filename != "." && $filename != "..") {
                     $fullpath = $fspath."/".$filename;
+                    $name = htmlspecialchars($filename);
                     printf($format, 
                            number_format(filesize($fullpath)),
                            strftime("%Y-%m-%d %H:%M:%S", filemtime($fullpath)), 
-                           htmlspecialchars($filename));
+                           "<a href='$name'>$name</a>");
                 }
             }
 
@@ -463,9 +473,9 @@
             if (!file_exists($path)) return "404 Not found";
 
             if (is_dir($path)) {
-                $query = "DELETE FROM properties WHERE path LIKE '$options[path]%'";
+                $query = "DELETE FROM properties WHERE path LIKE '".$options["path"]."%'";
                 mysql_query($query);
-                system("rm -rf $path");
+                System::rm("-rf $path");
             } else {
                 unlink ($path);
             }
@@ -532,36 +542,52 @@
 
             if (!$new) {
                 if ($options["overwrite"]) {
-                    $stat = $this->delete(array("path" => $options["dest"]));
-                    if ($stat{0} != "2") return $stat; 
+                    $stat = $this->DELETE(array("path" => $options["dest"]));
+                    if (($stat{0} != "2") && (substr($stat, 0, 3) != "404")) {
+                        return $stat; 
+                    }
                 } else {                
                     return "412 precondition failed";
                 }
             }
 
-            if (is_dir($source)) {
+            if (is_dir($source) && ($options["depth"] != "infinity")) {
                 // RFC 2518 Section 9.2, last paragraph
-                if ($options["depth"] != "infinity") {
-                    error_log("---- ".$options["depth"]);
-                    return "400 Bad request";
+                return "400 Bad request";
+            }
+                            
+            if ($del) {
+                if (!rename($source, $dest)) {
+                    return "500 Internal server error";
                 }
-                system(escapeshellcmd("cp -R ".escapeshellarg($source) ." " .  escapeshellarg($dest)));
+                if (is_dir($source)) {
+                    $destpath = $this->_slashify($options["dest"]);
+                    $query = "UPDATE properties 
+                                 SET path = REPLACE(path, '".$options["path"]."', '".$destpath."') 
+                               WHERE path LIKE '".$options["path"]."%'";
+                    mysql_query($query);
+                }
+                $query = "UPDATE properties 
+                             SET path = '".$destpath."'
+                           WHERE path = '".$options["path"]."%'";
+                mysql_query($query);
+            } else {
+                $files = array_reverse(System::find($source));
+                
+                if (!is_array($files)) {
+                    return "500 Internal server error";
+                }
+                    
+                foreach ($files as $file) {
+                    $destfile = str_replace($source, $dest, $file);
+                    if (is_dir($file)) {
+                        mkdir($destfile);
+                    } else {
+                        copy($sourcefile, $destfile);
+                    }
+                }
 
-                if ($del) {
-                    system(escapeshellcmd("rm -rf ".escapeshellarg($source)) );
-                }
-            } else {                
-                if ($del) {
-                    @unlink($dest);
-                    $query = "DELETE FROM properties WHERE path = '$options[dest]'";
-                    mysql_query($query);
-                    rename($source, $dest);
-                    $query = "UPDATE properties SET path = '$options[dest]' WHERE path = '$options[path]'";
-                    mysql_query($query);
-                } else {
-                    if (substr($dest,-1)=="/") $dest = substr($dest,0,-1);
-                    copy($source, $dest);
-                }
+                $query = "INSERT INTO properties SELECT ... FROM properties WHERE path = '".$options['path']."';
             }
 
             return ($new && !$existing_col) ? "201 Created" : "204 No Content";         
