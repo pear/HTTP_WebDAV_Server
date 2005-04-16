@@ -456,7 +456,7 @@
          * @param  array  general parameter passing array
          * @return bool   true on success
          */
-        function delete($options) 
+        function DELETE($options) 
         {
             $path = $this->base . "/" .$options["path"];
 
@@ -482,9 +482,9 @@
          * @param  array  general parameter passing array
          * @return bool   true on success
          */
-        function move($options) 
+        function MOVE($options) 
         {
-            return $this->copy($options, true);
+            return $this->COPY($options, true);
         }
 
         /**
@@ -493,7 +493,7 @@
          * @param  array  general parameter passing array
          * @return bool   true on success
          */
-        function copy($options, $del=false) 
+        function COPY($options, $del=false) 
         {
             // TODO Property updates still broken (Litmus should detect this?)
 
@@ -573,7 +573,7 @@
          * @param  array  general parameter passing array
          * @return bool   true on success
          */
-        function proppatch(&$options) 
+        function PROPPATCH(&$options) 
         {
             global $prefs, $tab;
 
@@ -607,7 +607,7 @@
          * @param  array  general parameter passing array
          * @return bool   true on success
          */
-        function lock(&$options) 
+        function LOCK(&$options) 
         {
             if (isset($options["update"])) { // Lock Update
                 $query = "UPDATE locks SET expires = ".(time()+300);
@@ -641,7 +641,7 @@
          * @param  array  general parameter passing array
          * @return bool   true on success
          */
-        function unlock(&$options) 
+        function UNLOCK(&$options) 
         {
             $query = "DELETE FROM locks
                       WHERE path = '$options[path]'
