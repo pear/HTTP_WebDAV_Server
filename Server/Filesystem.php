@@ -63,7 +63,7 @@
             // reply on its identifier header
             // not needed for the test itself but eases debugging
             foreach(apache_request_headers() as $key => $value) {
-                if(stristr($key,"litmus")) {
+                if (stristr($key,"litmus")) {
                     error_log("Litmus test $value");
                     header("X-Litmus-reply: ".$value);
                 }
@@ -72,7 +72,7 @@
             // set root directory, defaults to webserver document root if not set
             if ($base) { 
                 $this->base = realpath($base); // TODO throw if not a directory
-            } else if(!$this->base) {
+            } else if (!$this->base) {
                 $this->base = $_SERVER['DOCUMENT_ROOT'];
             }
                 
@@ -191,7 +191,7 @@
             // get additional properties from database
             $query = "SELECT ns, name, value FROM properties WHERE path = '$path'";
             $res = mysql_query($query);
-            while($row = mysql_fetch_assoc($res)) {
+            while ($row = mysql_fetch_assoc($res)) {
                 $info["props"][] = $this->mkprop($row["ns"], $row["name"], $row["value"]);
             }
             mysql_free_result($res);
@@ -401,7 +401,7 @@
         {
             $fspath = $this->base . $options["path"];
 
-            if(!@is_dir(dirname($fspath))) {
+            if (!@is_dir(dirname($fspath))) {
                 return "409 Conflict";
             }
 
@@ -425,24 +425,24 @@
             $parent = dirname($path);
             $name = basename($path);
 
-            if(!file_exists($parent)) {
+            if (!file_exists($parent)) {
                 return "409 Conflict";
             }
 
-            if(!is_dir($parent)) {
+            if (!is_dir($parent)) {
                 return "403 Forbidden";
             }
 
-            if( file_exists($parent."/".$name) ) {
+            if ( file_exists($parent."/".$name) ) {
                 return "405 Method not allowed";
             }
 
-            if(!empty($_SERVER["CONTENT_LENGTH"])) { // no body parsing yet
+            if (!empty($_SERVER["CONTENT_LENGTH"])) { // no body parsing yet
                 return "415 Unsupported media type";
             }
             
             $stat = mkdir ($parent."/".$name,0777);
-            if(!$stat) {
+            if (!$stat) {
                 return "403 Forbidden";                 
             }
 
@@ -460,7 +460,7 @@
         {
             $path = $this->base . "/" .$options["path"];
 
-            if(!file_exists($path)) return "404 Not found";
+            if (!file_exists($path)) return "404 Not found";
 
             if (is_dir($path)) {
                 $query = "DELETE FROM properties WHERE path LIKE '$options[path]%'";
@@ -498,30 +498,30 @@
             // TODO Property updates still broken (Litmus should detect this?)
 
             
-            if(!empty($_SERVER["CONTENT_LENGTH"])) { // no body parsing yet
+            if (!empty($_SERVER["CONTENT_LENGTH"])) { // no body parsing yet
                 return "415 Unsupported media type";
             }
 
             // no copying to different WebDAV Servers yet
-            if(isset($options["dest_url"])) {
+            if (isset($options["dest_url"])) {
                 return "502 bad gateway";
             }
 
             $source = $this->base .$options["path"];
-            if(!file_exists($source)) return "404 Not found";
+            if (!file_exists($source)) return "404 Not found";
 
             $dest = $this->base . $options["dest"];
 
             $new = !file_exists($dest);
             $existing_col = false;
 
-            if(!$new) {
-                if($del && is_dir($dest)) {
-                    if(!$options["overwrite"]) {
+            if (!$new) {
+                if ($del && is_dir($dest)) {
+                    if (!$options["overwrite"]) {
                         return "412 precondition failed";
                     }
                     $dest .= basename($source);
-                    if(file_exists($dest.basename($source))) {
+                    if (file_exists($dest.basename($source))) {
                         $options["dest"] .= basename($source);
                     } else {
                         $new = true;
@@ -530,10 +530,10 @@
                 }
             }
 
-            if(!$new) {
-                if($options["overwrite"]) {
+            if (!$new) {
+                if ($options["overwrite"]) {
                     $stat = $this->delete(array("path" => $options["dest"]));
-                    if($stat{0} != "2") return $stat; 
+                    if ($stat{0} != "2") return $stat; 
                 } else {                
                     return "412 precondition failed";
                 }
@@ -547,11 +547,11 @@
                 }
                 system(escapeshellcmd("cp -R ".escapeshellarg($source) ." " .  escapeshellarg($dest)));
 
-                if($del) {
+                if ($del) {
                     system(escapeshellcmd("rm -rf ".escapeshellarg($source)) );
                 }
             } else {                
-                if($del) {
+                if ($del) {
                     @unlink($dest);
                     $query = "DELETE FROM properties WHERE path = '$options[dest]'";
                     mysql_query($query);
@@ -559,7 +559,7 @@
                     $query = "UPDATE properties SET path = '$options[dest]' WHERE path = '$options[path]'";
                     mysql_query($query);
                 } else {
-                    if(substr($dest,-1)=="/") $dest = substr($dest,0,-1);
+                    if (substr($dest,-1)=="/") $dest = substr($dest,0,-1);
                     copy($source, $dest);
                 }
             }
@@ -585,10 +585,10 @@
             $base = basename($path);
             
             foreach($options["props"] as $key => $prop) {
-                if($ns == "DAV:") {
+                if ($ns == "DAV:") {
                     $options["props"][$key][$status] = "403 Forbidden";
                 } else {
-                    if(isset($prop["val"])) {
+                    if (isset($prop["val"])) {
                         $query = "REPLACE INTO properties SET path = '$options[path]', name = '$prop[name]', ns= '$prop[ns]', value = '$prop[val]'";
                     } else {
                         $query = "DELETE FROM properties WHERE path = '$options[path]' AND name = '$prop[name]' AND ns = '$prop[ns]'";
@@ -609,11 +609,11 @@
          */
         function lock(&$options) 
         {
-            if(isset($options["update"])) { // Lock Update
+            if (isset($options["update"])) { // Lock Update
                 $query = "UPDATE locks SET expires = ".(time()+300);
                 mysql_query($query);
                 
-                if(mysql_affected_rows()) {
+                if (mysql_affected_rows()) {
                     $options["timeout"] = 300; // 5min hardcoded
                     return true;
                 } else {
@@ -667,11 +667,11 @@
                ";
             $res = mysql_query($query);
 
-            if($res) {
+            if ($res) {
                 $row = mysql_fetch_array($res);
                 mysql_free_result($res);
 
-                if($row) {
+                if ($row) {
                     $result = array( "type"    => "write",
                                                      "scope"   => $row["exclusivelock"] ? "exclusive" : "shared",
                                                      "depth"   => 0,
