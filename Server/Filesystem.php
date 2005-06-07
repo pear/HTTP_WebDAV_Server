@@ -587,7 +587,7 @@
                     }
                 }
 
-                $query = "INSERT INTO properties SELECT ... FROM properties WHERE path = '".$options['path']."';
+                $query = "INSERT INTO properties SELECT ... FROM properties WHERE path = '".$options['path']."'";
             }
 
             return ($new && !$existing_col) ? "201 Created" : "204 No Content";         
