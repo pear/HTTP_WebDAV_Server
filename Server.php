@@ -1385,6 +1385,7 @@ class HTTP_WebDAV_Server
         }
 
         extract(parse_url($_SERVER["HTTP_DESTINATION"]));
+        $path = url_decode($path);
         $http_host = $host;
         if (isset($port) && $port != 80)
             $http_host.= ":$port";
