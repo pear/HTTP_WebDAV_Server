@@ -507,7 +507,7 @@ class HTTP_WebDAV_Server
         $options['props'] = $propinfo->props;
         
         // call user handler
-        if (!$this->propfind($options, $files)) {
+        if (!$this->PROPFIND($options, $files)) {
             $this->http_status("404 Not Found");
             return;
         }
@@ -756,7 +756,7 @@ class HTTP_WebDAV_Server
             
             $options['props'] = $propinfo->props;
             
-            $responsedescr = $this->proppatch($options);
+            $responsedescr = $this->PROPPATCH($options);
             
             $this->http_status("207 Multi-Status");
             header('Content-Type: text/xml; charset="utf-8"');
@@ -803,7 +803,7 @@ class HTTP_WebDAV_Server
         $options = Array();
         $options["path"] = $this->path;
 
-        $stat = $this->mkcol($options);
+        $stat = $this->MKCOL($options);
 
         $this->http_status($stat);
     }
@@ -827,7 +827,7 @@ class HTTP_WebDAV_Server
 
         $this->_get_ranges($options);
 
-        if (true === ($status = $this->get($options))) {
+        if (true === ($status = $this->GET($options))) {
             if (!headers_sent()) {
                 $status = "200 OK";
 
@@ -1192,7 +1192,7 @@ class HTTP_WebDAV_Server
             $options = Array();
             $options["path"] = $this->path;
 
-            $stat = $this->delete($options);
+            $stat = $this->DELETE($options);
 
             $this->http_status($stat);
         } else {
@@ -1273,7 +1273,7 @@ class HTTP_WebDAV_Server
 
             // refresh lock
             $options["update"] = substr($_SERVER['HTTP_IF'], 2, -2);
-            $stat = $this->lock($options);
+            $stat = $this->LOCK($options);
         } else { 
             // extract lock request information from request XML payload
             $lockinfo = new _parse_lockinfo("php://input");
@@ -1294,7 +1294,7 @@ class HTTP_WebDAV_Server
             
             $options["locktoken"] = $this->_new_locktoken();
             
-            $stat = $this->lock($options);              
+            $stat = $this->LOCK($options);              
         }
         
         if(is_bool($stat)) {
@@ -1362,7 +1362,7 @@ class HTTP_WebDAV_Server
         $options["token"] = substr(trim($_SERVER["HTTP_LOCK_TOKEN"]), 1, -1);  
 
         // call user method
-        $stat = $this->unlock($options);
+        $stat = $this->UNLOCK($options);
 
         $this->http_status($stat);
     }
