@@ -129,7 +129,7 @@ class HTTP_WebDAV_Server
         $uri.= "//$_SERVER[HTTP_HOST]$_SERVER[SCRIPT_NAME]";
         
         $this->base_uri = $uri;
-        $this->uri      = $uri . $_SERVER[PATH_INFO]";
+        $this->uri      = $uri . $_SERVER["PATH_INFO"];
 
         // identify ourselves
         if (empty($this->dav_powered_by)) {
