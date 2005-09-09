@@ -1,6 +1,7 @@
 <?php
 
     require_once "HTTP/WebDAV/Server.php";
+    require_once "System.php";
     
     /**
      * Filesystem access using WebDAV
@@ -470,7 +471,9 @@
         {
             $path = $this->base . "/" .$options["path"];
 
-            if (!file_exists($path)) return "404 Not found";
+            if (!file_exists($path)) {
+                return "404 Not found";
+            }
 
             if (is_dir($path)) {
                 $query = "DELETE FROM properties WHERE path LIKE '".$options["path"]."%'";
