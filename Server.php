@@ -1130,7 +1130,7 @@ class HTTP_WebDAV_Server
 
             $stat = $this->PUT($options);
 
-            if ($stat == false) {
+            if ($stat === false) {
                 $stat = "403 Forbidden";
             } else if (is_resource($stat) && get_resource_type($stat) == "stream") {
                 $stream = $stat;
@@ -1149,7 +1149,7 @@ class HTTP_WebDAV_Server
                     }
                 } else {
                     while (!feof($options["stream"])) {
-                        if (!fwrite($stream, fread($options["stream"], 4096))) {
+                        if (false === fwrite($stream, fread($options["stream"], 4096))) {
                             $stat = "403 Forbidden"; 
                             break;
                         }
