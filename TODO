@@ -8,6 +8,8 @@ Short term (1.0 show stoppers):
 
 - properties not copied/moved (in fileserver COPY/MOVE)
 
+- check url en-/decodings
+
 Medium term (nice to have in 1.0):
 
 - ETags support ...

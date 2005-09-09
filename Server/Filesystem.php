@@ -374,9 +374,9 @@
                 return false;
             }
 
-            echo "<html><head><title>Index of ".$options['path']."</title></head>\n";
+            echo "<html><head><title>Index of ".htmlspecialchars($options['path'])."</title></head>\n";
             
-            echo "<h1>Index of ".$options['path']."</h1>\n";
+            echo "<h1>Index of ".htmlspecialchars($options['path'])."</h1>\n";
             
             echo "<pre>";
             printf($format, "Size", "Last modified", "Filename");
@@ -510,7 +510,6 @@
         {
             // TODO Property updates still broken (Litmus should detect this?)
 
-            
             if (!empty($_SERVER["CONTENT_LENGTH"])) { // no body parsing yet
                 return "415 Unsupported media type";
             }
@@ -558,7 +557,7 @@
                 // RFC 2518 Section 9.2, last paragraph
                 return "400 Bad request";
             }
-                            
+
             if ($del) {
                 if (!rename($source, $dest)) {
                     return "500 Internal server error";
@@ -575,18 +574,29 @@
                            WHERE path = '".$options["path"]."%'";
                 mysql_query($query);
             } else {
-                $files = array_reverse(System::find($source));
-                
-                if (!is_array($files)) {
+                if (is_dir($source)) {
+                    $files = System::find($source);
+                    $files = array_reverse($files);
+                } else {
+                    $files = array($source);
+                }
+
+                if (!is_array($files) || empty($files)) {
                     return "500 Internal server error";
                 }
                     
+                
                 foreach ($files as $file) {
                     $destfile = str_replace($source, $dest, $file);
+
                     if (is_dir($file)) {
-                        mkdir($destfile);
+                        if (!mkdir($destfile)) {
+                            return "409 Conflict";
+                        }
                     } else {
-                        copy($sourcefile, $destfile);
+                        if (!copy($file, $destfile)) {
+                            return "409 Conflict";
+                        }
                     }
                 }
 

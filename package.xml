@@ -24,7 +24,7 @@
   </maintainers>
     
   <release>
-   <version>1.0rc1</version>
+   <version>1.0.0rc1</version>
    <date>2005-07-05</date>
    <state>beta</state>
    <license>PHP</license>
@@ -41,6 +41,7 @@
      <file role="php">Server.php</file>
      <dir name="Server">
       <file role="php">Filesystem.php</file>
+      <file role="php">FileSQLite.php</file>
      </dir>
      <dir name="Tools">
       <file role="php">_parse_propfind.php</file>
