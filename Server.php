@@ -162,9 +162,18 @@ class HTTP_WebDAV_Server
         // set path
         $this->path = $this->_urldecode($_SERVER["PATH_INFO"]);
         if (!strlen($this->path)) {
-            header("Location: ".$this->base_uri."/");
-            exit;
-        }
+            if ($_SERVER["REQUEST_METHOD"] == "GET") {
+                // redirect clients that try to GET a collection
+                // WebDAV clients should never try this while
+                // regular HTTP clients might ...
+                header("Location: ".$this->base_uri."/");
+                exit;
+            } else {
+                // if a WebDAV client didn't give a path we just assume '/'
+                $this->path = "/";
+            }
+        } 
+        
         if(ini_get("magic_quotes_gpc")) {
             $this->path = stripslashes($this->path);
         }
@@ -632,7 +641,7 @@ class HTTP_WebDAV_Server
 
             echo " <D:response $ns_defs>\n";
         
-            $href = $this->_slashify($_SERVER['SCRIPT_NAME'] . $path);
+            $href = $this->_slashify($this->_mergePathes($_SERVER['SCRIPT_NAME'], $path));
         
             echo "  <D:href>$href</D:href>\n";
         
@@ -765,7 +774,7 @@ class HTTP_WebDAV_Server
 
             echo "<D:multistatus xmlns:D=\"DAV:\">\n";
             echo " <D:response>\n";
-            echo "  <D:href>".$this->_urlencode($_SERVER["SCRIPT_NAME"].$this->path)."</D:href>\n";
+            echo "  <D:href>".$this->_urlencode($this->_mergePathes($_SERVER["SCRIPT_NAME"], $this->path))."</D:href>\n";
 
             foreach($options["props"] as $prop) {
                 echo "   <D:propstat>\n";
@@ -1914,6 +1923,35 @@ class HTTP_WebDAV_Server
             $path = $path."/";
         }
         return $path;
+    }
+
+    /**
+     * Unslashify - make sure path doesn't in a slash
+     *
+     * @param   string directory path
+     * @returns string directory path wihtout trailing slash
+     */
+    function _unslashify($path) {
+        if ($path[strlen($path)-1] == '/') {
+            $path = substr($path, 0, strlen($path, 0, -1));
+        }
+        return $path;
+    }
+
+    /**
+     * Merge two pathes, make sure there is exactly one slash between them
+     *
+     * @param  string  parent path
+     * @param  string  child path
+     * @return string  merged path
+     */
+    function _mergePathes($parent, $child) 
+    {
+        if ($child{0} == '/') {
+            return $this->unslashify($parent).$child;
+        } else {
+            return $this->slashify($parent).$child;
+        }
     }
 } 
 
