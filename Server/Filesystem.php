@@ -571,7 +571,7 @@
                 }
                 $query = "UPDATE properties 
                              SET path = '".$destpath."'
-                           WHERE path = '".$options["path"]."%'";
+                           WHERE path LIKE '".$options["path"]."%'";
                 mysql_query($query);
             } else {
                 if (is_dir($source)) {
