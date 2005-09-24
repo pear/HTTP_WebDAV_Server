@@ -1390,10 +1390,7 @@ class HTTP_WebDAV_Server
         if (isset($port) && $port != 80)
             $http_host.= ":$port";
 
-        list($http_header_host,$http_header_port)  = explode(":",$_SERVER["HTTP_HOST"]);
-        if (isset($http_header_port) && $http_header_port != 80) { 
-            $http_header_host .= ":".$http_header_port;
-        }
+        $http_header_host = ereg_replace(":80$", "", $_SERVER["HTTP_HOST"]);
 
         if ($http_host == $http_header_host &&
             !strncmp($_SERVER["SCRIPT_NAME"], $path,
