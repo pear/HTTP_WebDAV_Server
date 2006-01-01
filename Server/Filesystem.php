@@ -687,7 +687,7 @@
                         AND token = '$options[token]'";
             mysql_query($query);
 
-            return mysql_affected_rows() ? "200 OK" : "409 Conflict";
+            return mysql_affected_rows() ? "204 No Content" : "409 Conflict";
         }
 
         /**
