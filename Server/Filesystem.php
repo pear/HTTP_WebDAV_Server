@@ -625,7 +625,7 @@
             
             foreach($options["props"] as $key => $prop) {
                 if ($ns == "DAV:") {
-                    $options["props"][$key][$status] = "403 Forbidden";
+                    $options["props"][$key]['status'] = "403 Forbidden";
                 } else {
                     if (isset($prop["val"])) {
                         $query = "REPLACE INTO properties SET path = '$options[path]', name = '$prop[name]', ns= '$prop[ns]', value = '$prop[val]'";
