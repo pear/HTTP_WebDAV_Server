@@ -163,7 +163,8 @@
 
             // create result array
             $info = array();
-            $info["path"]  = $path;    
+            // TODO remove slash append code when base clase is able to do it itself
+            $info["path"]  = $path . (isdir($fspath) ? "/" : "");    
             $info["props"] = array();
             
             // no special beautified displayname here ...

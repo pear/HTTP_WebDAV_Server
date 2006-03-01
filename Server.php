@@ -641,7 +641,10 @@ class HTTP_WebDAV_Server
 
             echo " <D:response $ns_defs>\n";
         
-            $href = $this->_slashify($this->_mergePathes($_SERVER['SCRIPT_NAME'], $path));
+            /* TODO right now the user implementation has to make sure
+             collections end in a slash, this should be done in here
+             by checking the resource attribute */
+            $href = $this->_mergePathes($_SERVER['SCRIPT_NAME'].$path);
         
             echo "  <D:href>$href</D:href>\n";
         
