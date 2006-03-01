@@ -1034,9 +1034,16 @@ class HTTP_WebDAV_Server
         } else if (method_exists($this, "GET")) {
             ob_start();
             $status = $this->GET($options);
+            if (!isset($options['size'])) {
+                $options['size'] = ob_get_length();
+            }
             ob_end_clean();
         }
         
+        if (isset($options['size'])) {
+            header("Content-length: ".$options['size']);
+        }
+
         if($status===true)  $status = "200 OK";
         if($status===false) $status = "404 Not found";
         
