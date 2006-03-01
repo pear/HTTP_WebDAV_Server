@@ -131,6 +131,26 @@ class HTTP_WebDAV_Server
         $this->base_uri = $uri;
         $this->uri      = $uri . $_SERVER["PATH_INFO"];
 
+        // set path
+        $this->path = $this->_urldecode($_SERVER["PATH_INFO"]);
+        if (!strlen($this->path)) {
+            if ($_SERVER["REQUEST_METHOD"] == "GET") {
+                // redirect clients that try to GET a collection
+                // WebDAV clients should never try this while
+                // regular HTTP clients might ...
+                header("Location: ".$this->base_uri."/");
+                exit;
+            } else {
+                // if a WebDAV client didn't give a path we just assume '/'
+                $this->path = "/";
+            }
+        } 
+        
+        if(ini_get("magic_quotes_gpc")) {
+            $this->path = stripslashes($this->path);
+        }
+        
+        
         // identify ourselves
         if (empty($this->dav_powered_by)) {
             header("X-Dav-Powered-By: PHP class: ".get_class($this));
@@ -158,26 +178,6 @@ class HTTP_WebDAV_Server
             $this->http_status("412 Precondition failed");
             return;
         }
-        
-        // set path
-        $this->path = $this->_urldecode($_SERVER["PATH_INFO"]);
-        if (!strlen($this->path)) {
-            if ($_SERVER["REQUEST_METHOD"] == "GET") {
-                // redirect clients that try to GET a collection
-                // WebDAV clients should never try this while
-                // regular HTTP clients might ...
-                header("Location: ".$this->base_uri."/");
-                exit;
-            } else {
-                // if a WebDAV client didn't give a path we just assume '/'
-                $this->path = "/";
-            }
-        } 
-        
-        if(ini_get("magic_quotes_gpc")) {
-            $this->path = stripslashes($this->path);
-        }
-        
         
         // detect requested method names
         $method = strtolower($_SERVER["REQUEST_METHOD"]);
