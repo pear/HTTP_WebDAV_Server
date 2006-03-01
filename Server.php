@@ -128,11 +128,13 @@ class HTTP_WebDAV_Server
         $uri = (@$_SERVER["HTTPS"] === "on" ? "https:" : "http:");
         $uri.= "//$_SERVER[HTTP_HOST]$_SERVER[SCRIPT_NAME]";
         
+        $path_info = empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"];
+
         $this->base_uri = $uri;
-        $this->uri      = $uri . $_SERVER["PATH_INFO"];
+        $this->uri      = $uri . $path_info;
 
         // set path
-        $this->path = $this->_urldecode($_SERVER["PATH_INFO"]);
+        $this->path = $this->_urldecode($path_info);
         if (!strlen($this->path)) {
             if ($_SERVER["REQUEST_METHOD"] == "GET") {
                 // redirect clients that try to GET a collection
