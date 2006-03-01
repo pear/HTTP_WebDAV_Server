@@ -161,7 +161,10 @@ class HTTP_WebDAV_Server
         }
 
         // check authentication
-        if (!$this->_check_auth()) {
+        // for the motivation for not checking OPTIONS requests on / see 
+        // http://pear.php.net/bugs/bug.php?id=5363
+        if ( (   !(($_SERVER['REQUEST_METHOD'] == 'OPTIONS') && ($this->path == "/")))
+             && (!$this->_check_auth())) {
             // RFC2518 says we must use Digest instead of Basic
             // but Microsoft Clients do not support Digest
             // and we don't support NTLM and Kerberos
