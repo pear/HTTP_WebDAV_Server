@@ -1948,9 +1948,9 @@ class HTTP_WebDAV_Server
     function _mergePathes($parent, $child) 
     {
         if ($child{0} == '/') {
-            return $this->unslashify($parent).$child;
+            return $this->_unslashify($parent).$child;
         } else {
-            return $this->slashify($parent).$child;
+            return $this->_slashify($parent).$child;
         }
     }
 } 

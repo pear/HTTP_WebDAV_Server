@@ -24,12 +24,12 @@
   </maintainers>
     
   <release>
-   <version>1.0.0rc1</version>
-   <date>2005-07-05</date>
+   <version>1.0.0rc2</version>
+   <date>2006-01-15</date>
    <state>beta</state>
    <license>PHP</license>
    <notes>
-	  Preparing for 1.0 release ...
+	  Still preparing for 1.0 release after some bug fixes ...
    </notes>
    <deps>
     <dep type="php" rel="ge" version="4.3"/>
@@ -41,7 +41,6 @@
      <file role="php">Server.php</file>
      <dir name="Server">
       <file role="php">Filesystem.php</file>
-      <file role="php">FileSQLite.php</file>
      </dir>
      <dir name="Tools">
       <file role="php">_parse_propfind.php</file>
@@ -57,6 +56,15 @@
     
   <changelog>
    <release>
+    <version>1.0.0rc1</version>
+    <date>2005-07-05</date>
+    <state>beta</state>
+    <license>PHP</license>
+    <notes>
+	  Preparing for 1.0 release ...
+    </notes>
+   </release>
+   <release>
     <version>0.99.1</version>
     <date>2004-04-22</date>
     <state>beta</state>
@@ -67,7 +75,7 @@ we go for 1.0. This release doesn't really address any of these,
 it only fixes some small issues with the existing code and adds
 comments in various places.
     </notes>
-	 </release>
+   </release>
 
    <release>
     <version>0.99</version>
