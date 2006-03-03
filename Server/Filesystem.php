@@ -128,9 +128,7 @@
             if (!empty($options["depth"]))  { // TODO check for is_dir() first?
                 
                 // make sure path ends with '/'
-                if (substr($options["path"],-1) != "/") { 
-                    $options["path"] .= "/";
-                }
+                $options["path"] = $this->_slashify($options["path"]);
 
                 // try to open directory
                 $handle = @opendir($fspath);
@@ -164,7 +162,7 @@
             // create result array
             $info = array();
             // TODO remove slash append code when base clase is able to do it itself
-            $info["path"]  = $path . (is_dir($fspath) ? "/" : "");    
+            $info["path"]  = is_dir($fspath) ? $this->_slashify($path) : $path; 
             $info["props"] = array();
             
             // no special beautified displayname here ...
@@ -477,7 +475,7 @@
             }
 
             if (is_dir($path)) {
-                $query = "DELETE FROM properties WHERE path LIKE '".$options["path"]."%'";
+                $query = "DELETE FROM properties WHERE path LIKE '".$this->_slashify($options["path"])."%'";
                 mysql_query($query);
                 System::rm("-rf $path");
             } else {
@@ -563,16 +561,17 @@
                 if (!rename($source, $dest)) {
                     return "500 Internal server error";
                 }
+                $destpath = $this->_unslashify($options["dest"]);
                 if (is_dir($source)) {
-                    $destpath = $this->_slashify($options["dest"]);
                     $query = "UPDATE properties 
                                  SET path = REPLACE(path, '".$options["path"]."', '".$destpath."') 
-                               WHERE path LIKE '".$options["path"]."%'";
+                               WHERE path LIKE '".$this->_slashify($options["path"])."%'";
                     mysql_query($query);
                 }
+
                 $query = "UPDATE properties 
                              SET path = '".$destpath."'
-                           WHERE path LIKE '".$options["path"]."%'";
+                           WHERE path = '".$options["path"]."'";
                 mysql_query($query);
             } else {
                 if (is_dir($source)) {
@@ -596,7 +595,7 @@
                     
                     if (is_dir($file)) {
                         if (!is_dir($destfile)) {
-						    // TODO "mkdir -p" here? (only natively supported by PHP 5) 
+                            // TODO "mkdir -p" here? (only natively supported by PHP 5) 
                             if (!mkdir($destfile)) {
                                 return "409 Conflict";
                             }
@@ -634,11 +633,12 @@
             $base = basename($path);
             
             foreach($options["props"] as $key => $prop) {
-                if ($ns == "DAV:") {
+                if ($prop["ns"] == "DAV:") {
                     $options["props"][$key]['status'] = "403 Forbidden";
                 } else {
                     if (isset($prop["val"])) {
                         $query = "REPLACE INTO properties SET path = '$options[path]', name = '$prop[name]', ns= '$prop[ns]', value = '$prop[val]'";
+                        error_log($query);
                     } else {
                         $query = "DELETE FROM properties WHERE path = '$options[path]' AND name = '$prop[name]' AND ns = '$prop[ns]'";
                     }       

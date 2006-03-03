@@ -563,7 +563,7 @@ class HTTP_WebDAV_Server
                     // search property name in requested properties 
                     foreach((array)$options["props"] as $reqprop) {
                         if (   $reqprop["name"]  == $prop["name"] 
-                            && $reqprop["xmlns"] == $prop["ns"]) {
+                            && @$reqprop["xmlns"] == $prop["ns"]) {
                             $found = true;
                             break;
                         }
@@ -600,7 +600,7 @@ class HTTP_WebDAV_Server
                     // check if property exists in result
                     foreach($file["props"] as $prop) {
                         if (   $reqprop["name"]  == $prop["name"]
-                            && $reqprop["xmlns"] == $prop["ns"]) {
+                            && @$reqprop["xmlns"] == $prop["ns"]) {
                             $found = true;
                             break;
                         }
@@ -649,7 +649,7 @@ class HTTP_WebDAV_Server
             /* TODO right now the user implementation has to make sure
              collections end in a slash, this should be done in here
              by checking the resource attribute */
-            $href = $this->_mergePathes($_SERVER['SCRIPT_NAME'].$path);
+            $href = $this->_mergePathes($_SERVER['SCRIPT_NAME'], $path);
         
             echo "  <D:href>$href</D:href>\n";
         
@@ -1796,7 +1796,7 @@ class HTTP_WebDAV_Server
             // ... and lock is not owned?
             if (is_array($lock) && count($lock)) {
                 // FIXME doesn't check uri restrictions yet
-                if (!strstr($_SERVER["HTTP_IF"], $lock["token"])) {
+                if (!isset($_SERVER["HTTP_IF"]) || !strstr($_SERVER["HTTP_IF"], $lock["token"])) {
                     if (!$exclusive_only || ($lock["scope"] !== "shared"))
                         return false;
                 }
