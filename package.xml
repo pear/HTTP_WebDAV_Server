@@ -24,15 +24,17 @@
   </maintainers>
     
   <release>
-   <version>1.0.0rc2</version>
-   <date>2006-01-15</date>
+   <version>1.0.0RC3</version>
+   <date>2006-03-03</date>
    <state>beta</state>
    <license>PHP</license>
    <notes>
-	  Still preparing for 1.0 release after some bug fixes ...
+    More bug fixes, getting nearer to 1.0 release ...
+    - there are still known charset encoding issues
+    - some litmus locking tests are not passed yet
    </notes>
    <deps>
-    <dep type="php" rel="ge" version="4.3"/>
+    <dep type="php" rel="ge" version="4.4"/>
    </deps>
    <filelist>
     <dir name="/" baseinstalldir="HTTP/WebDAV">
@@ -55,6 +57,15 @@
   </release>
     
   <changelog>
+   <release>
+    <version>1.0.0rc2</version>
+    <date>2006-01-15</date>
+    <state>beta</state>
+    <license>PHP</license>
+    <notes>
+     Still preparing for 1.0 release after some bug fixes ...
+    </notes>
+   </release>
    <release>
     <version>1.0.0rc1</version>
     <date>2005-07-05</date>
