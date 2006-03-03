@@ -164,7 +164,7 @@
             // create result array
             $info = array();
             // TODO remove slash append code when base clase is able to do it itself
-            $info["path"]  = $path . (isdir($fspath) ? "/" : "");    
+            $info["path"]  = $path . (is_dir($fspath) ? "/" : "");    
             $info["props"] = array();
             
             // no special beautified displayname here ...
@@ -596,6 +596,7 @@
                     
                     if (is_dir($file)) {
                         if (!is_dir($destfile)) {
+						    // TODO "mkdir -p" here? (only natively supported by PHP 5) 
                             if (!mkdir($destfile)) {
                                 return "409 Conflict";
                             }
