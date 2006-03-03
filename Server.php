@@ -124,6 +124,12 @@ class HTTP_WebDAV_Server
      */
     function ServeRequest() 
     {
+        // prevent warning in litmus check 'delete_fragment'
+        if (strstr($_SERVER["REQUEST_URI"], '#')) {
+            $this->http_status("400 Bad Request");
+            return;
+        }
+
         // default uri is the complete request uri
         $uri = (@$_SERVER["HTTPS"] === "on" ? "https:" : "http:");
         $uri.= "//$_SERVER[HTTP_HOST]$_SERVER[SCRIPT_NAME]";
@@ -141,7 +147,7 @@ class HTTP_WebDAV_Server
                 // WebDAV clients should never try this while
                 // regular HTTP clients might ...
                 header("Location: ".$this->base_uri."/");
-                exit;
+                return;
             } else {
                 // if a WebDAV client didn't give a path we just assume '/'
                 $this->path = "/";
@@ -869,7 +875,7 @@ class HTTP_WebDAV_Server
                                 fseek($options['stream'], $range['start'], SEEK_SET);
                                 if (feof($options['stream'])) {
                                     $this->http_status("416 Requested range not satisfiable");
-                                    exit;
+                                    return;
                                 }
 
                                 if (isset($range['end'])) {
