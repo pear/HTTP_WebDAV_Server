@@ -186,7 +186,6 @@ class HTTP_WebDAV_Server
         
         // check 
         if(! $this->_check_if_header_conditions()) {
-            $this->http_status("412 Precondition failed");
             return;
         }
         
@@ -970,7 +969,7 @@ class HTTP_WebDAV_Server
         if (isset($_SERVER['HTTP_RANGE'])) {
 
             // we only support standard "bytes" range specifications for now
-            if (ereg("bytes[[:space:]]*=[[:space:]]*(.+)", $_SERVER['HTTP_RANGE'], $matches)) {
+            if (preg_match('/bytes\s*=\s*(.+)/', $_SERVER['HTTP_RANGE'], $matches)) {
                 $options["ranges"] = array();
 
                 // ranges are comma separated
@@ -1420,7 +1419,7 @@ class HTTP_WebDAV_Server
         if (isset($port) && $port != 80)
             $http_host.= ":$port";
 
-        $http_header_host = ereg_replace(":80$", "", $_SERVER["HTTP_HOST"]);
+        $http_header_host = preg_replace("/:80$/", "", $_SERVER["HTTP_HOST"]);
 
         if ($http_host == $http_header_host &&
             !strncmp($_SERVER["SCRIPT_NAME"], $path,
@@ -1748,11 +1747,13 @@ class HTTP_WebDAV_Server
                     // but if opaquelocktokens are used (RFC2518 6.4)
                     // we have to check the format (litmus tests this)
                     if (!strncmp($condition, "<opaquelocktoken:", strlen("<opaquelocktoken"))) {
-                        if (!ereg("^<opaquelocktoken:[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}>$", $condition)) {
+                        if (!preg_match('/^<opaquelocktoken:[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}>$/', $condition)) {
+                            $this->http_status("423 Locked");
                             return false;
                         }
                     }
                     if (!$this->_check_uri_condition($uri, $condition)) {
+                        $this->http_status("412 Precondition failed");
                         $state = false;
                         break;
                     }

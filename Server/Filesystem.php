@@ -272,7 +272,7 @@
                 if (!strncmp($reply, "$fspath: ", strlen($fspath)+2)) {                     
                     $reply = substr($reply, strlen($fspath)+2);
                     // followed by the mime type (maybe including options)
-                    if (ereg("^[[:alnum:]_-]+/[[:alnum:]_-]+;?.*", $reply, $matches)) {
+                    if (preg_match('/^[[:alnum:]_-]+/[[:alnum:]_-]+;?.*/', $reply, $matches)) {
                         $mime_type = $matches[0];
                     }
                 }

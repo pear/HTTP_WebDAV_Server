@@ -6,7 +6,7 @@
 	$group=1;
 	while(!feof($in)) {
 		$line = fgets($in);
-		if(ereg(" Running test ([[:digit:]]+): ([^[:space:]]+)", $line, $matches)) {
+		if(preg_match("/ Running test ([[:digit:]]+): ([^[:space:]]+)/", $line, $matches)) {
 			if($out) fclose($out);
 
 			$nr = $matches[1];
