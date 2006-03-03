@@ -534,7 +534,7 @@
                         return "412 precondition failed";
                     }
                     $dest .= basename($source);
-                    if (file_exists($dest.basename($source))) {
+                    if (file_exists($dest)) {
                         $options["dest"] .= basename($source);
                     } else {
                         $new = true;
@@ -588,11 +588,19 @@
                     
                 
                 foreach ($files as $file) {
-                    $destfile = str_replace($source, $dest, $file);
-
                     if (is_dir($file)) {
-                        if (!mkdir($destfile)) {
-                            return "409 Conflict";
+                      $file = $this->_slashify($file);
+                    }
+
+                    $destfile = str_replace($source, $dest, $file);
+                    
+                    if (is_dir($file)) {
+                        if (!is_dir($destfile)) {
+                            if (!mkdir($destfile)) {
+                                return "409 Conflict";
+                            }
+                        } else {
+                          error_log("existing dir '$destfile'");
                         }
                     } else {
                         if (!copy($file, $destfile)) {
