@@ -1790,6 +1790,13 @@ class HTTP_WebDAV_Server
     {
         // not really implemented here, 
         // implementations must override
+
+        // a lock token can never be from the DAV: scheme
+        // litmus uses DAV:no-lock in some tests
+        if (!strncmp("<DAV:", $condition, 5)) {
+            return false;
+        }
+
         return true;
     }
 
