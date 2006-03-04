@@ -152,8 +152,10 @@ class _parse_proppatch
 
         if ($this->depth >= 4) {
             $this->current["val"] .= "<$tag";
-            foreach ($attr as $key => $val) {
-                $this->current["val"] .= ' '.$key.'="'.str_replace('"','&quot;', $val).'"';
+            if (isset($attr)) {
+                foreach ($attr as $key => $val) {
+                    $this->current["val"] .= ' '.$key.'="'.str_replace('"','&quot;', $val).'"';
+                }
             }
             $this->current["val"] .= ">";
         }

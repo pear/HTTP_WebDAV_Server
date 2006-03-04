@@ -272,7 +272,7 @@
                 if (!strncmp($reply, "$fspath: ", strlen($fspath)+2)) {                     
                     $reply = substr($reply, strlen($fspath)+2);
                     // followed by the mime type (maybe including options)
-                    if (preg_match('/^[[:alnum:]_-]+/[[:alnum:]_-]+;?.*/', $reply, $matches)) {
+                    if (preg_match('|^[[:alnum:]_-]+/[[:alnum:]_-]+;?.*|', $reply, $matches)) {
                         $mime_type = $matches[0];
                     }
                 }
@@ -596,14 +596,12 @@
                     if (is_dir($file)) {
                         if (!is_dir($destfile)) {
                             // TODO "mkdir -p" here? (only natively supported by PHP 5) 
-                            if (!mkdir($destfile)) {
+                            if (!@mkdir($destfile)) {
                                 return "409 Conflict";
                             }
-                        } else {
-                          error_log("existing dir '$destfile'");
-                        }
+                        } 
                     } else {
-                        if (!copy($file, $destfile)) {
+                        if (!@copy($file, $destfile)) {
                             return "409 Conflict";
                         }
                     }
@@ -638,7 +636,6 @@
                 } else {
                     if (isset($prop["val"])) {
                         $query = "REPLACE INTO properties SET path = '$options[path]', name = '$prop[name]', ns= '$prop[ns]', value = '$prop[val]'";
-                        error_log($query);
                     } else {
                         $query = "DELETE FROM properties WHERE path = '$options[path]' AND name = '$prop[name]' AND ns = '$prop[ns]'";
                     }       
