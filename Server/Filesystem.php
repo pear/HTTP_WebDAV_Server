@@ -655,6 +655,14 @@
          */
         function LOCK(&$options) 
         {
+            // get absolute fs path to requested resource
+            $fspath = $this->base . $options["path"];
+
+            // TODO recursive locks on directories not supported yet
+            if (is_dir($fspath) && !empty($options["depth"])) {
+                return "409 Conflict";
+            }
+
             $options["timeout"] = time()+300; // 5min. hardcoded
 
             if (isset($options["update"])) { // Lock Update
