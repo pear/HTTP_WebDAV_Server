@@ -1,16 +1,21 @@
 Short term (1.0 show stoppers):
 
-- API cleanups
-
 - documentation
 
-- "Depth: Infinite" not supported yet (in fileserver PROPFIND)
+- check url en-/decodings (all pending bug reports are about this)
 
-- properties not copied/moved (in fileserver COPY/MOVE)
 
-- check url en-/decodings
+Medium term (nice to have in 1.1):
 
-Medium term (nice to have in 1.0):
+- the following items affect the fileserver example only,
+  these are not problems of the base class itself
+
+ - "Depth: Infinite" not supported yet (in PROPFIND)
+
+ - properties not always copied/moved (in COPY/MOVE)
+
+ - no recursove locks (in LOCK, UNLOCK etc.)
+- API cleanups
 
 - ETags support ...
 
