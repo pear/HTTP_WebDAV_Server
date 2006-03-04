@@ -655,20 +655,30 @@
          */
         function LOCK(&$options) 
         {
+            $options["timeout"] = time()+300; // 5min. hardcoded
+
             if (isset($options["update"])) { // Lock Update
-                $query = "UPDATE locks SET expires = ".(time()+300);
-                mysql_query($query);
-                
-                if (mysql_affected_rows()) {
-                    $options["timeout"] = 300; // 5min hardcoded
+                $where = "WHERE path = '$options[path]' AND token = '$options[update]'";
+
+                $query = "SELECT owner, exclusivelock FROM locks $where";
+                $res = mysql_query($query);
+                $row = mysql_fetch_assoc($res);
+                mysql_free_result($res);
+
+                if (is_array($row)) {
+                    $query = "UPDATE locks SET expires = '$options[timeout]' $where";
+                    mysql_query($query);
+
+                    $options['owner']     = $row['owner'];
+                    $options['scope']     = $row["exclusivelock"] ? "exclusive" : "shared";
+                    $options['type']      = $row["exclusivelock"] ? "write"     : "read";
+
                     return true;
                 } else {
                     return false;
                 }
             }
             
-            $options["timeout"] = time()+300; // 5min. hardcoded
-
             $query = "INSERT INTO locks
                         SET token   = '$options[locktoken]'
                           , path    = '$options[path]'

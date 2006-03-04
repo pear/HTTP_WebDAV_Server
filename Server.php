@@ -1301,7 +1301,15 @@ class HTTP_WebDAV_Server
             }
 
             // refresh lock
-            $options["update"] = substr($_SERVER['HTTP_IF'], 2, -2);
+            $options["locktoken"] = substr($_SERVER['HTTP_IF'], 2, -2);
+            $options["update"]    = $options["locktoken"];
+
+            // setting defaults for required fields, LOCK() SHOULD overwrite these
+            $options['owner']     = "unknown";
+            $options['scope']     = "exclusive";
+            $options['type']      = "write";
+
+
             $stat = $this->LOCK($options);
         } else { 
             // extract lock request information from request XML payload
@@ -1331,7 +1339,6 @@ class HTTP_WebDAV_Server
         } else {
             $http_stat = $stat;
         }
-        
         $this->http_status($http_stat);
         
         if ($http_stat{0} == 2) { // 2xx states are ok 
