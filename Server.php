@@ -1053,6 +1053,15 @@ class HTTP_WebDAV_Server
             ob_end_clean();
         }
         
+        if (!isset($options['mimetype'])) {
+            $options['mimetype'] = "application/octet-stream";
+        }
+        header("Content-type: $options[mimetype]");
+        
+        if (isset($options['mtime'])) {
+            header("Last-modified:".gmdate("D, d M Y H:i:s ", $options['mtime'])."GMT");
+        }
+                
         if (isset($options['size'])) {
             header("Content-length: ".$options['size']);
         }
