@@ -1120,7 +1120,7 @@ class HTTP_WebDAV_Server
                 case 'HTTP_CONTENT_LANGUAGE': // RFC 2616 14.12
                     // we assume it is not critical if this one is ignored
                     // in the actual PUT implementation ...
-                    $options["content_language"] = $value;
+                    $options["content_language"] = $val;
                     break;
 
                 case 'HTTP_CONTENT_LOCATION': // RFC 2616 14.14
@@ -1133,7 +1133,7 @@ class HTTP_WebDAV_Server
                     // single byte range requests are supported
                     // the header format is also specified in RFC 2616 14.16
                     // TODO we have to ensure that implementations support this or send 501 instead
-                    if (!preg_match('@bytes\s+(\d+)-(\d+)/((\d+)|\*)@', $value, $matches)) {
+                    if (!preg_match('@bytes\s+(\d+)-(\d+)/((\d+)|\*)@', $val, $matches)) {
                         $this->http_status("400 bad request"); 
                         echo "The service does only support single byte ranges";
                         return;
