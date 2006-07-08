@@ -74,7 +74,7 @@
             if ($base) { 
                 $this->base = realpath($base); // TODO throw if not a directory
             } else if (!$this->base) {
-                $this->base = $_SERVER['DOCUMENT_ROOT'];
+                $this->base = $this->_SERVER['DOCUMENT_ROOT'];
             }
                 
             // establish connection to property/locking db
@@ -447,7 +447,7 @@
                 return "405 Method not allowed";
             }
 
-            if (!empty($_SERVER["CONTENT_LENGTH"])) { // no body parsing yet
+            if (!empty($this->_SERVER["CONTENT_LENGTH"])) { // no body parsing yet
                 return "415 Unsupported media type";
             }
             
@@ -509,7 +509,7 @@
         {
             // TODO Property updates still broken (Litmus should detect this?)
 
-            if (!empty($_SERVER["CONTENT_LENGTH"])) { // no body parsing yet
+            if (!empty($this->_SERVER["CONTENT_LENGTH"])) { // no body parsing yet
                 return "415 Unsupported media type";
             }
 
