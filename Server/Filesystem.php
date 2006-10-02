@@ -39,6 +39,14 @@
         var $db_name = "webdav";
 
         /**
+         * MySQL table name prefix 
+         *
+         * @access private
+         * @var    string
+         */
+        var $db_prefix = "";
+
+        /**
          * MySQL user for property/locking db access
          *
          * @access private
@@ -191,7 +199,9 @@
             }
 
             // get additional properties from database
-            $query = "SELECT ns, name, value FROM properties WHERE path = '$path'";
+            $query = "SELECT ns, name, value 
+                        FROM {$this->db_prefix}properties 
+                       WHERE path = '$path'";
             $res = mysql_query($query);
             while ($row = mysql_fetch_assoc($res)) {
                 $info["props"][] = $this->mkprop($row["ns"], $row["name"], $row["value"]);
@@ -477,13 +487,15 @@
             }
 
             if (is_dir($path)) {
-                $query = "DELETE FROM properties WHERE path LIKE '".$this->_slashify($options["path"])."%'";
+                $query = "DELETE FROM {$this->db_prefix}properties 
+                           WHERE path LIKE '".$this->_slashify($options["path"])."%'";
                 mysql_query($query);
                 System::rm("-rf $path");
             } else {
                 unlink ($path);
             }
-            $query = "DELETE FROM properties WHERE path = '$options[path]'";
+            $query = "DELETE FROM {$this->db_prefix}properties 
+                       WHERE path = '$options[path]'";
             mysql_query($query);
 
             return "204 No Content";
@@ -565,13 +577,13 @@
                 }
                 $destpath = $this->_unslashify($options["dest"]);
                 if (is_dir($source)) {
-                    $query = "UPDATE properties 
+                    $query = "UPDATE {$this->db_prefix}properties 
                                  SET path = REPLACE(path, '".$options["path"]."', '".$destpath."') 
                                WHERE path LIKE '".$this->_slashify($options["path"])."%'";
                     mysql_query($query);
                 }
 
-                $query = "UPDATE properties 
+                $query = "UPDATE {$this->db_prefix}properties 
                              SET path = '".$destpath."'
                            WHERE path = '".$options["path"]."'";
                 mysql_query($query);
@@ -609,7 +621,10 @@
                     }
                 }
 
-                $query = "INSERT INTO properties SELECT ... FROM properties WHERE path = '".$options['path']."'";
+                $query = "INSERT INTO {$this->db_prefix}properties 
+                               SELECT *
+                                 FROM {$this->db_prefix}properties 
+                                WHERE path = '".$options['path']."'";
             }
 
             return ($new && !$existing_col) ? "201 Created" : "204 No Content";         
@@ -637,9 +652,16 @@
                     $options["props"][$key]['status'] = "403 Forbidden";
                 } else {
                     if (isset($prop["val"])) {
-                        $query = "REPLACE INTO properties SET path = '$options[path]', name = '$prop[name]', ns= '$prop[ns]', value = '$prop[val]'";
+                        $query = "REPLACE INTO {$this->db_prefix}properties 
+                                           SET path = '$options[path]'
+                                             , name = '$prop[name]'
+                                             , ns= '$prop[ns]'
+                                             , value = '$prop[val]'";
                     } else {
-                        $query = "DELETE FROM properties WHERE path = '$options[path]' AND name = '$prop[name]' AND ns = '$prop[ns]'";
+                        $query = "DELETE FROM {$this->db_prefix}properties 
+                                        WHERE path = '$options[path]' 
+                                          AND name = '$prop[name]' 
+                                          AND ns = '$prop[ns]'";
                     }       
                     mysql_query($query);
                 }
@@ -670,13 +692,13 @@
             if (isset($options["update"])) { // Lock Update
                 $where = "WHERE path = '$options[path]' AND token = '$options[update]'";
 
-                $query = "SELECT owner, exclusivelock FROM locks $where";
+                $query = "SELECT owner, exclusivelock FROM {$this->db_prefix}locks $where";
                 $res = mysql_query($query);
                 $row = mysql_fetch_assoc($res);
                 mysql_free_result($res);
 
                 if (is_array($row)) {
-                    $query = "UPDATE locks SET expires = '$options[timeout]' $where";
+                    $query = "UPDATE {$this->db_prefix}locks SET expires = '$options[timeout]' $where";
                     mysql_query($query);
 
                     $options['owner']     = $row['owner'];
@@ -689,7 +711,7 @@
                 }
             }
             
-            $query = "INSERT INTO locks
+            $query = "INSERT INTO {$this->db_prefix}locks
                         SET token   = '$options[locktoken]'
                           , path    = '$options[path]'
                           , owner   = '$options[owner]'
@@ -709,7 +731,7 @@
          */
         function UNLOCK(&$options) 
         {
-            $query = "DELETE FROM locks
+            $query = "DELETE FROM {$this->db_prefix}locks
                       WHERE path = '$options[path]'
                         AND token = '$options[token]'";
             mysql_query($query);
@@ -728,7 +750,7 @@
             $result = false;
             
             $query = "SELECT owner, token, expires, exclusivelock
-                  FROM locks
+                  FROM {$this->db_prefix}locks
                  WHERE path = '$path'
                ";
             $res = mysql_query($query);
