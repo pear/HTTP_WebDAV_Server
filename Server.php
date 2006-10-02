@@ -539,8 +539,29 @@ class HTTP_WebDAV_Server
         $files = Array();
         // call user handler
         if (!$this->PROPFIND($options, $files)) {
-            $this->http_status("404 Not Found");
-            return;
+            $files = array("files" => array());
+            if (method_exists($this, "checkLock")) {
+                // is locked?
+                $lock = $this->checkLock($this->path);
+
+                if (is_array($lock) && count($lock)) {
+                    $created  = isset($lock['created'])  ? $lock['created']  : time();
+                    $modified = isset($lock['modified']) ? $lock['modified'] : time();
+                    $files['files'][] = array("path"  => $this->_slashify($this->path),
+                                              "props" => array($this->mkprop("displayname",      $this->path),
+                                                               $this->mkprop("creationdate",     $created),
+                                                               $this->mkprop("getlastmodified",  $modified),
+                                                               $this->mkprop("resourcetype",     ""),
+                                                               $this->mkprop("getcontenttype",   ""),
+                                                               $this->mkprop("getcontentlength", 0))
+                                              );
+                }
+            }
+
+            if (empty($files['files'])) {
+                $this->http_status("404 Not Found");
+                return;
+            }
         }
         
         // collect namespaces here

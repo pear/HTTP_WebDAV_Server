@@ -4,6 +4,9 @@
 ---------------------------------------------------------
 -- Server version	4.0.3-beta
 
+CREATE DATABASE webdav;
+USE webdav;
+
 --
 -- Table structure for table 'locks'
 --

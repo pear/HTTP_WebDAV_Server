@@ -698,7 +698,10 @@
                 mysql_free_result($res);
 
                 if (is_array($row)) {
-                    $query = "UPDATE {$this->db_prefix}locks SET expires = '$options[timeout]' $where";
+                    $query = "UPDATE {$this->db_prefix}locks 
+                                 SET expires = '$options[timeout]' 
+                                   , modified = ".time()."
+                              $where";
                     mysql_query($query);
 
                     $options['owner']     = $row['owner'];
@@ -714,6 +717,8 @@
             $query = "INSERT INTO {$this->db_prefix}locks
                         SET token   = '$options[locktoken]'
                           , path    = '$options[path]'
+                          , created = ".time()."
+                          , modified = ".time()."
                           , owner   = '$options[owner]'
                           , expires = '$options[timeout]'
                           , exclusivelock  = " .($options['scope'] === "exclusive" ? "1" : "0")
@@ -749,7 +754,7 @@
         {
             $result = false;
             
-            $query = "SELECT owner, token, expires, exclusivelock
+            $query = "SELECT owner, token, created, modified, expires, exclusivelock
                   FROM {$this->db_prefix}locks
                  WHERE path = '$path'
                ";
@@ -765,6 +770,8 @@
                                                      "depth"   => 0,
                                                      "owner"   => $row['owner'],
                                                      "token"   => $row['token'],
+                                                     "created" => $row['created'],   
+                                                     "modified" => $row['modified'],   
                                                      "expires" => $row['expires']
                                                      );
                 }
