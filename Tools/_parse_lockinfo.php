@@ -25,7 +25,7 @@
  * 
  * @package HTTP_WebDAV_Server
  * @author Hartmut Holzgraefe <hholzgra@php.net>
- * @version 0.99.1dev
+ * @version @package-version@
  */
 class _parse_lockinfo 
 {

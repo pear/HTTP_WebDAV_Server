@@ -6,7 +6,9 @@
     /**
      * Filesystem access using WebDAV
      *
-     * @access public
+     * @access  public
+     * @author  Hartmut Holzgraefe <hartmut@php.net>
+     * @version @package-version@
      */
     class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server 
     {
