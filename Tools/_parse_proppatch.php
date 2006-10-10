@@ -206,11 +206,18 @@ class _parse_proppatch
      * @return void
      * @access private
      */
-    function _data($parser, $data) {
+    function _data($parser, $data) 
+    {
         if (isset($this->current)) {
             $this->current["val"] .= $data;
         }
     }
 }
 
-?>
+/*
+ * Local variables:
+ * tab-width: 4
+ * c-basic-offset: 4
+ * indent-tabs-mode:nil
+ * End:
+ */
