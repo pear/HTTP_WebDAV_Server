@@ -42,8 +42,8 @@ class HTTP_WebDAV_Server
      * @var string 
      */
     var $uri;
-
-
+    
+    
     /**
      * base URI for this request
      *
@@ -166,7 +166,7 @@ class HTTP_WebDAV_Server
             }
         } 
         
-        if(ini_get("magic_quotes_gpc")) {
+        if (ini_get("magic_quotes_gpc")) {
             $this->path = stripslashes($this->path);
         }
         
@@ -175,7 +175,7 @@ class HTTP_WebDAV_Server
         if (empty($this->dav_powered_by)) {
             header("X-Dav-Powered-By: PHP class: ".get_class($this));
         } else {
-            header("X-Dav-Powered-By: ".$this->dav_powered_by );
+            header("X-Dav-Powered-By: ".$this->dav_powered_by);
         }
 
         // check authentication
@@ -197,12 +197,12 @@ class HTTP_WebDAV_Server
         }
         
         // check 
-        if(! $this->_check_if_header_conditions()) {
+        if (! $this->_check_if_header_conditions()) {
             return;
         }
         
         // detect requested method names
-        $method = strtolower($this->_SERVER["REQUEST_METHOD"]);
+        $method  = strtolower($this->_SERVER["REQUEST_METHOD"]);
         $wrapper = "http_".$method;
         
         // activate HEAD emulation by GET if no HEAD method found
@@ -246,11 +246,11 @@ class HTTP_WebDAV_Server
      */
 
     /* abstract
-       function GET(&$params) 
-       {
-           // dummy entry for PHPDoc
-       } 
-     */
+     function GET(&$params) 
+     {
+     // dummy entry for PHPDoc
+     } 
+    */
 
     // }}}
 
@@ -266,10 +266,10 @@ class HTTP_WebDAV_Server
      */
     
     /* abstract
-       function PUT() 
-       {
-           // dummy entry for PHPDoc
-       } 
+     function PUT() 
+     {
+     // dummy entry for PHPDoc
+     } 
     */
     
     // }}}
@@ -287,11 +287,11 @@ class HTTP_WebDAV_Server
      */
     
     /* abstract
-       function COPY() 
-       {
-           // dummy entry for PHPDoc
-       } 
-     */
+     function COPY() 
+     {
+     // dummy entry for PHPDoc
+     } 
+    */
 
     // }}}
 
@@ -308,11 +308,11 @@ class HTTP_WebDAV_Server
      */
     
     /* abstract
-       function MOVE() 
-       {
-           // dummy entry for PHPDoc
-       } 
-     */
+     function MOVE() 
+     {
+     // dummy entry for PHPDoc
+     } 
+    */
 
     // }}}
 
@@ -329,11 +329,11 @@ class HTTP_WebDAV_Server
      */
     
     /* abstract
-       function DELETE() 
-       {
-           // dummy entry for PHPDoc
-       } 
-     */
+     function DELETE() 
+     {
+     // dummy entry for PHPDoc
+     } 
+    */
     // }}}
 
     // {{{ PROPFIND() 
@@ -349,11 +349,11 @@ class HTTP_WebDAV_Server
      */
     
     /* abstract
-       function PROPFIND() 
-       {
-           // dummy entry for PHPDoc
-       } 
-     */
+     function PROPFIND() 
+     {
+     // dummy entry for PHPDoc
+     } 
+    */
 
     // }}}
 
@@ -370,11 +370,11 @@ class HTTP_WebDAV_Server
      */
     
     /* abstract
-       function PROPPATCH() 
-       {
-           // dummy entry for PHPDoc
-       } 
-     */
+     function PROPPATCH() 
+     {
+     // dummy entry for PHPDoc
+     } 
+    */
     // }}}
 
     // {{{ LOCK() 
@@ -390,11 +390,11 @@ class HTTP_WebDAV_Server
      */
     
     /* abstract
-       function LOCK() 
-       {
-           // dummy entry for PHPDoc
-       } 
-     */
+     function LOCK() 
+     {
+     // dummy entry for PHPDoc
+     } 
+    */
     // }}}
 
     // {{{ UNLOCK() 
@@ -410,11 +410,11 @@ class HTTP_WebDAV_Server
      */
 
     /* abstract
-       function UNLOCK() 
-       {
-           // dummy entry for PHPDoc
-       } 
-     */
+     function UNLOCK() 
+     {
+     // dummy entry for PHPDoc
+     } 
+    */
     // }}}
 
     // }}}
@@ -436,10 +436,10 @@ class HTTP_WebDAV_Server
      */
     
     /* abstract
-       function checkAuth($type, $username, $password) 
-       {
-           // dummy entry for PHPDoc
-       } 
+     function checkAuth($type, $username, $password) 
+     {
+     // dummy entry for PHPDoc
+     } 
     */
     
     // }}}
@@ -459,11 +459,11 @@ class HTTP_WebDAV_Server
      */
     
     /* abstract
-       function checklock($resource) 
-       {
-           // dummy entry for PHPDoc
-       } 
-     */
+     function checklock($resource) 
+     {
+     // dummy entry for PHPDoc
+     } 
+    */
 
     // }}}
 
@@ -500,7 +500,7 @@ class HTTP_WebDAV_Server
 
         // tell clients what we found
         $this->http_status("200 OK");
-        header("DAV: "  .join("," , $dav));
+        header("DAV: "  .join(", ", $dav));
         header("Allow: ".join(", ", $allow));
 
         header("Content-length: 0");
@@ -520,6 +520,8 @@ class HTTP_WebDAV_Server
     function http_PROPFIND() 
     {
         $options = Array();
+        $files   = Array();
+
         $options["path"] = $this->path;
         
         // search depth from header (default is "infinity)
@@ -536,7 +538,7 @@ class HTTP_WebDAV_Server
             return;
         }
         $options['props'] = $propinfo->props;
-        $files = Array();
+
         // call user handler
         if (!$this->PROPFIND($options, $files)) {
             $files = array("files" => array());
@@ -545,8 +547,8 @@ class HTTP_WebDAV_Server
                 $lock = $this->checkLock($this->path);
 
                 if (is_array($lock) && count($lock)) {
-                    $created  = isset($lock['created'])  ? $lock['created']  : time();
-                    $modified = isset($lock['modified']) ? $lock['modified'] : time();
+                    $created          = isset($lock['created'])  ? $lock['created']  : time();
+                    $modified         = isset($lock['modified']) ? $lock['modified'] : time();
                     $files['files'][] = array("path"  => $this->_slashify($this->path),
                                               "props" => array($this->mkprop("displayname",      $this->path),
                                                                $this->mkprop("creationdate",     $created),
@@ -571,7 +573,7 @@ class HTTP_WebDAV_Server
         $ns_defs = "xmlns:ns0=\"urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/\"";    
     
         // now we loop over all returned file entries
-        foreach($files["files"] as $filekey => $file) {
+        foreach ($files["files"] as $filekey => $file) {
             
             // nothing to do if no properties were returend for a file
             if (!isset($file["props"]) || !is_array($file["props"])) {
@@ -579,7 +581,7 @@ class HTTP_WebDAV_Server
             }
             
             // now loop over all returned properties
-            foreach($file["props"] as $key => $prop) {
+            foreach ($file["props"] as $key => $prop) {
                 // as a convenience feature we do not require that user handlers
                 // restrict returned properties to the requested ones
                 // here we strip all unrequested entries out of the response
@@ -599,9 +601,9 @@ class HTTP_WebDAV_Server
                     $found = false;
                     
                     // search property name in requested properties 
-                    foreach((array)$options["props"] as $reqprop) {
+                    foreach ((array)$options["props"] as $reqprop) {
                         if (   $reqprop["name"]  == $prop["name"] 
-                            && @$reqprop["xmlns"] == $prop["ns"]) {
+                               && @$reqprop["xmlns"] == $prop["ns"]) {
                             $found = true;
                             break;
                         }
@@ -630,26 +632,26 @@ class HTTP_WebDAV_Server
             // we also need to add empty entries for properties that were requested
             // but for which no values where returned by the user handler
             if (is_array($options['props'])) {
-                foreach($options["props"] as $reqprop) {
-                    if($reqprop['name']=="") continue; // skip empty entries
+                foreach ($options["props"] as $reqprop) {
+                    if ($reqprop['name']=="") continue; // skip empty entries
                     
                     $found = false;
                     
                     // check if property exists in result
-                    foreach($file["props"] as $prop) {
+                    foreach ($file["props"] as $prop) {
                         if (   $reqprop["name"]  == $prop["name"]
-                            && @$reqprop["xmlns"] == $prop["ns"]) {
+                               && @$reqprop["xmlns"] == $prop["ns"]) {
                             $found = true;
                             break;
                         }
                     }
                     
                     if (!$found) {
-                        if($reqprop["xmlns"]==="DAV:" && $reqprop["name"]==="lockdiscovery") {
+                        if ($reqprop["xmlns"]==="DAV:" && $reqprop["name"]==="lockdiscovery") {
                             // lockdiscovery is handled by the base class
                             $files["files"][$filekey]["props"][] 
                                 = $this->mkprop("DAV:", 
-                                                "lockdiscovery" , 
+                                                "lockdiscovery", 
                                                 $this->lockdiscovery($files["files"][$filekey]['path']));
                         } else {
                             // add empty value for this property
@@ -676,11 +678,11 @@ class HTTP_WebDAV_Server
         echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
         echo "<D:multistatus xmlns:D=\"DAV:\">\n";
             
-        foreach($files["files"] as $file) {
+        foreach ($files["files"] as $file) {
             // ignore empty or incomplete entries
-            if(!is_array($file) || empty($file) || !isset($file["path"])) continue;
+            if (!is_array($file) || empty($file) || !isset($file["path"])) continue;
             $path = $file['path'];                  
-            if(!is_string($path) || $path==="") continue;
+            if (!is_string($path) || $path==="") continue;
 
             echo " <D:response $ns_defs>\n";
         
@@ -696,16 +698,16 @@ class HTTP_WebDAV_Server
                 echo "   <D:propstat>\n";
                 echo "    <D:prop>\n";
 
-                foreach($file["props"] as $key => $prop) {
+                foreach ($file["props"] as $key => $prop) {
                     
                     if (!is_array($prop)) continue;
                     if (!isset($prop["name"])) continue;
                     
                     if (!isset($prop["val"]) || $prop["val"] === "" || $prop["val"] === false) {
                         // empty properties (cannot use empty() for check as "0" is a legal value here)
-                        if($prop["ns"]=="DAV:") {
+                        if ($prop["ns"]=="DAV:") {
                             echo "     <D:$prop[name]/>\n";
-                        } else if(!empty($prop["ns"])) {
+                        } else if (!empty($prop["ns"])) {
                             echo "     <".$ns_hash[$prop["ns"]].":$prop[name]/>\n";
                         } else {
                             echo "     <$prop[name] xmlns=\"\"/>";
@@ -715,7 +717,7 @@ class HTTP_WebDAV_Server
                         switch ($prop["name"]) {
                         case "creationdate":
                             echo "     <D:creationdate ns0:dt=\"dateTime.tz\">"
-                                . gmdate("Y-m-d\\TH:i:s\\Z",$prop['val'])
+                                . gmdate("Y-m-d\\TH:i:s\\Z", $prop['val'])
                                 . "</D:creationdate>\n";
                             break;
                         case "getlastmodified":
@@ -764,7 +766,7 @@ class HTTP_WebDAV_Server
                 echo "   <D:propstat>\n";
                 echo "    <D:prop>\n";
 
-                foreach($file["noprops"] as $key => $prop) {
+                foreach ($file["noprops"] as $key => $prop) {
                     if ($prop["ns"] == "DAV:") {
                         echo "     <D:$prop[name]/>\n";
                     } else if ($prop["ns"] == "") {
@@ -798,8 +800,9 @@ class HTTP_WebDAV_Server
      */
     function http_PROPPATCH() 
     {
-        if($this->_check_lock_status($this->path)) {
+        if ($this->_check_lock_status($this->path)) {
             $options = Array();
+
             $options["path"] = $this->path;
 
             $propinfo = new _parse_proppatch("php://input");
@@ -822,7 +825,7 @@ class HTTP_WebDAV_Server
             echo " <D:response>\n";
             echo "  <D:href>".$this->_urlencode($this->_mergePathes($this->_SERVER["SCRIPT_NAME"], $this->path))."</D:href>\n";
 
-            foreach($options["props"] as $prop) {
+            foreach ($options["props"] as $prop) {
                 echo "   <D:propstat>\n";
                 echo "    <D:prop><$prop[name] xmlns=\"$prop[ns]\"/></D:prop>\n";
                 echo "    <D:status>HTTP/1.1 $prop[status]</D:status>\n";
@@ -856,6 +859,7 @@ class HTTP_WebDAV_Server
     function http_MKCOL() 
     {
         $options = Array();
+
         $options["path"] = $this->path;
 
         $stat = $this->MKCOL($options);
@@ -940,14 +944,14 @@ class HTTP_WebDAV_Server
                             foreach ($options['ranges'] as $range) {
                                 // TODO what if size unknown? 500?
                                 if (isset($range['start'])) {
-                                    $from  = $range['start'];
-                                    $to    = !empty($range['end']) ? $range['end'] : $options['size']-1; 
+                                    $from = $range['start'];
+                                    $to   = !empty($range['end']) ? $range['end'] : $options['size']-1; 
                                 } else {
                                     $from = $options['size'] - $range['last']-1;
-                                    $to = $options['size'] -1;
+                                    $to   = $options['size'] -1;
                                 }
                                 $total = isset($options['size']) ? $options['size'] : "*"; 
-                                $size = $to - $from + 1;
+                                $size  = $to - $from + 1;
                                 $this->_multipart_byterange_header($options['mimetype'], $from, $to, $total);
 
 
@@ -1010,8 +1014,8 @@ class HTTP_WebDAV_Server
                     // ranges are either from-to pairs or just end positions
                     list($start, $end) = explode("-", $range);
                     $options["ranges"][] = ($start==="") 
-                                         ? array("last"=>$end) 
-                                         : array("start"=>$start, "end"=>$end);
+                        ? array("last"=>$end) 
+                        : array("start"=>$start, "end"=>$end);
                 }
             }
         }
@@ -1099,8 +1103,8 @@ class HTTP_WebDAV_Server
             header("Content-length: ".$options['size']);
         }
 
-        if($status===true)  $status = "200 OK";
-        if($status===false) $status = "404 Not found";
+        if ($status===true)  $status = "200 OK";
+        if ($status===false) $status = "404 Not found";
         
         $this->http_status($status);
     }
@@ -1137,9 +1141,9 @@ class HTTP_WebDAV_Server
             }
 
             /* RFC 2616 2.6 says: "The recipient of the entity MUST NOT 
-               ignore any Content-* (e.g. Content-Range) headers that it 
-               does not understand or implement and MUST return a 501 
-               (Not Implemented) response in such cases."
+             ignore any Content-* (e.g. Content-Range) headers that it 
+             does not understand or implement and MUST return a 501 
+             (Not Implemented) response in such cases."
             */ 
             foreach ($this->_SERVER as $key => $val) {
                 if (strncmp($key, "HTTP_CONTENT", 11)) continue;
@@ -1158,8 +1162,8 @@ class HTTP_WebDAV_Server
 
                 case 'HTTP_CONTENT_LOCATION': // RFC 2616 14.14
                     /* The meaning of the Content-Location header in PUT 
-                       or POST requests is undefined; servers are free 
-                       to ignore it in those cases. */
+                     or POST requests is undefined; servers are free 
+                     to ignore it in those cases. */
                     break;
 
                 case 'HTTP_CONTENT_RANGE':    // RFC 2616 14.16
@@ -1335,9 +1339,9 @@ class HTTP_WebDAV_Server
             $options["timeout"] = explode(",", $this->_SERVER["HTTP_TIMEOUT"]);
         }
         
-        if(empty($this->_SERVER['CONTENT_LENGTH']) && !empty($this->_SERVER['HTTP_IF'])) {
+        if (empty($this->_SERVER['CONTENT_LENGTH']) && !empty($this->_SERVER['HTTP_IF'])) {
             // check if locking is possible
-            if(!$this->_check_lock_status($this->path)) {
+            if (!$this->_check_lock_status($this->path)) {
                 $this->http_status("423 Locked");
                 return;
             }
@@ -1361,7 +1365,7 @@ class HTTP_WebDAV_Server
             }
 
             // check if locking is possible
-            if(!$this->_check_lock_status($this->path, $lockinfo->lockscope === "shared")) {
+            if (!$this->_check_lock_status($this->path, $lockinfo->lockscope === "shared")) {
                 $this->http_status("423 Locked");
                 return;
             }
@@ -1376,7 +1380,7 @@ class HTTP_WebDAV_Server
             $stat = $this->LOCK($options);              
         }
         
-        if(is_bool($stat)) {
+        if (is_bool($stat)) {
             $http_stat = $stat ? "200 OK" : "423 Locked";
         } else {
             $http_stat = $stat;
@@ -1384,10 +1388,10 @@ class HTTP_WebDAV_Server
         $this->http_status($http_stat);
         
         if ($http_stat{0} == 2) { // 2xx states are ok 
-            if($options["timeout"]) {
+            if ($options["timeout"]) {
                 // more than a million is considered an absolute timestamp
                 // less is more likely a relative value
-                if($options["timeout"]>1000000) {
+                if ($options["timeout"]>1000000) {
                     $timeout = "Second-".($options['timeout']-time());
                 } else {
                     $timeout = "Second-$options[timeout]";
@@ -1512,7 +1516,7 @@ class HTTP_WebDAV_Server
         // all other METHODS need both a http_method() wrapper
         // and a method() implementation
         // the base class supplies wrappers only
-        foreach(get_class_methods($this) as $method) {
+        foreach (get_class_methods($this) as $method) {
             if (!strncmp("http_", $method, 5)) {
                 $method = strtoupper(substr($method, 5));
                 if (method_exists($this, $method)) {
@@ -1571,8 +1575,8 @@ class HTTP_WebDAV_Server
         if (method_exists($this, "checkAuth")) {
             // PEAR style method name
             return $this->checkAuth(@$this->_SERVER["AUTH_TYPE"],
-                                     @$this->_SERVER["PHP_AUTH_USER"],
-                                     @$this->_SERVER["PHP_AUTH_PW"]);
+                                    @$this->_SERVER["PHP_AUTH_USER"],
+                                    @$this->_SERVER["PHP_AUTH_PW"]);
         } else if (method_exists($this, "check_auth")) {
             // old (pre 1.0) method name
             return $this->check_auth(@$this->_SERVER["AUTH_TYPE"],
@@ -1657,34 +1661,34 @@ class HTTP_WebDAV_Server
 
         // now it depends on what we found
         switch ($c) {
-            case "<":
-                // URIs are enclosed in <...>
-                $pos2 = strpos($string, ">", $pos);
-                $uri = substr($string, $pos, $pos2 - $pos);
-                $pos = $pos2 + 1;
-                return array("URI", $uri);
+        case "<":
+            // URIs are enclosed in <...>
+            $pos2 = strpos($string, ">", $pos);
+            $uri = substr($string, $pos, $pos2 - $pos);
+            $pos = $pos2 + 1;
+            return array("URI", $uri);
 
-            case "[":
-                //Etags are enclosed in [...]
-                if ($string{$pos} == "W") {
-                    $type = "ETAG_WEAK";
-                    $pos += 2;
-                } else {
-                    $type = "ETAG_STRONG";
-                }
-                $pos2 = strpos($string, "]", $pos);
-                $etag = substr($string, $pos + 1, $pos2 - $pos - 2);
-                $pos = $pos2 + 1;
-                return array($type, $etag);
-
-            case "N":
-                // "N" indicates negation
+        case "[":
+            //Etags are enclosed in [...]
+            if ($string{$pos} == "W") {
+                $type = "ETAG_WEAK";
                 $pos += 2;
-                return array("NOT", "Not");
+            } else {
+                $type = "ETAG_STRONG";
+            }
+            $pos2 = strpos($string, "]", $pos);
+            $etag = substr($string, $pos + 1, $pos2 - $pos - 2);
+            $pos = $pos2 + 1;
+            return array($type, $etag);
 
-            default:
-                // anything else is passed verbatim char by char
-                return array("CHAR", $c);
+        case "N":
+            // "N" indicates negation
+            $pos += 2;
+            return array("NOT", "Not");
+
+        default:
+            // anything else is passed verbatim char by char
+            return array("CHAR", $c);
         }
     }
 
@@ -1729,39 +1733,39 @@ class HTTP_WebDAV_Server
                     continue;
                 }
                 switch ($token[0]) {
-                    case "CHAR":
-                        switch ($token[1]) {
-                            case "(":
-                                $level++;
-                                break;
-                            case ")":
-                                $level--;
-                                break;
-                            default:
-                                return false;
-                        }
+                case "CHAR":
+                    switch ($token[1]) {
+                    case "(":
+                        $level++;
                         break;
-
-                    case "URI":
-                        $list[] = $not."<$token[1]>";
+                    case ")":
+                        $level--;
                         break;
-
-                    case "ETAG_WEAK":
-                        $list[] = $not."[W/'$token[1]']>";
-                        break;
-
-                    case "ETAG_STRONG":
-                        $list[] = $not."['$token[1]']>";
-                        break;
-
                     default:
                         return false;
+                    }
+                    break;
+
+                case "URI":
+                    $list[] = $not."<$token[1]>";
+                    break;
+
+                case "ETAG_WEAK":
+                    $list[] = $not."[W/'$token[1]']>";
+                    break;
+
+                case "ETAG_STRONG":
+                    $list[] = $not."['$token[1]']>";
+                    break;
+
+                default:
+                    return false;
                 }
                 $not = "";
             }
 
             if (@is_array($uris[$uri])) {
-                $uris[$uri] = array_merge($uris[$uri],$list);
+                $uris[$uri] = array_merge($uris[$uri], $list);
             } else {
                 $uris[$uri] = $list;
             }
@@ -1785,13 +1789,13 @@ class HTTP_WebDAV_Server
             $this->_if_header_uris =
                 $this->_if_header_parser($this->_SERVER["HTTP_IF"]);
 
-            foreach($this->_if_header_uris as $uri => $conditions) {
+            foreach ($this->_if_header_uris as $uri => $conditions) {
                 if ($uri == "") {
                     $uri = $this->uri;
                 }
                 // all must match
                 $state = true;
-                foreach($conditions as $condition) {
+                foreach ($conditions as $condition) {
                     // lock tokens may be free form (RFC2518 6.3)
                     // but if opaquelocktokens are used (RFC2518 6.4)
                     // we have to check the format (litmus tests this)
@@ -1928,7 +1932,7 @@ class HTTP_WebDAV_Server
     function http_status($status) 
     {
         // simplified success case
-        if($status === true) {
+        if ($status === true) {
             $status = "200 OK";
         }
 
@@ -1996,7 +2000,8 @@ class HTTP_WebDAV_Server
      * @param   string directory path
      * @returns string directory path wiht trailing slash
      */
-    function _slashify($path) {
+    function _slashify($path) 
+    {
         if ($path[strlen($path)-1] != '/') {
             $path = $path."/";
         }
@@ -2009,7 +2014,8 @@ class HTTP_WebDAV_Server
      * @param   string directory path
      * @returns string directory path wihtout trailing slash
      */
-    function _unslashify($path) {
+    function _unslashify($path) 
+    {
         if ($path[strlen($path)-1] == '/') {
             $path = substr($path, 0, strlen($path) -1);
         }
@@ -2033,10 +2039,10 @@ class HTTP_WebDAV_Server
     }
 } 
 
-  /*
-   * Local variables:
-   * tab-width: 4
-   * c-basic-offset: 4
-   * End:
-   */
+/*
+ * Local variables:
+ * tab-width: 4
+ * c-basic-offset: 4
+ * End:
+ */
 ?>
