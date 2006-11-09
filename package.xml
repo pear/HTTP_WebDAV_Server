@@ -24,14 +24,26 @@
   </maintainers>
     
   <release>
-   <version>1.0.0RC3</version>
-   <date>2006-03-03</date>
+   <version>1.0.0RC4</version>
+   <date>2006-11-10</date>
    <state>beta</state>
    <license>PHP</license>
    <notes>
-    More bug fixes, getting nearer to 1.0 release ...
-    - there are still known charset encoding issues
-    - some litmus locking tests are not passed yet
+    More bug fixes:
+    - prevent warnings
+    - fixed failing litmus tests:
+      - lock_refresh
+      - fail_cond_put_unlocked
+    - fail hard on unimplemented recursive lock 
+    - $_SERVER contents are now copied to the private _SERVER array
+      in the constructor, derived classes can extend the constructor
+      to modify $_SERVER contents
+    - some headers were missing from HEAD replies (Bug #7240)
+    - fixed variable name typos (Bug #7328)
+    - added support for configurable table name prefixes (Bug #8366)
+    - use @package-version@ placeholder in class headers (Bug #8811)
+    - PROPFIND now returns null resources for resources locked
+      but not yet created (Bug #8570)
    </notes>
    <deps>
     <dep type="php" rel="ge" version="4.4"/>
@@ -57,6 +69,38 @@
   </release>
     
   <changelog>
+   <release>
+    <version>1.0.0RC3</version>
+    <date>2006-03-03</date>
+    <state>beta</state>
+    <license>PHP</license>
+    <notes>
+     More bug fixes, getting nearer to 1.0 release ...
+     - there are still known charset encoding issues
+     - some litmus locking tests are not passed yet
+    </notes>
+    <deps>
+     <dep type="php" rel="ge" version="4.4"/>
+    </deps>
+    <filelist>
+     <dir name="/" baseinstalldir="HTTP/WebDAV">
+      <file role="doc">README</file>
+      <file role="doc">dav.txt</file>
+      <file role="php">Server.php</file>
+      <dir name="Server">
+       <file role="php">Filesystem.php</file>
+      </dir>
+      <dir name="Tools">
+       <file role="php">_parse_propfind.php</file>
+       <file role="php">_parse_proppatch.php</file>
+       <file role="php">_parse_lockinfo.php</file>
+      </dir>
+      <dir name="db">
+       <file role="doc">Fileserver.sql</file>
+      </dir>
+     </dir>
+    </filelist>
+   </release>
    <release>
     <version>1.0.0rc2</version>
     <date>2006-01-15</date>
