@@ -143,8 +143,11 @@ class HTTP_WebDAV_Server
         }
 
         // default uri is the complete request uri
-        $uri = (@$this->_SERVER["HTTPS"] === "on" ? "https:" : "http:");
-        $uri.= "//".$this->_SERVER["HTTP_HOST"].$this->_SERVER["SCRIPT_NAME"];
+        $uri = "http";
+        if (isset($this->_SERVER["HTTPS"]) && $this->_SERVER["HTTPS"] === "on") {
+          $uri = "https";
+        }
+        $uri.= "://".$this->_SERVER["HTTP_HOST"].$this->_SERVER["SCRIPT_NAME"];
         
         $path_info = empty($this->_SERVER["PATH_INFO"]) ? "/" : $this->_SERVER["PATH_INFO"];
 
@@ -602,8 +605,11 @@ class HTTP_WebDAV_Server
                     
                     // search property name in requested properties 
                     foreach ((array)$options["props"] as $reqprop) {
+                        if (!isset($regprop["xmlns"])) {
+                            $reqprop["xmlns"] = "";
+                        }
                         if (   $reqprop["name"]  == $prop["name"] 
-                               && @$reqprop["xmlns"] == $prop["ns"]) {
+                               && $reqprop["xmlns"] == $prop["ns"]) {
                             $found = true;
                             break;
                         }
@@ -639,8 +645,11 @@ class HTTP_WebDAV_Server
                     
                     // check if property exists in result
                     foreach ($file["props"] as $prop) {
+                        if (!isset($prop["xmlns"])) {
+                            $prop["xmlns"] = "";
+                        }
                         if (   $reqprop["name"]  == $prop["name"]
-                               && @$reqprop["xmlns"] == $prop["ns"]) {
+                               && $reqprop["xmlns"] == $prop["ns"]) {
                             $found = true;
                             break;
                         }
@@ -1582,16 +1591,24 @@ class HTTP_WebDAV_Server
      */
     function _check_auth() 
     {
+        $auth_type = isset($this->_SERVER["AUTH_TYPE"]) 
+            ? $this->_SERVER["AUTH_TYPE"] 
+            : null;
+
+        $auth_user = isset($this->_SERVER["PHP_AUTH_USER"]) 
+            ? $this->_SERVER["PHP_AUTH_USER"] 
+            : null;
+
+        $auth_pw   = isset($this->_SERVER["PHP_AUTH_PW"]) 
+            ? $this->_SERVER["PHP_AUTH_PW"] 
+            : null;
+
         if (method_exists($this, "checkAuth")) {
             // PEAR style method name
-            return $this->checkAuth(@$this->_SERVER["AUTH_TYPE"],
-                                    @$this->_SERVER["PHP_AUTH_USER"],
-                                    @$this->_SERVER["PHP_AUTH_PW"]);
+            return $this->checkAuth($auth_type, $auth_uset, $auth_pw);
         } else if (method_exists($this, "check_auth")) {
             // old (pre 1.0) method name
-            return $this->check_auth(@$this->_SERVER["AUTH_TYPE"],
-                                     @$this->_SERVER["PHP_AUTH_USER"],
-                                     @$this->_SERVER["PHP_AUTH_PW"]);
+            return $this->check_auth($auth_type, $auth_uset, $auth_pw);
         } else {
             // no method found -> no authentication required
             return true;
@@ -1773,7 +1790,7 @@ class HTTP_WebDAV_Server
                 $not = "";
             }
 
-            if (@is_array($uris[$uri])) {
+            if (isset($uris[$uri]) && is_array($uris[$uri])) {
                 $uris[$uri] = array_merge($uris[$uri], $list);
             } else {
                 $uris[$uri] = $list;

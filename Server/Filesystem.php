@@ -133,13 +133,12 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
         $files["files"][] = $this->fileinfo($options["path"]);
 
         // information for contained resources requested?
-        if (!empty($options["depth"])) { // TODO check for is_dir() first?
-                
+        if (!empty($options["depth"]) && is_dir($fspath) && is_readable($fspath)) {                
             // make sure path ends with '/'
             $options["path"] = $this->_slashify($options["path"]);
 
             // try to open directory
-            $handle = @opendir($fspath);
+            $handle = opendir($fspath);
                 
             if ($handle) {
                 // ok, now get all its contents
@@ -265,7 +264,7 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
      */
     function _mimetype($fspath) 
     {
-        if (@is_dir($fspath)) {
+        if (is_dir($fspath)) {
             // directories are easy
             return "httpd/unix-directory"; 
         } else if (function_exists("mime_content_type")) {
@@ -382,7 +381,11 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
         // fixed width directory column format
         $format = "%15s  %-19s  %-s\n";
 
-        $handle = @opendir($fspath);
+        if (!is_readable($fspath)) {
+            return false;
+        }
+
+        $handle = opendir($fspath);
         if (!$handle) {
             return false;
         }
@@ -425,8 +428,13 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
     {
         $fspath = $this->base . $options["path"];
 
-        if (!@is_dir(dirname($fspath))) {
-            return "409 Conflict";
+        $dir = dirname($fspath);
+        if (!file_exists($dir) || !is_dir($dir)) {
+            return "409 Conflict"; // TODO right status code for both?
+        }
+
+        if (!is_writeable($dir) || !is_writeable($fspath) || is_dir($fspath)) {
+            return "403 Forbidden";
         }
 
         $options["new"] = ! file_exists($fspath);
@@ -534,10 +542,19 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
             return "502 bad gateway";
         }
 
-        $source = $this->base .$options["path"];
-        if (!file_exists($source)) return "404 Not found";
+        $source = $this->base . $options["path"];
+        if (!file_exists($source)) {
+            return "404 Not found";
+        }
 
         $dest         = $this->base . $options["dest"];
+        $destdir      = dirname($dest);
+        
+        if (!file_exists($destdir)) || !is_dir($destdir) {
+            return "403 Forbidden"; // TODO right status code?
+        }
+
+
         $new          = !file_exists($dest);
         $existing_col = false;
 
@@ -609,14 +626,19 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
                 $destfile = str_replace($source, $dest, $file);
                     
                 if (is_dir($file)) {
-                    if (!is_dir($destfile)) {
-                        // TODO "mkdir -p" here? (only natively supported by PHP 5) 
-                        if (!@mkdir($destfile)) {
+                    if (!file_exists($destfile)) {
+                        if (!is_writeable(dirname($destfile))) {
+                            return "403 Forbidden";
+                        }
+                        if (!mkdir($destfile)) {
                             return "409 Conflict";
                         }
-                    } 
+                    } else if (!is_dir($destfile)) {
+                        return "409 Conflict";
+                    }
                 } else {
-                    if (!@copy($file, $destfile)) {
+                    
+                    if (!copy($file, $destfile)) {
                         return "409 Conflict";
                     }
                 }
