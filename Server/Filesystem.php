@@ -73,11 +73,9 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
         // special treatment for litmus compliance test
         // reply on its identifier header
         // not needed for the test itself but eases debugging
-        foreach (apache_request_headers() as $key => $value) {
-            if (stristr($key, "litmus")) {
-                error_log("Litmus test $value");
-                header("X-Litmus-reply: ".$value);
-            }
+        if (isset($this->_SERVER['HTTP_LITMUS'])) {
+            error_log("Litmus test ".$this->_SERVER['HTTP_LITMUS']);
+            header("X-Litmus-reply: ".$this->_SERVER['HTTP_LITMUS']);
         }
 
         // set root directory, defaults to webserver document root if not set
