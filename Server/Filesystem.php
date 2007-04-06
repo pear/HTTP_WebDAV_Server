@@ -180,6 +180,10 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
         $info["props"][] = $this->mkprop("creationdate",    filectime($fspath));
         $info["props"][] = $this->mkprop("getlastmodified", filemtime($fspath));
 
+        // Microsoft extensions: last access time and 'hidden' status
+        $info["props"][] = $this->mkprop("lastaccessed",    fileatime($fspath));
+        $info["props"][] = $this->mkprop("ishidden", ('.' === substr(basename($fspath), 0, 1)));
+
         // type and size (caller already made sure that path exists)
         if (is_dir($fspath)) {
             // directory (WebDAV collection)

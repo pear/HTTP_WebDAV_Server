@@ -736,6 +736,17 @@ class HTTP_WebDAV_Server
                             echo $prop["val"];
                             echo "     </D:lockdiscovery>\n";
                             break;
+                        // the following are non-standard Microsoft extensions to the DAV namespace
+                        case "lastaccessed":
+                            echo "     <D:lastaccessed ns0:dt=\"dateTime.rfc1123\">"
+                                . gmdate("D, d M Y H:i:s ", $prop['val'])
+                                . "GMT</D:lastaccessed>\n";
+                            break;
+                        case "ishidden":
+                            echo "     <D:ishidden>"
+                                . is_string($prop['val']) ? $prop['val'] : ($prop['val'] ? 'true' : 'false')
+                                . "</D:ishidden>\n";
+                            break;
                         default:                                    
                             echo "     <D:$prop[name]>"
                                 . $this->_prop_encode(htmlspecialchars($prop['val']))
