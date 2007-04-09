@@ -433,11 +433,17 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
             return "409 Conflict"; // TODO right status code for both?
         }
 
-        if (!is_writeable($dir) || !is_writeable($fspath) || is_dir($fspath)) {
+        $options["new"] = ! file_exists($fspath);
+
+        if ($options["new"] && !is_writeable($dir)) {
             return "403 Forbidden";
         }
-
-        $options["new"] = ! file_exists($fspath);
+        if (!$options["new"] && !is_writeable($fspath)) {
+            return "403 Forbidden";
+        }
+        if (!$options["new"] && is_dir($fspath)) {
+            return "403 Forbidden";
+        }
 
         $fp = fopen($fspath, "w");
 
