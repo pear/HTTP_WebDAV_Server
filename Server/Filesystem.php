@@ -550,7 +550,7 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
         $dest         = $this->base . $options["dest"];
         $destdir      = dirname($dest);
         
-        if (!file_exists($destdir)) || !is_dir($destdir) {
+        if (!file_exists($destdir) || !is_dir($destdir)) {
             return "403 Forbidden"; // TODO right status code?
         }
 
