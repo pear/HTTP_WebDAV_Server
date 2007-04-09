@@ -705,8 +705,8 @@ class HTTP_WebDAV_Server
         
             // report all found properties and their values (if any)
             if (isset($file["props"]) && is_array($file["props"])) {
-                echo "   <D:propstat>\n";
-                echo "    <D:prop>\n";
+                echo "  <D:propstat>\n";
+                echo "   <D:prop>\n";
 
                 foreach ($file["props"] as $key => $prop) {
                     
@@ -784,8 +784,8 @@ class HTTP_WebDAV_Server
        
             // now report all properties requested but not found
             if (isset($file["noprops"])) {
-                echo "   <D:propstat>\n";
-                echo "    <D:prop>\n";
+                echo "  <D:propstat>\n";
+                echo "   <D:prop>\n";
 
                 foreach ($file["noprops"] as $key => $prop) {
                     if ($prop["ns"] == "DAV:") {
