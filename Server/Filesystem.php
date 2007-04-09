@@ -553,6 +553,21 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
             return "404 Not found";
         }
 
+        if (is_dir($source)) { // resource is a collection
+            switch ($options["depth"]) {
+            case "infinity": // valid 
+                break;
+            case "0": // valid for COPY only
+                if ($del) { // MOVE?
+                    return "400 Bad request";
+                }
+                break;
+            case "1": // invalid for both COPY and MOVE
+            default: 
+                return "400 Bad request";
+            }
+        }
+
         $dest         = $this->base . $options["dest"];
         $destdir      = dirname($dest);
         
@@ -588,11 +603,6 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
             } else {
                 return "412 precondition failed";
             }
-        }
-
-        if (is_dir($source) && ($options["depth"] != "infinity")) {
-            // RFC 2518 Section 9.2, last paragraph
-            return "400 Bad request";
         }
 
         if ($del) {
