@@ -605,8 +605,8 @@ class HTTP_WebDAV_Server
                     
                     // search property name in requested properties 
                     foreach ((array)$options["props"] as $reqprop) {
-                        if (!isset($regprop["xmlns"])) {
-                            $reqprop["xmlns"] = "";
+                        if (!isset($reqprop["xmlns"])) {
+                            $reqprop["xmlns"] = "DAV:";
                         }
                         if (   $reqprop["name"]  == $prop["name"] 
                                && $reqprop["xmlns"] == $prop["ns"]) {
@@ -643,11 +643,12 @@ class HTTP_WebDAV_Server
                     
                     $found = false;
                     
+                    if (!isset($reqprop["xmlns"])) {
+                        $reqprop["xmlns"] = "DAV:";
+                    }
+
                     // check if property exists in result
                     foreach ($file["props"] as $prop) {
-                        if (!isset($prop["xmlns"])) {
-                            $prop["xmlns"] = "";
-                        }
                         if (   $reqprop["name"]  == $prop["name"]
                                && $reqprop["xmlns"] == $prop["ns"]) {
                             $found = true;
