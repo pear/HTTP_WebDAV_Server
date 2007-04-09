@@ -19,6 +19,8 @@ CREATE TABLE locks (
   recursive int(11) default '0',
   writelock int(11) default '0',
   exclusivelock int(11) NOT NULL default 0,
+  created bigint(20) default 0,
+  modified bigint(20) default 0,
   PRIMARY KEY  (token),
   UNIQUE KEY token (token),
   KEY path (path),
