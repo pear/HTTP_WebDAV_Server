@@ -557,7 +557,7 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
         $destdir      = dirname($dest);
         
         if (!file_exists($destdir) || !is_dir($destdir)) {
-            return "403 Forbidden"; // TODO right status code?
+            return "409 Conflict";
         }
 
 
