@@ -720,6 +720,7 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
         $fspath = $this->base . $options["path"];
 
         // TODO recursive locks on directories not supported yet
+        // makes litmus test "32. lock_collection" fail
         if (is_dir($fspath) && !empty($options["depth"])) {
             return "409 Conflict";
         }
