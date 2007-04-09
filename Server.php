@@ -1605,10 +1605,10 @@ class HTTP_WebDAV_Server
 
         if (method_exists($this, "checkAuth")) {
             // PEAR style method name
-            return $this->checkAuth($auth_type, $auth_uset, $auth_pw);
+            return $this->checkAuth($auth_type, $auth_user, $auth_pw);
         } else if (method_exists($this, "check_auth")) {
             // old (pre 1.0) method name
-            return $this->check_auth($auth_type, $auth_uset, $auth_pw);
+            return $this->check_auth($auth_type, $auth_user, $auth_pw);
         } else {
             // no method found -> no authentication required
             return true;
