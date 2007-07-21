@@ -24,6 +24,46 @@
   </maintainers>
     
   <release>
+   <version>1.0.0RC5</version>
+   <date>2007-07-16</date>
+   <state>beta</state>
+   <license>New BSD License</license>
+  
+ 
+   <notes>
+   - License Change to the new BSD License
+   - reverting wrong namespace default logic
+   - whitespace fix in XML output
+   - Getting rid of warning suppression by @ prefixes (PEAR Bug #10637)
+   - added handling for Microsoft specific 'lastaccessed' and 'ishidden'
+   - Fix for $uri variable gets set wrongly (PEAR Bug #10614)
+   </notes>
+   <deps>
+    <dep type="php" rel="ge" version="4.4"/>
+   </deps>
+   <filelist>
+    <dir name="/" baseinstalldir="HTTP/WebDAV">
+	 <file role="doc" name="LICENSE" />
+     <file role="doc">README</file>
+     <file role="doc">dav.txt</file>
+     <file role="php">Server.php</file>
+     <dir name="Server">
+      <file role="php">Filesystem.php</file>
+     </dir>
+     <dir name="Tools">
+      <file role="php">_parse_propfind.php</file>
+      <file role="php">_parse_proppatch.php</file>
+      <file role="php">_parse_lockinfo.php</file>
+     </dir>
+     <dir name="db">
+      <file role="doc">Fileserver.sql</file>
+     </dir>
+    </dir>
+   </filelist>
+  </release>
+    
+  <changelog>
+    <release>
    <version>1.0.0RC4</version>
    <date>2006-11-10</date>
    <state>beta</state>
@@ -68,7 +108,7 @@
    </filelist>
   </release>
     
-  <changelog>
+  
    <release>
     <version>1.0.0RC3</version>
     <date>2006-03-03</date>
