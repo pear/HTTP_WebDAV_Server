@@ -506,7 +506,7 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
             $query = "DELETE FROM {$this->db_prefix}properties 
                            WHERE path LIKE '".$this->_slashify($options["path"])."%'";
             mysql_query($query);
-            System::rm("-rf $path");
+            System::rm(array("-rf", $path));
         } else {
             unlink($path);
         }
