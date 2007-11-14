@@ -957,7 +957,7 @@ class HTTP_WebDAV_Server
                                            . (isset($options['size']) ? $options['size'] : "*"));
                                     while ($size && !feof($options['stream'])) {
                                         $buffer = fread($options['stream'], 4096);
-                                        $size  -= strlen($buffer);
+                                        $size  -= $this->bytes($buffer);
                                         echo $buffer;
                                     }
                                 } else {
@@ -993,7 +993,7 @@ class HTTP_WebDAV_Server
                                 fseek($options['stream'], $from, SEEK_SET);
                                 while ($size && !feof($options['stream'])) {
                                     $buffer = fread($options['stream'], 4096);
-                                    $size  -= strlen($buffer);
+                                    $size  -= $this->bytes($buffer);
                                     echo $buffer;
                                 }
                             }
@@ -1011,7 +1011,7 @@ class HTTP_WebDAV_Server
                     if (is_array($options['data'])) {
                         // reply to partial request
                     } else {
-                        header("Content-length: ".strlen($options['data']));
+                        header("Content-length: ".$this->bytes($options['data']));
                         echo $options['data'];
                     }
                 }
@@ -2090,6 +2090,23 @@ class HTTP_WebDAV_Server
         } else {
             return $this->_slashify($parent).$child;
         }
+    }
+    
+    /**
+     * mbstring.func_overload save strlen version: counting the bytes not the chars
+     *
+     * @param string $str
+     * @return int
+     */
+    function bytes($str)
+    {
+    	static $func_overload;
+    	
+    	if (is_null($func_overload))
+    	{
+    		$func_overload = @extension_loaded('mbstring') ? ini_get('mbstring.func_overload') : 0;
+    	}
+    	return $func_overload & 2 ? mb_strlen($str,'ascii') : strlen($str);
     }
 } 
 
