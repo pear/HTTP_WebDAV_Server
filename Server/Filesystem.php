@@ -358,23 +358,18 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
     }
 
     /**
-     * GET method handler
+     * HEAD method handler
      * 
      * @param  array  parameter passing array
      * @return bool   true on success
      */
-    function GET(&$options) 
+    function HEAD(&$options) 
     {
         // get absolute fs path to requested resource
         $fspath = $this->base . $options["path"];
 
         // sanity check
         if (!file_exists($fspath)) return false;
-            
-        // is this a collection?
-        if (is_dir($fspath)) {
-            return $this->GetDir($fspath, $options);
-        }
             
         // detect resource type
         $options['mimetype'] = $this->_mimetype($fspath); 
@@ -388,6 +383,30 @@ class HTTP_WebDAV_Server_Filesystem extends HTTP_WebDAV_Server
         // detect resource size
         $options['size'] = filesize($fspath);
             
+        return true;
+    }
+
+    /**
+     * GET method handler
+     * 
+     * @param  array  parameter passing array
+     * @return bool   true on success
+     */
+    function GET(&$options) 
+    {
+        // get absolute fs path to requested resource
+        $fspath = $this->base . $options["path"];
+
+        // is this a collection?
+        if (is_dir($fspath)) {
+            return $this->GetDir($fspath, $options);
+        }
+
+        // the header output is the same as for HEAD
+        if (!$this->HEAD($options)) {
+            return false;
+        }
+
         // no need to check result here, it is handled by the base class
         $options['stream'] = fopen($fspath, "r");
             
