@@ -1423,12 +1423,25 @@ class HTTP_WebDAV_Server
         
         if ($http_stat{0} == 2) { // 2xx states are ok 
             if ($options["timeout"]) {
-                // more than a million is considered an absolute timestamp
-                // less is more likely a relative value
-                if ($options["timeout"]>1000000) {
-                    $timeout = "Second-".($options['timeout']-time());
+                // if multiple timeout values were given we take the first only
+                if (is_array($options["timeout"])) {
+                    reset($options["timeout"]);
+                    $options["timeout"] = current($options["timeout"]);
+                }
+                // if the timeout is numeric only we need to reformat it
+                if (is_numeric($options["timeout"])) {
+                    // more than a million is considered an absolute timestamp
+                    // less is more likely a relative value
+                    if ($options["timeout"]>1000000) {
+                        $timeout = "Second-".($options['timeout']-time());
+                    } else {
+                        $timeout = "Second-$options[timeout]";
+                    }
                 } else {
-                    $timeout = "Second-$options[timeout]";
+                    // non-numeric values are passed on verbatim,
+                    // no error checking is performed here in this case
+                    // TODO: send "Infinite" on invalid timeout strings?
+                    $timeout = $options["timeout"];
                 }
             } else {
                 $timeout = "Infinite";
