@@ -1513,13 +1513,20 @@ class HTTP_WebDAV_Server
             $options["depth"] = "infinity";
         }
 
+        $http_header_host = preg_replace("/:80$/", "", $this->_SERVER["HTTP_HOST"]);
+
         $url = parse_url($this->_SERVER["HTTP_DESTINATION"]);
         $path      = urldecode($url["path"]);
-        $http_host = $url["host"];
-        if (isset($url["port"]) && $url["port"] != 80)
-            $http_host.= ":".$url["port"];
 
-        $http_header_host = preg_replace("/:80$/", "", $this->_SERVER["HTTP_HOST"]);
+        if (isset($url["host"])) {
+            // TODO check url scheme, too
+            $http_host = $url["host"];
+            if (isset($url["port"]) && $url["port"] != 80)
+                $http_host.= ":".$url["port"];
+        } else {
+            // only path given, set host to self
+            $http_host == $http_header_host;
+        }
 
         if ($http_host == $http_header_host &&
             !strncmp($this->_SERVER["SCRIPT_NAME"], $path,
