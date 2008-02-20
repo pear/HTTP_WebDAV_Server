@@ -1,184 +1,177 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE package SYSTEM "http://pear.php.net/dtd/package-1.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<package packagerversion="1.4.11" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
+http://pear.php.net/dtd/tasks-1.0.xsd
+http://pear.php.net/dtd/package-2.0
+http://pear.php.net/dtd/package-2.0.xsd">
+ <name>HTTP_WebDAV_Server</name>
+ <channel>pear.php.net</channel>
+ <summary>WebDAV Server Baseclass.</summary>
+ <description>RFC2518 compliant helper class for WebDAV server implementation. 
+ </description>
+ <lead>
+  <name>Hartmut Holzgraefe</name>
+  <user>hholzgra</user>
+  <email>hholzgra@php.net</email>
+  <active>yes</active>
+ </lead>
+ <lead>
+  <name>Christian Stocker</name>
+  <user>chregu</user>
+  <email>chregu@bitflux.ch</email>
+  <active>yes</active>
+ </lead>
+ <date>2008-02-20</date>
+ <time>16:43:29</time>
+ <version>
+  <release>1.0.0RC5</release>
+  <api>1.0.0RC5</api>
+ </version>
+ <stability>
+  <release>beta</release>
+  <api>beta</api>
+ </stability>
+ <license>New BSD License</license>
+ <notes>- License Change to the new BSD License
+- reverting wrong namespace default logic
+- whitespace fix in XML output
+- Getting rid of warning suppression by @ prefixes (PEAR Bug #10637)
+- added handling for Microsoft specific &apos;lastaccessed&apos; and &apos;ishidden&apos;
+- Fix for $uri variable gets set wrongly (PEAR Bug #10614)
 
- <package>
-  <name>HTTP_WebDAV_Server</name>
-  <summary>WebDAV Server Baseclass.</summary>
-  <description>
-   RFC2518 compliant helper class for WebDAV server implementation. 
-  </description>
-    
-  <maintainers>
-   <maintainer>
-    <user>hholzgra</user>
-    <name>Hartmut Holzgraefe</name>
-    <email>hholzgra@php.net</email>
-    <role>lead</role>
-   </maintainer>     
-   <maintainer>
-    <user>chregu</user>
-    <name>Christian Stocker</name>
-    <email>chregu@bitflux.ch</email>
-    <role>lead</role>
-   </maintainer>
-  </maintainers>
-    
+ </notes>
+ <contents>
+  <dir name="/">
+   <dir name="db">
+    <file baseinstalldir="HTTP/WebDAV" name="Fileserver.sql" role="doc" />
+   </dir> <!-- /db -->
+   <dir name="Server">
+    <file baseinstalldir="HTTP/WebDAV" name="Filesystem.php" role="php" />
+   </dir> <!-- /Server -->
+   <dir name="Tools">
+    <file baseinstalldir="HTTP/WebDAV" name="_parse_lockinfo.php" role="php" />
+    <file baseinstalldir="HTTP/WebDAV" name="_parse_propfind.php" role="php" />
+    <file baseinstalldir="HTTP/WebDAV" name="_parse_proppatch.php" role="php" />
+   </dir> <!-- /Tools -->
+   <file baseinstalldir="HTTP/WebDAV" name="dav.txt" role="doc" />
+   <file baseinstalldir="HTTP/WebDAV" name="LICENSE" role="doc" />
+   <file baseinstalldir="HTTP/WebDAV" name="README" role="doc" />
+   <file baseinstalldir="HTTP/WebDAV" name="Server.php" role="php" />
+  </dir> <!-- / -->
+ </contents>
+ <dependencies>
+  <required>
+   <php>
+    <min>4.4</min>
+   </php>
+   <pearinstaller>
+    <min>1.4.0b1</min>
+   </pearinstaller>
+  </required>
+ </dependencies>
+ <phprelease />
+ <changelog>
   <release>
-   <version>1.0.0RC5</version>
-   <date>2007-07-16</date>
-   <state>beta</state>
-   <license>New BSD License</license>
-  
- 
-   <notes>
-   - License Change to the new BSD License
-   - reverting wrong namespace default logic
-   - whitespace fix in XML output
-   - Getting rid of warning suppression by @ prefixes (PEAR Bug #10637)
-   - added handling for Microsoft specific 'lastaccessed' and 'ishidden'
-   - Fix for $uri variable gets set wrongly (PEAR Bug #10614)
-   </notes>
-   <deps>
-    <dep type="php" rel="ge" version="4.4"/>
-   </deps>
-   <filelist>
-    <dir name="/" baseinstalldir="HTTP/WebDAV">
-	 <file role="doc" name="LICENSE" />
-     <file role="doc">README</file>
-     <file role="doc">dav.txt</file>
-     <file role="php">Server.php</file>
-     <dir name="Server">
-      <file role="php">Filesystem.php</file>
-     </dir>
-     <dir name="Tools">
-      <file role="php">_parse_propfind.php</file>
-      <file role="php">_parse_proppatch.php</file>
-      <file role="php">_parse_lockinfo.php</file>
-     </dir>
-     <dir name="db">
-      <file role="doc">Fileserver.sql</file>
-     </dir>
-    </dir>
-   </filelist>
-  </release>
-    
-  <changelog>
-    <release>
-   <version>1.0.0RC4</version>
+   <version>
+    <release>1.0.0RC4</release>
+    <api>1.0.0RC4</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
    <date>2006-11-10</date>
-   <state>beta</state>
-   <license>PHP</license>
-   <notes>
-    More bug fixes:
-    - prevent warnings
-    - fixed failing litmus tests:
-      - lock_refresh
-      - fail_cond_put_unlocked
-    - fail hard on unimplemented recursive lock 
-    - $_SERVER contents are now copied to the private _SERVER array
-      in the constructor, derived classes can extend the constructor
-      to modify $_SERVER contents
-    - some headers were missing from HEAD replies (Bug #7240)
-    - fixed variable name typos (Bug #7328)
-    - added support for configurable table name prefixes (Bug #8366)
-    - use @package-version@ placeholder in class headers (Bug #8811)
-    - PROPFIND now returns null resources for resources locked
-      but not yet created (Bug #8570)
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>More bug fixes:
+- prevent warnings
+- fixed failing litmus tests:
+  - lock_refresh
+  - fail_cond_put_unlocked
+- fail hard on unimplemented recursive lock 
+- $_SERVER contents are now copied to the private _SERVER array
+  in the constructor, derived classes can extend the constructor
+  to modify $_SERVER contents
+- some headers were missing from HEAD replies (Bug #7240)
+- fixed variable name typos (Bug #7328)
+- added support for configurable table name prefixes (Bug #8366)
+- use @package-version@ placeholder in class headers (Bug #8811)
+- PROPFIND now returns null resources for resources locked
+  but not yet created (Bug #8570)
    </notes>
-   <deps>
-    <dep type="php" rel="ge" version="4.4"/>
-   </deps>
-   <filelist>
-    <dir name="/" baseinstalldir="HTTP/WebDAV">
-     <file role="doc">README</file>
-     <file role="doc">dav.txt</file>
-     <file role="php">Server.php</file>
-     <dir name="Server">
-      <file role="php">Filesystem.php</file>
-     </dir>
-     <dir name="Tools">
-      <file role="php">_parse_propfind.php</file>
-      <file role="php">_parse_proppatch.php</file>
-      <file role="php">_parse_lockinfo.php</file>
-     </dir>
-     <dir name="db">
-      <file role="doc">Fileserver.sql</file>
-     </dir>
-    </dir>
-   </filelist>
   </release>
-    
-  
-   <release>
-    <version>1.0.0RC3</version>
-    <date>2006-03-03</date>
-    <state>beta</state>
-    <license>PHP</license>
-    <notes>
-     More bug fixes, getting nearer to 1.0 release ...
-     - there are still known charset encoding issues
-     - some litmus locking tests are not passed yet
-    </notes>
-    <deps>
-     <dep type="php" rel="ge" version="4.4"/>
-    </deps>
-    <filelist>
-     <dir name="/" baseinstalldir="HTTP/WebDAV">
-      <file role="doc">README</file>
-      <file role="doc">dav.txt</file>
-      <file role="php">Server.php</file>
-      <dir name="Server">
-       <file role="php">Filesystem.php</file>
-      </dir>
-      <dir name="Tools">
-       <file role="php">_parse_propfind.php</file>
-       <file role="php">_parse_proppatch.php</file>
-       <file role="php">_parse_lockinfo.php</file>
-      </dir>
-      <dir name="db">
-       <file role="doc">Fileserver.sql</file>
-      </dir>
-     </dir>
-    </filelist>
-   </release>
-   <release>
-    <version>1.0.0rc2</version>
-    <date>2006-01-15</date>
-    <state>beta</state>
-    <license>PHP</license>
-    <notes>
-     Still preparing for 1.0 release after some bug fixes ...
-    </notes>
-   </release>
-   <release>
-    <version>1.0.0rc1</version>
-    <date>2005-07-05</date>
-    <state>beta</state>
-    <license>PHP</license>
-    <notes>
-	  Preparing for 1.0 release ...
-    </notes>
-   </release>
-   <release>
-    <version>0.99.1</version>
-    <date>2004-04-22</date>
-    <state>beta</state>
-    <license>PHP</license>
-    <notes>
-Some serious stuff showed up that needs to be added/fixed before 
-we go for 1.0. This release doesn't really address any of these,
+  <release>
+   <version>
+    <release>1.0.0RC3</release>
+    <api>1.0.0RC3</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2006-03-03</date>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>More bug fixes, getting nearer to 1.0 release ...
+- there are still known charset encoding issues
+- some litmus locking tests are not passed yet
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.0.0rc2</release>
+    <api>1.0.0rc2</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2006-01-15</date>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>Still preparing for 1.0 release after some bug fixes ...
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.0.0rc1</release>
+    <api>1.0.0rc1</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2005-07-05</date>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>Preparing for 1.0 release ...
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>0.99.1</release>
+    <api>0.99.1</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2004-04-22</date>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>Some serious stuff showed up that needs to be added/fixed before 
+we go for 1.0. This release doesn&apos;t really address any of these,
 it only fixes some small issues with the existing code and adds
 comments in various places.
-    </notes>
-   </release>
-
-   <release>
-    <version>0.99</version>
-    <date>2003-11-18</date>
-    <state>beta</state>
-    <license>PHP</license>
-    <notes>
-almost all TODO features and issues for 1.0 are now implemented,
+    
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>0.99</release>
+    <api>0.99</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2003-11-18</date>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>almost all TODO features and issues for 1.0 are now implemented,
 there might be some additional API cleanups in PROPFIND and PROPPATCH
 and some small issues in the Fileserver example still exist
 
@@ -194,33 +187,43 @@ returned streams are seekable).
 
 The only things you should return in addition to an
 appropriate open stream are the current size of the
-resource in $options['size'] for both GET and PUT 
-and the mimetype in $options['mimetype'] and modification 
-date in $options['mtime'] for GET.
-    </notes>
-   </release>
-
-   <release>
-    <version>0.9.1</version>
-    <date>2003-05-28</date>
-    <state>alpha</state>
-    <license>PHP</license>
-    <notes>
-usable (complies to RFC 2518 in all but shared locks afaik)
-but still in developement
-    </notes>
-   </release>
-  
-   <release>
-    <version>0.9</version>
-    <date>2003-02-18</date>
-    <state>alpha</state>
-    <license>PHP</license>
-    <notes>
-usable (complies to RFC 2518 in all but shared locks afaik)
-but still in developement
-    </notes>
-   </release>
-  </changelog>
+resource in $options[&apos;size&apos;] for both GET and PUT 
+and the mimetype in $options[&apos;mimetype&apos;] and modification 
+date in $options[&apos;mtime&apos;] for GET.
     
- </package>
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>0.9.1</release>
+    <api>0.9.1</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2003-05-28</date>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>usable (complies to RFC 2518 in all but shared locks afaik)
+but still in developement
+    
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>0.9</release>
+    <api>0.9</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2003-02-18</date>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>usable (complies to RFC 2518 in all but shared locks afaik)
+but still in developement
+    
+   </notes>
+  </release>
+ </changelog>
+</package>
