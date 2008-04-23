@@ -163,7 +163,15 @@ class HTTP_WebDAV_Server
         }
         $uri.= "://".$this->_SERVER["HTTP_HOST"].$this->_SERVER["SCRIPT_NAME"];
         
-        $path_info = empty($this->_SERVER["PATH_INFO"]) ? "/" : $this->_SERVER["PATH_INFO"];
+        // WebDAV has no concept of a query string and clients (including cadaver)
+        // seem to pass '?' unencoded, so we need to extract the path info out
+        // of the request URI ourselves
+        $path_info = substr($this->_SERVER["REQUEST_URI"], strlen($this->_SERVER["SCRIPT_NAME"]));
+
+        // just in case the path came in empty ...
+        if (empty($path_info)) {
+            $path_info = "/";
+        }
 
         $this->base_uri = $uri;
         $this->uri      = $uri . $path_info;
@@ -494,7 +502,7 @@ class HTTP_WebDAV_Server
      * OPTIONS method handler
      *
      * The OPTIONS method handler creates a valid OPTIONS reply
-     * including Dav: and Allowed: heaers
+     * including Dav: and Allowed: headers
      * based on the implemented methods found in the actual instance
      *
      * @param  void
@@ -1518,8 +1526,8 @@ class HTTP_WebDAV_Server
 
         $http_header_host = preg_replace("/:80$/", "", $this->_SERVER["HTTP_HOST"]);
 
-        $url = parse_url($this->_SERVER["HTTP_DESTINATION"]);
-        $path      = urldecode($url["path"]);
+        $url  = parse_url($this->_SERVER["HTTP_DESTINATION"]);
+        $path = urldecode($url["path"]);
 
         if (isset($url["host"])) {
             // TODO check url scheme, too
@@ -2037,7 +2045,7 @@ class HTTP_WebDAV_Server
      */
     function _urldecode($path) 
     {
-        return urldecode($path);
+        return rawurldecode($path);
     }
 
     /**
