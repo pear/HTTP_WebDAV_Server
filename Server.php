@@ -1436,7 +1436,7 @@ class HTTP_WebDAV_Server
         if (is_bool($stat)) {
             $http_stat = $stat ? "200 OK" : "423 Locked";
         } else {
-            $http_stat = $stat;
+            $http_stat = (string)$stat;
         }
         $this->http_status($http_stat);
         
