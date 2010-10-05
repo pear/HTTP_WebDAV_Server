@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.4.11" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
-http://pear.php.net/dtd/tasks-1.0.xsd
-http://pear.php.net/dtd/package-2.0
-http://pear.php.net/dtd/package-2.0.xsd">
+<package packagerversion="1.9.0" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>HTTP_WebDAV_Server</name>
  <channel>pear.php.net</channel>
  <summary>WebDAV Server Baseclass.</summary>
- <description>RFC2518 compliant helper class for WebDAV server implementation. 
- </description>
+ <description>RFC2518 compliant helper class for WebDAV server implementation.</description>
  <lead>
   <name>Hartmut Holzgraefe</name>
   <user>hholzgra</user>
@@ -20,8 +16,8 @@ http://pear.php.net/dtd/package-2.0.xsd">
   <email>chregu@bitflux.ch</email>
   <active>yes</active>
  </lead>
- <date>2008-02-20</date>
- <time>16:43:29</time>
+ <date>2010-10-05</date>
+ <time>21:15:37</time>
  <version>
   <release>1.0.0RC5</release>
   <api>1.0.0RC5</api>
@@ -31,32 +27,56 @@ http://pear.php.net/dtd/package-2.0.xsd">
   <api>beta</api>
  </stability>
  <license>New BSD License</license>
- <notes>- License Change to the new BSD License
+ <notes>
+QA Release
+Bug #1949 $_prop_encoding not used for $file[&apos;path&apos;] 	hholzgra
+Bug #2464 Missing return in http_GET() 	hholzgra
+Bug #6189 Various international filename issues 	hholzgra
+Bug #9367 Example Fileserver shows wrong uri for folders 	hholzgra
+Bug #10107 WebDAV Server only works with mod_php 	hholzgra
+Bug #10238 DELETE method in Filesystem.php breaks when path contains space character 	hholzgra
+Bug #10614 $uri variable gets set wrongly 	hholzgra
+Bug #10632 support D:lastaccessed as date field 	hholzgra
+Bug #10637 HTTP_WebDav_Server is throwing E_NOTICE&apos;s 	jorrit
+Bug #11069 download broken if mbstring.func_overload &amp; 2 and utf-8 charset 	hholzgra
+Bug #11070 broken GET with mbstring.func_overload &amp; 2 	hholzgra
+Bug #11816 Fatal error when locking 	hholzgra
+Bug #11902 Implement HEAD in Filesystem and Reuse in GET 	hholzgra
+Bug #11903 CVS revision in fileheader 	hholzgra
+Bug #12073 Issues with filenames containing spaces 	hholzgra
+Bug #12282 MOVE (rename) not properly urldecoded 	hholzgra
+Bug #12283 Double urldecode causes problems with filenames that have % or + 	hholzgra
+Bug #12500 Undefined variable: host in HTTP/WebDAV/Server.php line 1470 	hholzgra
+Bug #12602 Irrelevant 	NA 	Misspellings in API: pathes &gt; paths 	hholzgra
+Bug #13372 script name is appended to path 	hholzgra
+Bug #13809 Unhandled HTTP_CONTENT_* Headers 	hholzgra
+Bug #13920 http_LOCK() expects string, requires int 	hholzgra
+- License Change to the new BSD License
 - reverting wrong namespace default logic
 - whitespace fix in XML output
 - Getting rid of warning suppression by @ prefixes (PEAR Bug #10637)
 - added handling for Microsoft specific &apos;lastaccessed&apos; and &apos;ishidden&apos;
 - Fix for $uri variable gets set wrongly (PEAR Bug #10614)
-
  </notes>
  <contents>
-  <dir name="/">
-   <dir name="db">
-    <file baseinstalldir="HTTP/WebDAV" name="Fileserver.sql" role="doc" />
-   </dir> <!-- /db -->
-   <dir name="Server">
-    <file baseinstalldir="HTTP/WebDAV" name="Filesystem.php" role="php" />
-   </dir> <!-- /Server -->
-   <dir name="Tools">
-    <file baseinstalldir="HTTP/WebDAV" name="_parse_lockinfo.php" role="php" />
-    <file baseinstalldir="HTTP/WebDAV" name="_parse_propfind.php" role="php" />
-    <file baseinstalldir="HTTP/WebDAV" name="_parse_proppatch.php" role="php" />
-   </dir> <!-- /Tools -->
-   <file baseinstalldir="HTTP/WebDAV" name="dav.txt" role="doc" />
-   <file baseinstalldir="HTTP/WebDAV" name="LICENSE" role="doc" />
-   <file baseinstalldir="HTTP/WebDAV" name="README" role="doc" />
-   <file baseinstalldir="HTTP/WebDAV" name="Server.php" role="php" />
-  </dir> <!-- / -->
+  <dir baseinstalldir="HTTP/WebDAV" name="/">
+   <file baseinstalldir="HTTP/WebDAV" md5sum="906a69b17aaeeb4d69ddae46bbcb9195" name="db/Fileserver.sql" role="doc" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="a2dc47ca79d0663bc1468d7acdea398e" name="Server/Filesystem.php" role="php" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="aaa6019bfe483b7cf88b98680d9b5bbf" name="tests/split_log.php" role="test" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="d37fb492f53245ff93dae30f06ac30a4" name="tests/test.sh" role="test" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="dd37396af7cd967841cc160788c90cb1" name="Tools/_parse_lockinfo.php" role="php" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="0ce5e3dbef6c5c2200ccda8354b34d9f" name="Tools/_parse_propfind.php" role="php" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="c5fa806fc6504cf71ccd7b751b0ba74a" name="Tools/_parse_proppatch.php" role="php" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="74053e69c7b6f66f741684e32d7545f3" name="AUTHORS" role="data" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="648a80e67723e40b8ca3809c746342b5" name="COPYING" role="data" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="c5235ed64efa685da638c6dcdb6a9708" name="dav.txt" role="doc" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="7225526d543b2c370de158610bfb23c6" name="EXPERIMENTAL" role="data" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="2a2dae8f62ff0573400d1221dea14d3c" name="file.php" role="php" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="534efadb5423d9ad817cdbf8e3cdb58b" name="LICENSE" role="doc" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="e6f0ca3d7e4fa2b20310995f269c3ef2" name="README" role="doc" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="1a2fb23828540874bfd01d2b3849bd71" name="Server.php" role="php" />
+   <file baseinstalldir="HTTP/WebDAV" md5sum="559b64969ec9c4a406893f16b090ce9f" name="TODO" role="data" />
+  </dir>
  </contents>
  <dependencies>
   <required>
@@ -72,92 +92,34 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <changelog>
   <release>
    <version>
-    <release>1.0.0RC4</release>
-    <api>1.0.0RC4</api>
+    <release>0.9</release>
+    <api>0.9</api>
    </version>
    <stability>
-    <release>beta</release>
-    <api>beta</api>
+    <release>alpha</release>
+    <api>alpha</api>
    </stability>
-   <date>2006-11-10</date>
+   <date>2003-02-18</date>
    <license uri="http://www.php.net/license">PHP</license>
-   <notes>More bug fixes:
-- prevent warnings
-- fixed failing litmus tests:
-  - lock_refresh
-  - fail_cond_put_unlocked
-- fail hard on unimplemented recursive lock 
-- $_SERVER contents are now copied to the private _SERVER array
-  in the constructor, derived classes can extend the constructor
-  to modify $_SERVER contents
-- some headers were missing from HEAD replies (Bug #7240)
-- fixed variable name typos (Bug #7328)
-- added support for configurable table name prefixes (Bug #8366)
-- use @package-version@ placeholder in class headers (Bug #8811)
-- PROPFIND now returns null resources for resources locked
-  but not yet created (Bug #8570)
+   <notes>
+usable (complies to RFC 2518 in all but shared locks afaik)
+but still in developement
    </notes>
   </release>
   <release>
    <version>
-    <release>1.0.0RC3</release>
-    <api>1.0.0RC3</api>
+    <release>0.9.1</release>
+    <api>0.9.1</api>
    </version>
    <stability>
-    <release>beta</release>
-    <api>beta</api>
+    <release>alpha</release>
+    <api>alpha</api>
    </stability>
-   <date>2006-03-03</date>
+   <date>2003-05-28</date>
    <license uri="http://www.php.net/license">PHP</license>
-   <notes>More bug fixes, getting nearer to 1.0 release ...
-- there are still known charset encoding issues
-- some litmus locking tests are not passed yet
-   </notes>
-  </release>
-  <release>
-   <version>
-    <release>1.0.0rc2</release>
-    <api>1.0.0rc2</api>
-   </version>
-   <stability>
-    <release>beta</release>
-    <api>beta</api>
-   </stability>
-   <date>2006-01-15</date>
-   <license uri="http://www.php.net/license">PHP</license>
-   <notes>Still preparing for 1.0 release after some bug fixes ...
-   </notes>
-  </release>
-  <release>
-   <version>
-    <release>1.0.0rc1</release>
-    <api>1.0.0rc1</api>
-   </version>
-   <stability>
-    <release>beta</release>
-    <api>beta</api>
-   </stability>
-   <date>2005-07-05</date>
-   <license uri="http://www.php.net/license">PHP</license>
-   <notes>Preparing for 1.0 release ...
-   </notes>
-  </release>
-  <release>
-   <version>
-    <release>0.99.1</release>
-    <api>0.99.1</api>
-   </version>
-   <stability>
-    <release>beta</release>
-    <api>beta</api>
-   </stability>
-   <date>2004-04-22</date>
-   <license uri="http://www.php.net/license">PHP</license>
-   <notes>Some serious stuff showed up that needs to be added/fixed before 
-we go for 1.0. This release doesn&apos;t really address any of these,
-it only fixes some small issues with the existing code and adds
-comments in various places.
-    
+   <notes>
+usable (complies to RFC 2518 in all but shared locks afaik)
+but still in developement
    </notes>
   </release>
   <release>
@@ -171,7 +133,8 @@ comments in various places.
    </stability>
    <date>2003-11-18</date>
    <license uri="http://www.php.net/license">PHP</license>
-   <notes>almost all TODO features and issues for 1.0 are now implemented,
+   <notes>
+almost all TODO features and issues for 1.0 are now implemented,
 there might be some additional API cleanups in PROPFIND and PROPPATCH
 and some small issues in the Fileserver example still exist
 
@@ -190,39 +153,143 @@ appropriate open stream are the current size of the
 resource in $options[&apos;size&apos;] for both GET and PUT 
 and the mimetype in $options[&apos;mimetype&apos;] and modification 
 date in $options[&apos;mtime&apos;] for GET.
-    
    </notes>
   </release>
   <release>
    <version>
-    <release>0.9.1</release>
-    <api>0.9.1</api>
+    <release>0.99.1</release>
+    <api>0.99.1</api>
    </version>
    <stability>
-    <release>alpha</release>
-    <api>alpha</api>
+    <release>beta</release>
+    <api>beta</api>
    </stability>
-   <date>2003-05-28</date>
+   <date>2004-04-22</date>
    <license uri="http://www.php.net/license">PHP</license>
-   <notes>usable (complies to RFC 2518 in all but shared locks afaik)
-but still in developement
-    
+   <notes>
+Some serious stuff showed up that needs to be added/fixed before 
+we go for 1.0. This release doesn&apos;t really address any of these,
+it only fixes some small issues with the existing code and adds
+comments in various places.
    </notes>
   </release>
   <release>
    <version>
-    <release>0.9</release>
-    <api>0.9</api>
+    <release>1.0.0rc1</release>
+    <api>1.0.0rc1</api>
    </version>
    <stability>
-    <release>alpha</release>
-    <api>alpha</api>
+    <release>beta</release>
+    <api>beta</api>
    </stability>
-   <date>2003-02-18</date>
+   <date>2005-07-05</date>
    <license uri="http://www.php.net/license">PHP</license>
-   <notes>usable (complies to RFC 2518 in all but shared locks afaik)
-but still in developement
-    
+   <notes>
+Preparing for 1.0 release ...
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.0.0rc2</release>
+    <api>1.0.0rc2</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2006-01-15</date>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>
+Still preparing for 1.0 release after some bug fixes ...
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.0.0RC3</release>
+    <api>1.0.0RC3</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2006-03-03</date>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>
+More bug fixes, getting nearer to 1.0 release ...
+- there are still known charset encoding issues
+- some litmus locking tests are not passed yet
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.0.0RC4</release>
+    <api>1.0.0RC4</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2006-11-10</date>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>
+More bug fixes:
+- prevent warnings
+- fixed failing litmus tests:
+  - lock_refresh
+  - fail_cond_put_unlocked
+- fail hard on unimplemented recursive lock 
+- $_SERVER contents are now copied to the private _SERVER array
+  in the constructor, derived classes can extend the constructor
+  to modify $_SERVER contents
+- some headers were missing from HEAD replies (Bug #7240)
+- fixed variable name typos (Bug #7328)
+- added support for configurable table name prefixes (Bug #8366)
+- use @package-version@ placeholder in class headers (Bug #8811)
+- PROPFIND now returns null resources for resources locked
+  but not yet created (Bug #8570)
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.0.0RC5</release>
+    <api>1.0.0RC5</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2010-10-05</date>
+   <license>New BSD License</license>
+   <notes>
+QA Release
+Bug #1949 $_prop_encoding not used for $file[&apos;path&apos;] 	hholzgra
+Bug #2464 Missing return in http_GET() 	hholzgra
+Bug #6189 Various international filename issues 	hholzgra
+Bug #9367 Example Fileserver shows wrong uri for folders 	hholzgra
+Bug #10107 WebDAV Server only works with mod_php 	hholzgra
+Bug #10238 DELETE method in Filesystem.php breaks when path contains space character 	hholzgra
+Bug #10614 $uri variable gets set wrongly 	hholzgra
+Bug #10632 support D:lastaccessed as date field 	hholzgra
+Bug #10637 HTTP_WebDav_Server is throwing E_NOTICE&apos;s 	jorrit
+Bug #11069 download broken if mbstring.func_overload &amp; 2 and utf-8 charset 	hholzgra
+Bug #11070 broken GET with mbstring.func_overload &amp; 2 	hholzgra
+Bug #11816 Fatal error when locking 	hholzgra
+Bug #11902 Implement HEAD in Filesystem and Reuse in GET 	hholzgra
+Bug #11903 CVS revision in fileheader 	hholzgra
+Bug #12073 Issues with filenames containing spaces 	hholzgra
+Bug #12282 MOVE (rename) not properly urldecoded 	hholzgra
+Bug #12283 Double urldecode causes problems with filenames that have % or + 	hholzgra
+Bug #12500 Undefined variable: host in HTTP/WebDAV/Server.php line 1470 	hholzgra
+Bug #12602 Irrelevant 	NA 	Misspellings in API: pathes &gt; paths 	hholzgra
+Bug #13372 script name is appended to path 	hholzgra
+Bug #13809 Unhandled HTTP_CONTENT_* Headers 	hholzgra
+Bug #13920 http_LOCK() expects string, requires int 	hholzgra
+- License Change to the new BSD License
+- reverting wrong namespace default logic
+- whitespace fix in XML output
+- Getting rid of warning suppression by @ prefixes (PEAR Bug #10637)
+- added handling for Microsoft specific &apos;lastaccessed&apos; and &apos;ishidden&apos;
+- Fix for $uri variable gets set wrongly (PEAR Bug #10614)
    </notes>
   </release>
  </changelog>
