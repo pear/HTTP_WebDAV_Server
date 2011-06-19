@@ -1226,11 +1226,16 @@ class HTTP_WebDAV_Server
                         return;
                     }
                     
-                    $range = array("start"=>$matches[1], "end"=>$matches[2]);
+                    $range = array("start" => $matches[1], "end" => $matches[2]);
                     if (is_numeric($matches[3])) {
                         $range["total_length"] = $matches[3];
                     }
-                    $option["ranges"][] = $range;
+
+                    if (!isset($options['ranges'])) {
+                        $options['ranges'] = array(); 
+                    }
+
+                    $options["ranges"][] = $range;
 
                     // TODO make sure the implementation supports partial PUT
                     // this has to be done in advance to avoid data being overwritten
@@ -1268,24 +1273,43 @@ class HTTP_WebDAV_Server
 
                 if (!empty($options["ranges"])) {
                     // TODO multipart support is missing (see also above)
-                    if (0 == fseek($stream, $range[0]["start"], SEEK_SET)) {
-                        $length = $range[0]["end"]-$range[0]["start"]+1;
-                        if (!fwrite($stream, fread($options["stream"], $length))) {
-                            $stat = "403 Forbidden"; 
+                    if (0 == fseek($stream, $options['ranges'][0]["start"], SEEK_SET)) {
+                        $length = $options['ranges'][0]["end"] - $options['ranges'][0]["start"]+1;
+                        
+                        while (!feof($options['stream'])) {
+                            if ($length <= 0) {
+                               break;
+                            }
+
+                            if ($length <= 8192) {
+                                $data = fread($options['stream'], $length);
+                            } else {
+                                $data = fread($options['stream'], 8192);
+                            }
+
+                            if ($data === false) {
+                                $stat = "400 Bad request";
+                            } elseif (strlen($data)) {
+                                if (false === fwrite($stream, $data)) {
+                                    $stat = "403 Forbidden";
+                                    break;
+                                }
+                                $length -= strlen($data);
+                            }
                         }
                     } else {
                         $stat = "403 Forbidden"; 
                     }
                 } else {
                     while (!feof($options["stream"])) {
-                        if (false === fwrite($stream, fread($options["stream"], 4096))) {
-                            $stat = "403 Forbidden"; 
+                        if (false === fwrite($stream, fread($options["stream"], 8192))) {
+                            $stat = "403 Forbidden";
                             break;
                         }
                     }
                 }
 
-                fclose($stream);            
+                fclose($stream);
             } 
 
             $this->http_status($stat);
