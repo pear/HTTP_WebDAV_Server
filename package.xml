@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.9.0" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<package packagerversion="1.9.3" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>HTTP_WebDAV_Server</name>
  <channel>pear.php.net</channel>
  <summary>WebDAV Server Baseclass.</summary>
@@ -16,10 +16,10 @@
   <email>chregu@bitflux.ch</email>
   <active>yes</active>
  </lead>
- <date>2010-10-05</date>
- <time>21:15:37</time>
+ <date>2011-06-19</date>
+ <time>22:36:48</time>
  <version>
-  <release>1.0.0RC5</release>
+  <release>1.0.0RC6</release>
   <api>1.0.0RC5</api>
  </version>
  <stability>
@@ -29,39 +29,16 @@
  <license>New BSD License</license>
  <notes>
 QA Release
-Bug #1949 $_prop_encoding not used for $file[&apos;path&apos;] 	hholzgra
-Bug #2464 Missing return in http_GET() 	hholzgra
-Bug #6189 Various international filename issues 	hholzgra
-Bug #9367 Example Fileserver shows wrong uri for folders 	hholzgra
-Bug #10107 WebDAV Server only works with mod_php 	hholzgra
-Bug #10238 DELETE method in Filesystem.php breaks when path contains space character 	hholzgra
-Bug #10614 $uri variable gets set wrongly 	hholzgra
-Bug #10632 support D:lastaccessed as date field 	hholzgra
-Bug #10637 HTTP_WebDav_Server is throwing E_NOTICE&apos;s 	jorrit
-Bug #11069 download broken if mbstring.func_overload &amp; 2 and utf-8 charset 	hholzgra
-Bug #11070 broken GET with mbstring.func_overload &amp; 2 	hholzgra
-Bug #11816 Fatal error when locking 	hholzgra
-Bug #11902 Implement HEAD in Filesystem and Reuse in GET 	hholzgra
-Bug #11903 CVS revision in fileheader 	hholzgra
-Bug #12073 Issues with filenames containing spaces 	hholzgra
-Bug #12282 MOVE (rename) not properly urldecoded 	hholzgra
-Bug #12283 Double urldecode causes problems with filenames that have % or + 	hholzgra
-Bug #12500 Undefined variable: host in HTTP/WebDAV/Server.php line 1470 	hholzgra
-Bug #12602 Irrelevant 	NA 	Misspellings in API: pathes &gt; paths 	hholzgra
-Bug #13372 script name is appended to path 	hholzgra
-Bug #13809 Unhandled HTTP_CONTENT_* Headers 	hholzgra
-Bug #13920 http_LOCK() expects string, requires int 	hholzgra
-- License Change to the new BSD License
-- reverting wrong namespace default logic
-- whitespace fix in XML output
-- Getting rid of warning suppression by @ prefixes (PEAR Bug #10637)
-- added handling for Microsoft specific &apos;lastaccessed&apos; and &apos;ishidden&apos;
-- Fix for $uri variable gets set wrongly (PEAR Bug #10614)
+Fix dir structure
+Bug #14163 Content-range is not processed (Hiroaki Kawai)
+
+Bug #14242 Uploaded file will be broken (Hiroaki Kawai)
  </notes>
  <contents>
-  <dir baseinstalldir="HTTP/WebDAV" name="/">
+  <dir baseinstalldir="/" name="/">
    <file baseinstalldir="HTTP/WebDAV" md5sum="906a69b17aaeeb4d69ddae46bbcb9195" name="db/Fileserver.sql" role="doc" />
-   <file baseinstalldir="HTTP/WebDAV" md5sum="a2dc47ca79d0663bc1468d7acdea398e" name="Server/Filesystem.php" role="php" />
+   <file baseinstalldir="/" md5sum="527721a5182391543c9757287c0a8eb3" name="HTTP/WebDAV/Server.php" role="php" />
+   <file baseinstalldir="/" md5sum="a2dc47ca79d0663bc1468d7acdea398e" name="HTTP/WebDAV/Server/Filesystem.php" role="php" />
    <file baseinstalldir="HTTP/WebDAV" md5sum="aaa6019bfe483b7cf88b98680d9b5bbf" name="tests/split_log.php" role="test" />
    <file baseinstalldir="HTTP/WebDAV" md5sum="d37fb492f53245ff93dae30f06ac30a4" name="tests/test.sh" role="test" />
    <file baseinstalldir="HTTP/WebDAV" md5sum="dd37396af7cd967841cc160788c90cb1" name="Tools/_parse_lockinfo.php" role="php" />
@@ -74,7 +51,6 @@ Bug #13920 http_LOCK() expects string, requires int 	hholzgra
    <file baseinstalldir="HTTP/WebDAV" md5sum="2a2dae8f62ff0573400d1221dea14d3c" name="file.php" role="php" />
    <file baseinstalldir="HTTP/WebDAV" md5sum="534efadb5423d9ad817cdbf8e3cdb58b" name="LICENSE" role="doc" />
    <file baseinstalldir="HTTP/WebDAV" md5sum="e6f0ca3d7e4fa2b20310995f269c3ef2" name="README" role="doc" />
-   <file baseinstalldir="HTTP/WebDAV" md5sum="1a2fb23828540874bfd01d2b3849bd71" name="Server.php" role="php" />
    <file baseinstalldir="HTTP/WebDAV" md5sum="559b64969ec9c4a406893f16b090ce9f" name="TODO" role="data" />
   </dir>
  </contents>
@@ -290,6 +266,25 @@ Bug #13920 http_LOCK() expects string, requires int 	hholzgra
 - Getting rid of warning suppression by @ prefixes (PEAR Bug #10637)
 - added handling for Microsoft specific &apos;lastaccessed&apos; and &apos;ishidden&apos;
 - Fix for $uri variable gets set wrongly (PEAR Bug #10614)
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.0.0RC6</release>
+    <api>1.0.0RC5</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2011-06-19</date>
+   <license>New BSD License</license>
+   <notes>
+QA Release
+Fix dir structure
+Bug #14163 Content-range is not processed (Hiroaki Kawai)
+
+Bug #14242 Uploaded file will be broken (Hiroaki Kawai)
    </notes>
   </release>
  </changelog>
