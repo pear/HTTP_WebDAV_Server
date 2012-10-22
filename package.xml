@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.9.2" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<package packagerversion="1.9.4" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>HTTP_WebDAV_Server</name>
  <channel>pear.php.net</channel>
  <summary>WebDAV Server Baseclass.</summary>
@@ -16,10 +16,10 @@
   <email>chregu@bitflux.ch</email>
   <active>yes</active>
  </lead>
- <date>2012-02-15</date>
- <time>22:19:31</time>
+ <date>2012-10-22</date>
+ <time>12:58:57</time>
  <version>
-  <release>1.0.0RC7</release>
+  <release>1.0.0RC8</release>
   <api>1.0.0RC5</api>
  </version>
  <stability>
@@ -29,13 +29,13 @@
  <license>New BSD License</license>
  <notes>
 QA release
-Bug #18694 Filesystem.php GetDir wrongly encoded filesnames containing single quotes
+Bug #19664	PHP Parse error: syntax error, unexpected &apos;&quot;&apos; on line 559 (Filesystem.php)
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
    <file baseinstalldir="HTTP/WebDAV" md5sum="906a69b17aaeeb4d69ddae46bbcb9195" name="db/Fileserver.sql" role="doc" />
    <file baseinstalldir="/" md5sum="e29445be3c91bf152229bb636000dbe6" name="HTTP/WebDAV/Server.php" role="php" />
-   <file baseinstalldir="/" md5sum="101318610e39e19dc2113a96a332c1e5" name="HTTP/WebDAV/Server/Filesystem.php" role="php" />
+   <file baseinstalldir="/" md5sum="1f83a4adc235c5f2c9e79271543bd1f8" name="HTTP/WebDAV/Server/Filesystem.php" role="php" />
    <file baseinstalldir="HTTP/WebDAV" md5sum="aaa6019bfe483b7cf88b98680d9b5bbf" name="tests/split_log.php" role="test" />
    <file baseinstalldir="HTTP/WebDAV" md5sum="d37fb492f53245ff93dae30f06ac30a4" name="tests/test.sh" role="test" />
    <file baseinstalldir="HTTP/WebDAV" md5sum="a81f47027458af1676bbb1a1429f7001" name="Tools/_parse_lockinfo.php" role="php" />
@@ -298,6 +298,22 @@ Bug #14242 Uploaded file will be broken (Hiroaki Kawai)
    <notes>
 QA release
 Bug #18694 Filesystem.php GetDir wrongly encoded filesnames containing single quotes
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.0.0RC8</release>
+    <api>1.0.0RC5</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2012-10-22</date>
+   <license>New BSD License</license>
+   <notes>
+QA release
+Bug #19664	PHP Parse error: syntax error, unexpected &apos;&quot;&apos; on line 559 (Filesystem.php)
    </notes>
   </release>
  </changelog>
