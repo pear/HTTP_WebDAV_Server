@@ -13,7 +13,7 @@
     ],
     "autoload": {
         "psr-0": {
-            "HTTP_WebDAV_Server": "./"
+            "HTTP": "./"
         }
     },
     "description": "More info available on: http://pear.php.net/package/HTTP_WebDAV_Server",
