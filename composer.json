@@ -1,0 +1,36 @@
+{
+    "authors": [
+        {
+            "email": "hholzgra@php.net",
+            "name": "Hartmut Holzgraefe",
+            "role": "Lead"
+        },
+        {
+            "email": "chregu@bitflux.ch",
+            "name": "Christian Stocker",
+            "role": "Lead"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "HTTP": "./"
+        }
+    },
+    "description": "More info available on: http://pear.php.net/package/HTTP_WebDAV_Server",
+    "include-path": [
+        "./"
+    ],
+    "license": "New BSD License",
+    "name": "pear/http_webdav_server",
+    "support": {
+        "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=HTTP_WebDAV_Server",
+        "source": "https://github.com/pear/HTTP_WebDAV_Server"
+    },
+    "type": "library",
+    "require": {
+        "pear/pear_exception": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    }
+}
