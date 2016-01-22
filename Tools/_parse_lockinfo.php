@@ -89,7 +89,7 @@ class _parse_lockinfo
      * @param  string  path of stream to read
      * @access public
      */
-    function _parse_lockinfo($path) 
+    public function __construct($path)
     {
         // we assume success unless problems occur
         $this->success = true;

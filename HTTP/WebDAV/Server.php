@@ -127,7 +127,7 @@ class HTTP_WebDAV_Server
      *
      * @param void
      */
-    function HTTP_WebDAV_Server() 
+    public function __construct()
     {
         // PHP messages destroy XML output -> switch them off
         ini_set("display_errors", 0);
