@@ -1192,7 +1192,7 @@ class HTTP_WebDAV_Server
              (Not Implemented) response in such cases."
             */ 
             foreach ($this->_SERVER as $key => $val) {
-                if (strncmp($key, "HTTP_CONTENT", 11)) continue;
+                if (strncmp($key, "HTTP_CONTENT", 12)) continue;
                 switch ($key) {
                 case 'HTTP_CONTENT_ENCODING': // RFC 2616 14.11
                     // TODO support this if ext/zlib filters are available
