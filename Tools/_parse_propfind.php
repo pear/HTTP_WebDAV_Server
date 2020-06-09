@@ -72,7 +72,7 @@ class _parse_propfind
      *
      * @access public
      */
-    function _parse_propfind($path) 
+    public function __construct($path)
     {
         // success state flag
         $this->success = true;

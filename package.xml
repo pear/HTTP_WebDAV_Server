@@ -54,7 +54,7 @@ Bug #18694 Filesystem.php GetDir wrongly encoded filesnames containing single qu
  <dependencies>
   <required>
    <php>
-    <min>4.4</min>
+    <min>5.0</min>
    </php>
    <pearinstaller>
     <min>1.4.0b1</min>
